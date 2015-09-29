@@ -1,0 +1,275 @@
+import java_cup.runtime.*;
+
+/*
+   September 2015 - changed considerably to work with a limited Python syntax
+                    (authors: J. Cosel and J. Fix)
+ */
+
+/* MiniPython3 parser for CUP.  
+ * Copyright (C) 2015 J. M. Cosel (jmcosel@gmail.com)
+ * Modified from the Java 1.2 parser for CUP which had this copyright:
+ *    Copyright (C) 1998 C. Scott Ananian <cananian@alumni.princeton.edu>
+ *    This program is released under the terms of the GPL; see the file
+ *    COPYING for more details.  There is NO WARRANTY on this code.
+ */
+
+parser code  {: 
+  public void report_error(String message, Object info) {
+    StringBuilder m = new StringBuilder("Error ");
+
+    if (info instanceof java_cup.runtime.Symbol) 
+      m.append( "("+info.toString()+")" );
+     
+    m.append(" : "+message);
+   
+    System.out.println(m);
+  }
+   
+  public void report_fatal_error(String message, Object info) {
+    report_error(message, info);
+    throw new RuntimeException("Fatal Syntax Error");
+  }
+:};
+
+terminal BOOL;               // boolean type
+terminal INT;                // integer type
+terminal UNIT;               // integer type
+terminal LBRACK, RBRACK;     // array index or type annotation
+terminal DOT;                // field selector
+terminal SEMICOLON, COMMA, LBRACE, RBRACE, ASSIGN, LPAREN, RPAREN, COLON;
+terminal IMPORT;             // import declaration
+terminal IF, ELSE;           // conditional statement keywords
+terminal WHILE;              // loop keywords
+terminal RETURN;             // return
+terminal NEW;                // array creation
+terminal PLUS, MINUS, MULT;  // arithmetic
+terminal DIV, MOD;           // integer division
+terminal LT, GT, LEQ, GEQ;   // comparators
+terminal EQ, NEQ;            // equality
+terminal AND, OR, NOT;       // logical connectives
+
+terminal java.lang.Number INT_LITERAL;
+terminal java.lang.Boolean BOOL_LITERAL;
+terminal java.lang.String STRING_LITERAL;
+terminal java.lang.String IDENTIFIER;     // names
+terminal NONE_LITERAL;
+
+non terminal goal;
+non terminal literal;
+non terminal type, primitive_type, list_type, function_type;
+non terminal name, simple_name, qualified_name;
+non terminal compilation_unit;
+non terminal package_declaration_opt, package_declaration;
+non terminal import_declarations_opt, import_declarations;
+non terminal type_declarations_opt, type_declarations;
+non terminal import_declaration;
+non terminal single_type_import_declaration;
+non terminal type_import_on_demand_declaration;
+non terminal type_declaration;
+non terminal modifiers_opt, modifiers, modifier;
+non terminal class_declaration, super_cl, super_opt;
+non terminal interfaces, interfaces_opt, interface_type_list;
+non terminal class_body;
+non terminal class_body_declarations, class_body_declarations_opt;
+non terminal class_body_declaration, class_member_declaration;
+non terminal field_declaration, variable_declarators, variable_declarator;
+non terminal variable_declarator_id, variable_initializer;
+non terminal method_declaration, method_header, method_declarator;
+non terminal formal_parameter_list_opt, formal_parameter_list;
+non terminal formal_parameter;
+non terminal class_type_list, method_body;
+non terminal static_initializer;
+non terminal constructor_declaration, constructor_declarator;
+non terminal constructor_body;
+non terminal explicit_constructor_invocation;
+non terminal list_initializer;
+non terminal variable_initializers;
+non terminal block;
+non terminal block_statements_opt, block_statements, block_statement;
+non terminal local_variable_declaration_statement, local_variable_declaration;
+non terminal statement, statement_no_short_if;
+non terminal statement_without_trailing_substatement;
+non terminal empty_statement;
+non terminal labeled_statement, labeled_statement_no_short_if;
+non terminal expression_statement, statement_expression;
+non terminal if_then_statement;
+non terminal if_then_else_statement, if_then_else_statement_no_short_if;
+non terminal while_statement, while_statement_no_short_if;
+non terminal for_statement, for_statement_no_short_if;
+non terminal statement_expression_list;
+non terminal identifier_opt;
+non terminal break_statement, continue_statement;
+non terminal return_statement, throw_statement;
+non terminal synchronized_statement, try_statement;
+non terminal catches_opt, catches, catch_clause;
+non terminal finally;
+// 19.12) Expressions
+non terminal primary, primary_no_new_array;
+non terminal class_instance_creation_expression;
+non terminal argument_list_opt, argument_list;
+non terminal array_creation_expression;
+non terminal dim_exprs, dim_expr, dims_opt, dims;
+non terminal field_access, method_invocation, array_access;
+non terminal postfix_expression;
+non terminal postincrement_expression, postdecrement_expression;
+non terminal unary_expression, unary_expression_not_plus_minus;
+non terminal preincrement_expression, predecrement_expression;
+non terminal cast_expression;
+non terminal multiplicative_expression, additive_expression;
+non terminal shift_expression, relational_expression, equality_expression;
+non terminal and_expression, exclusive_or_expression, inclusive_or_expression;
+non terminal conditional_and_expression, conditional_or_expression;
+non terminal conditional_expression, assignment_expression;
+non terminal assignment;
+non terminal left_hand_side;
+non terminal assignment_operator;
+non terminal expression_opt, expression;
+non terminal constant_expression;
+
+start with goal;
+
+// 19.2) The Syntactic Grammar
+goal ::=	compilation_unit
+	;
+
+// 19.3) Lexical Structure.
+literal ::=	INT_LITERAL
+	|	BOOL_LITERAL
+	|	STRING_LITERAL
+	|	NONE_LITERAL
+	;
+
+// 19.4) Types, Values, and Variables
+type	::=	primitive_type
+	|	reference_type
+	;
+
+primitive_type ::=
+		INT
+	|	BOOL
+    |   UNIT
+	;
+
+
+function_definition ::= IDENTIFIER LPAREN formal_parameter_list_opt RPAREN COLON block
+	;
+
+formal_parameter_list_opt ::=
+	|	formal_parameter_list
+	;
+
+formal_parameter_list ::=
+		formal_parameter
+	|	formal_parameter_list COMMA formal_parameter
+	;
+
+formal_parameter ::=
+		type IDENTIFIER
+	;
+
+block ::=	LBRACE block_statements RBRACE
+	;
+
+block_statements ::=
+		statement
+	|	statements statement
+	;
+
+statement ::=	
+	  type assignment SEMICOLON
+    | statement_expression SEMICOLON
+    | assignment SEMICOLON
+	| WHILE expression COLON block
+	| IF expression COLON block ELSE COLON block 
+    | RETURN expression_opt SEMICOLON
+	;
+
+assignment_expression ::=
+		conditional_expression
+	|	assignment
+	;
+
+argument_list_opt ::=
+	|	argument_list
+	;
+argument_list ::=
+		expression
+	|	argument_list COMMA expression
+	;
+
+pair_creation_expression ::=
+		NEW 
+	;
+
+pair_access ::=
+		primary DOT LEFT
+	|	primary DOT RIGHT
+	;
+
+postfix_expression ::=
+		primary
+	|	name
+	;
+unary_expression ::=
+	|	PLUS unary_expression
+	|	MINUS unary_expression
+	|	NOT unary_expression
+	;
+multiplicative_expression ::=
+		unary_expression
+	|	multiplicative_expression MULT unary_expression
+	|	multiplicative_expression DIV unary_expression
+	|	multiplicative_expression MOD unary_expression
+	;
+additive_expression ::=
+		multiplicative_expression
+	|	additive_expression PLUS multiplicative_expression
+	|	additive_expression MINUS multiplicative_expression
+	;
+comparison_expression ::=
+		shift_expression
+	|	relational_expression LT shift_expression
+	|	relational_expression GT shift_expression
+	|	relational_expression LEQ shift_expression
+	|	relational_expression GEQ shift_expression
+	;
+equality_expression ::=
+		relational_expression
+	|	equality_expression EQEQ relational_expression
+	|	equality_expression NOTEQ relational_expression
+	;
+
+inclusive_or_expression ::=
+		exclusive_or_expression
+	|	inclusive_or_expression OR exclusive_or_expression
+	;
+
+conditional_and_expression ::=
+		inclusive_or_expression
+	|	conditional_and_expression AND inclusive_or_expression
+	;
+conditional_or_expression ::=
+		conditional_and_expression
+	|	conditional_or_expression OR conditional_and_expression
+	;
+conditional_expression ::=
+		conditional_or_expression
+	|	conditional_or_expression QUESTION expression 
+			COLON conditional_expression
+	;
+
+assignment ::=	left_hand_side ASSIGN assignment_expression
+	;
+left_hand_side ::=
+		name
+	|	field_access
+	;
+
+expression_opt ::=
+	|	expression
+	;
+expression ::=	assignment_expression
+	;
+constant_expression ::=
+		expression
+	;
