@@ -13,7 +13,7 @@ javac *.java
 
 
 The parser can be tested with:
-java JavaParser <inputfiles>
+java TestParser <inputfiles>
 
 The scanner (without parser attached) can be test with:
 java TestLexer <inputfiles>
@@ -32,7 +32,7 @@ minipython.flex
 minipython.cup
   CUP specification for the "MiniPython" parser
   
-JavaParser.java
+TestParser.java
   a simple main class to run the parser (no other useful output though)
 
 TestLexer.java
