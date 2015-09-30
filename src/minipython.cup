@@ -2,11 +2,11 @@ import java_cup.runtime.*;
 
 /*
    September 2015 - changed considerably to work with a limited Python syntax
-                    (authors: J. Cosel and J. Fix)
+                    (authors: Jeremy Cosel and James Fix)
  */
 
 /* MiniPython3 parser for CUP.  
- * Copyright (C) 2015 J. M. Cosel (jmcosel@gmail.com)
+ * Copyright (C) 2015 Jeremy Cosel (jcosel@reed.edu)
  * Modified from the Java 1.2 parser for CUP which had this copyright:
  *    Copyright (C) 1998 C. Scott Ananian <cananian@alumni.princeton.edu>
  *    This program is released under the terms of the GPL; see the file
@@ -33,7 +33,7 @@ parser code  {:
 
 terminal BOOL;               // boolean type
 terminal INT;                // integer type
-terminal UNIT;               // integer type
+terminal UNIT;               // none type
 terminal LBRACK, RBRACK;     // array index or type annotation
 terminal DOT;                // field selector
 terminal SEMICOLON, COMMA, LBRACE, RBRACE, ASSIGN, LPAREN, RPAREN, COLON;
@@ -59,25 +59,16 @@ non terminal literal;
 non terminal type, primitive_type, list_type, function_type;
 non terminal name, simple_name, qualified_name;
 non terminal compilation_unit;
-non terminal package_declaration_opt, package_declaration;
-non terminal import_declarations_opt, import_declarations;
 non terminal type_declarations_opt, type_declarations;
-non terminal import_declaration;
 non terminal single_type_import_declaration;
 non terminal type_import_on_demand_declaration;
 non terminal type_declaration;
 non terminal modifiers_opt, modifiers, modifier;
-non terminal class_declaration, super_cl, super_opt;
-non terminal interfaces, interfaces_opt, interface_type_list;
-non terminal class_body;
-non terminal class_body_declarations, class_body_declarations_opt;
-non terminal class_body_declaration, class_member_declaration;
 non terminal field_declaration, variable_declarators, variable_declarator;
 non terminal variable_declarator_id, variable_initializer;
 non terminal method_declaration, method_header, method_declarator;
 non terminal formal_parameter_list_opt, formal_parameter_list;
 non terminal formal_parameter;
-non terminal class_type_list, method_body;
 non terminal static_initializer;
 non terminal constructor_declaration, constructor_declarator;
 non terminal constructor_body;
@@ -235,8 +226,8 @@ comparison_expression ::=
 	;
 equality_expression ::=
 		relational_expression
-	|	equality_expression EQEQ relational_expression
-	|	equality_expression NOTEQ relational_expression
+	|	equality_expression EQ relational_expression
+	|	equality_expression NEQ relational_expression
 	;
 
 inclusive_or_expression ::=

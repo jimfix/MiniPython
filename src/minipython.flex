@@ -1,23 +1,16 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Copyright (C) 1998-2015  Gerwin Klein <lsf@jflex.de>                    *
+ * Modified by Jeremy Cosel & James Fix for Python                         *
  * All rights reserved.                                                    *
  *                                                                         *
  * License: BSD                                                            *
  *                                                                         *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* Java 1.2 language lexer specification */
+/* Python3 language lexer specification written in Java */
 
 /* Use together with unicode.flex for Unicode preprocesssing */
-/* and java12.cup for a Java 1.2 parser                      */
-
-/* Note that this lexer specification is not tuned for speed.
-   It is in fact quite slow on integer and floating point literals, 
-   because the input is read twice and the methods used to parse
-   the numbers are not very fast. 
-   For a production quality application (e.g. a Java compiler) 
-   this could be optimized */
-
+/* and minipython.cup for a Python parser                      */
 
 import java_cup.runtime.*;
 
@@ -39,11 +32,11 @@ import java_cup.runtime.*;
   StringBuilder string = new StringBuilder();
   
   private Symbol symbol(int type) {
-    return new JavaSymbol(type, yyline+1, yycolumn+1);
+    return new PythonSymbol(type, yyline+1, yycolumn+1);
   }
 
   private Symbol symbol(int type, Object value) {
-    return new JavaSymbol(type, yyline+1, yycolumn+1, value);
+    return new PythonSymbol(type, yyline+1, yycolumn+1, value);
   }
 
   /** 
@@ -80,25 +73,23 @@ EndOfLineComment = "#" {InputCharacter}* {LineTerminator}?
 /* identifiers */
 Identifier = [:jletter:][:jletterdigit:]*
 
-/* integer literals */
+/* integer literal */
 DecIntegerLiteral = 0 | [1-9][0-9]*
-DecLongLiteral    = {DecIntegerLiteral} [lL]
 
 /* string and character literals */
 DStringCharacter = [^\r\n\"\\]
 SStringCharacter = [^\r\n\'\\]
 
-%state STRING, CHARLITERAL
+%state STRING
 
 %%
 
 <YYINITIAL> {
 
   /* keywords */
-  "bool"                         { return symbol(BOOLEAN); }
+  "bool"                         { return symbol(BOOL); }
   "break"                        { return symbol(BREAK); }
   "continue"                     { return symbol(CONTINUE); }
-  "elif"                         { return symbol(ELIF); }
   "else"                         { return symbol(ELSE); }
   "except"                       { return symbol(EXCEPT); }
   "finally"                      { return symbol(FINALLY); }
@@ -137,8 +128,8 @@ SStringCharacter = [^\r\n\'\\]
   /* operators */
   "->"                           { return symbol(TO); }
   "="                            { return symbol(ASSIGN); }
-  ">"                            { return symbol(GTR); }
-  "<"                            { return symbol(LTR); }
+  ">"                            { return symbol(GT); }
+  "<"                            { return symbol(LT); }
   "not"                          { return symbol(NOT); }
   ":"                            { return symbol(COLON); }
   "=="                           { return symbol(EQ); }
@@ -174,10 +165,10 @@ SStringCharacter = [^\r\n\'\\]
 
 <DSTRING> {
   \"                             { yybegin(YYINITIAL); return symbol(STRING_LITERAL, string.toString()); }
-
+}
 <SSTRING> {
   \'                             { yybegin(YYINITIAL); return symbol(STRING_LITERAL, string.toString()); }
-   
+}  
   {DStringCharacter}+            { string.append( yytext() ); }
   {SStringCharacter}+            { string.append( yytext() ); }
  

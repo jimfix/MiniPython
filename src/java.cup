@@ -4,9 +4,6 @@ import java_cup.runtime.*;
 /* August 1999 - modified by Gerwin Klein <lsf@jflex.de>
                  to interface with JFlex scanners,
                  allows empty semicolon in class decls.
-
-   September 2015 - changed considerably to work with a limited Python syntax
-                    (authors: J. Cosel and J. Fix)
   
   changed productions:
 
@@ -29,12 +26,10 @@ import java_cup.runtime.*;
 */
 
 
-/* MiniPython3 parser for CUP.  
- * Copyright (C) 2015 J. M. Cosel (jmcosel@gmail.com)
- * Modified from the Java 1.2 parser for CUP which had this copyright:
- *    Copyright (C) 1998 C. Scott Ananian <cananian@alumni.princeton.edu>
- *    This program is released under the terms of the GPL; see the file
- *    COPYING for more details.  There is NO WARRANTY on this code.
+/* Java 1.2 parser for CUP.  
+ * Copyright (C) 1998 C. Scott Ananian <cananian@alumni.princeton.edu>
+ * This program is released under the terms of the GPL; see the file
+ * COPYING for more details.  There is NO WARRANTY on this code.
  */
 
 /*
