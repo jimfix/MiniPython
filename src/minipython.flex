@@ -80,7 +80,7 @@ DecIntegerLiteral = 0 | [1-9][0-9]*
 DStringCharacter = [^\r\n\"\\]
 SStringCharacter = [^\r\n\'\\]
 
-%state STRING
+%state DSTRING, SSTRING
 
 %%
 
@@ -165,16 +165,31 @@ SStringCharacter = [^\r\n\'\\]
 
 <DSTRING> {
   \"                             { yybegin(YYINITIAL); return symbol(STRING_LITERAL, string.toString()); }
+
+  {DStringCharacter}+            { string.append( yytext() ); }
+
+  /* escape sequences */
+  "\\b"                          { string.append( '\b' ); }
+  "\\t"                          { string.append( '\t' ); }
+  "\\n"                          { string.append( '\n' ); }
+  "\\f"                          { string.append( '\f' ); }
+  "\\r"                          { string.append( '\r' ); }
+  "\\\""                         { string.append( '\"' ); }
+  "\\'"                          { string.append( '\'' ); }
+  "\\\\"                         { string.append( '\\' ); }
+
+  
+  /* error cases */
+  \\.                            { throw new RuntimeException("Illegal escape sequence \""+yytext()+"\""); }
+  {LineTerminator}               { throw new RuntimeException("Unterminated string at end of line"); }
 }
+
 <SSTRING> {
   \'                             { yybegin(YYINITIAL); return symbol(STRING_LITERAL, string.toString()); }
-}  
-  {DStringCharacter}+            { string.append( yytext() ); }
+ 
   {SStringCharacter}+            { string.append( yytext() ); }
  
   /* escape sequences */
-  "'"                            { string.append( '\'' ); }
-  "\""                           { string.append( '"' ); }
   "\\b"                          { string.append( '\b' ); }
   "\\t"                          { string.append( '\t' ); }
   "\\n"                          { string.append( '\n' ); }
