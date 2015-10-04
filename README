@@ -11,11 +11,10 @@ jflex minipython.flex
 java java_cup.Main -interface < minipython.cup
 javac *.java
 
-
 The parser can be tested with:
 java TestParser <inputfiles>
 
-The scanner (without parser attached) can be test with:
+The scanner (without parser attached) can be tested with:
 java TestLexer <inputfiles>
 
 
@@ -30,13 +29,13 @@ minipython.flex
   JFlex specification for the "MiniPython" lexer.
 
 minipython.cup
-  CUP specification for the "MiniPython" parser
+  CUP specification for the "MiniPython" parser.
   
 TestParser.java
-  a simple main class to run the parser (no other useful output though)
+  a simple main class to run the parser (no other useful output though).
 
 TestLexer.java
-  a simple test driver for the scanner, produces debug output
+  a simple test driver for the scanner; produces debug output.
 
 lexer-output.good
-  lexer output for input file TestLexer.java for testing
+  lexer output for input file TestLexer.java, for testing.
