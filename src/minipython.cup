@@ -54,27 +54,39 @@ terminal java.lang.String STRING_LITERAL;
 terminal java.lang.String IDENTIFIER;     // names
 terminal NONE_LITERAL;
 
+// 19.2) The Syntactic Grammar
 non terminal goal;
+// 19.3) Lexical Structure
 non terminal literal;
+// 19.4) Types, Values, and Variables
 non terminal type, primitive_type, list_type, function_type;
+// 19.5) Names
 non terminal name, simple_name, qualified_name;
+// 19.6) Packages
 non terminal compilation_unit;
 non terminal type_declarations_opt, type_declarations;
 non terminal single_type_import_declaration;
 non terminal type_import_on_demand_declaration;
 non terminal type_declaration;
+// 19.7) Productions used only in the LALR(1) grammar
 non terminal modifiers_opt, modifiers, modifier;
+// 19.8.2) Field Declarations
 non terminal field_declaration, variable_declarators, variable_declarator;
 non terminal variable_declarator_id, variable_initializer;
-non terminal method_declaration, method_header, method_declarator;
+// 19.8.3) Method Declarations
+non terminal method_declaration, method_header, method_body, method_declarator;
 non terminal formal_parameter_list_opt, formal_parameter_list;
 non terminal formal_parameter;
+// 19.8.4) Static Initializers
 non terminal static_initializer;
+// 19.8.5) Constructor Declarations
 non terminal constructor_declaration, constructor_declarator;
 non terminal constructor_body;
 non terminal explicit_constructor_invocation;
+// 19.10) Lists
 non terminal list_initializer;
 non terminal variable_initializers;
+// 19.11) Blocks and Statements
 non terminal block;
 non terminal block_statements_opt, block_statements, block_statement;
 non terminal local_variable_declaration_statement, local_variable_declaration;
@@ -107,7 +119,7 @@ non terminal unary_expression, unary_expression_not_plus_minus;
 non terminal preincrement_expression, predecrement_expression;
 non terminal cast_expression;
 non terminal multiplicative_expression, additive_expression;
-non terminal shift_expression, relational_expression, equality_expression;
+non terminal shift_expression, comparison_expression, equality_expression;
 non terminal and_expression, exclusive_or_expression, inclusive_or_expression;
 non terminal conditional_and_expression, conditional_or_expression;
 non terminal conditional_expression, assignment_expression;
@@ -132,19 +144,47 @@ literal ::=	INT_LITERAL
 
 // 19.4) Types, Values, and Variables
 type	::=	primitive_type
-	|	reference_type
 	;
-
 primitive_type ::=
 		INT
 	|	BOOL
     |   UNIT
 	;
 
-
 function_definition ::= IDENTIFIER LPAREN formal_parameter_list_opt RPAREN COLON block
 	;
+// 19.8.2) Field Declarations
+field_declaration ::= 
+		modifiers_opt type variable_declarators SEMICOLON
+	;
+variable_declarators ::=
+		variable_declarator
+	|	variable_declarators COMMA variable_declarator
+	;
+variable_declarator ::=
+		variable_declarator_id
+	|	variable_declarator_id EQ variable_initializer
+	;
+variable_declarator_id ::=
+		IDENTIFIER
+	|	variable_declarator_id LBRACK RBRACK
+	;
+variable_initializer ::=
+		expression
+	;
 
+// 19.8.3) Method Declarations
+method_declaration ::=
+		method_header method_body
+	;
+method_header ::=
+		modifiers_opt type method_declarator
+	;
+method_declarator ::=
+		IDENTIFIER LPAREN formal_parameter_list_opt RPAREN
+	|	method_declarator LBRACK RBRACK // deprecated
+	// be careful; the above production also allows 'void foo() []'
+	;
 formal_parameter_list_opt ::=
 	|	formal_parameter_list
 	;
@@ -158,15 +198,16 @@ formal_parameter ::=
 		type IDENTIFIER
 	;
 
+// 19.11) Blocks and Statements
 block ::=	LBRACE block_statements RBRACE
 	;
 
 block_statements ::=
-		statement
-	|	statements statement
+		block_statement
+	|	block_statements statement
 	;
 
-statement ::=	
+block_statement ::=	
 	  type assignment SEMICOLON
     | statement_expression SEMICOLON
     | assignment SEMICOLON
@@ -197,6 +238,7 @@ pair_access ::=
 	|	primary DOT RIGHT
 	;
 
+// 19.12) Expressions
 postfix_expression ::=
 		primary
 	|	name
@@ -219,15 +261,15 @@ additive_expression ::=
 	;
 comparison_expression ::=
 		shift_expression
-	|	relational_expression LT shift_expression
-	|	relational_expression GT shift_expression
-	|	relational_expression LEQ shift_expression
-	|	relational_expression GEQ shift_expression
+	|	comparison_expression LT shift_expression
+	|	comparison_expression GT shift_expression
+	|	comparison_expression LEQ shift_expression
+	|	comparison_expression GEQ shift_expression
 	;
 equality_expression ::=
-		relational_expression
-	|	equality_expression EQ relational_expression
-	|	equality_expression NEQ relational_expression
+		comparison_expression
+	|	equality_expression EQ comparison_expression
+	|	equality_expression NEQ comparison_expression
 	;
 
 inclusive_or_expression ::=
