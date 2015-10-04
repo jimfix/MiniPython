@@ -151,7 +151,7 @@ SStringCharacter = [^\r\n\'\\]
 
   /* numeric literals */
 
-  {DecIntegerLiteral}            { return symbol(INTEGER_LITERAL, new Integer(yytext())); }
+  {DecIntegerLiteral}            { return symbol(INT_LITERAL, new Integer(yytext())); }
   
   /* comments */
   {Comment}                      { /* ignore */ }
