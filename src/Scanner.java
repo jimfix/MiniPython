@@ -952,7 +952,7 @@ public class Scanner implements sym, java_cup.runtime.Scanner {
             }
           case 69: break;
           case 5: 
-            { return symbol(INTEGER_LITERAL, new Integer(yytext()));
+            { return symbol(INT_LITERAL, new Integer(yytext()));
             }
           case 70: break;
           case 6: 
