@@ -31,7 +31,7 @@ parser code  {:
   }
 :};
 
-// Terminals
+/* Terminals */
 
 terminal ASSIGN;                       // assignment keyword
 terminal PRINT;
@@ -58,7 +58,7 @@ terminal java.lang.String STRING_LITERAL;
 terminal java.lang.String IDENTIFIER;     // names
 terminal NONE_LITERAL;
 
-// Variables
+/* Variables */
 
 non terminal program;
 non terminal statement, statement_list;
@@ -77,9 +77,20 @@ non terminal postfix;
 non terminal name, name_list;
 non terminal definition, definition_list;
 
+/* Precedences */
+
+precedence left IF, ELSE;
+precedence left OR;
+precedence left AND;
+precedence left NOT;
+precedence left LT, GT, LEQ, GEQ, NEQ, EQ;
+precedence left PLUS, MINUS;
+precedence left MULT, DIV, MOD;
+
+/* The Grammar Rules */
+
 start with program;
 
-// 19.2) The Syntactic Grammar
 program	::= definition_list block
     | block
 	;
@@ -96,8 +107,8 @@ block ::= LBRACE RBRACE
     |   LBRACE statement_list RBRACE
     ;
 
-statement_list ::= statement statement_list
-    |   statement
+statement_list ::= statement
+    |   statement statement_list
     ;
 
 statement ::= assignment
@@ -113,16 +124,16 @@ if_statement ::= IF expression COLON block ELSE COLON block;
 
 while_statement ::= WHILE expression COLON block;
 
-return_statement ::= RETURN expression
-    |   RETURN
+return_statement ::= RETURN
+    |   RETURN expression
     ;
 
-call_statement ::= name LPAREN expression_list RPAREN
-    |   name LPAREN RPAREN
+call_statement ::= name LPAREN RPAREN
+    |   name LPAREN expression_list RPAREN
     ;
 
-expression_list ::= expression COMMA expression_list
-    |   expression
+expression_list ::= expression
+    |   expression COMMA expression_list
     ;
 
 expression ::= expression postfix
