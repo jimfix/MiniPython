@@ -74,7 +74,6 @@ non terminal expression, expression_list;
 non terminal binop;
 non terminal unop;
 non terminal postfix;
-non terminal event;
 non terminal name, name_list;
 non terminal definition, definition_list;
 
