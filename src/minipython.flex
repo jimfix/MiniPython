@@ -87,10 +87,6 @@ SStringCharacter = [^\r\n\'\\]
 <YYINITIAL> {
 
   /* type keywords */
-  "bool"                         { return symbol(BOOL); }
-  "int"                          { return symbol(INT); }
-  "string"                       { return symbol(STRING); }
-  "unit"                         { return symbol(UNIT); }
   "print"                        { return symbol(PRINT); }
   "input"                        { return symbol(INPUT); }
   
@@ -98,7 +94,6 @@ SStringCharacter = [^\r\n\'\\]
   "def"                          { return symbol(DEF); }
   "new"                          { return symbol(NEW); }
   "return"                       { return symbol(RETURN); }
-  "x"                            { return symbol(CROSS); }
   
   /* conditional keywords */
   "if"                           { return symbol(IF); }
@@ -125,7 +120,6 @@ SStringCharacter = [^\r\n\'\\]
   "."                            { return symbol(DOT); }
   
   /* operators */
-  "->"                           { return symbol(TO); }
   "="                            { return symbol(ASSIGN); }
   ">"                            { return symbol(GT); }
   "<"                            { return symbol(LT); }
