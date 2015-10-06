@@ -31,23 +31,26 @@ parser code  {:
   }
 :};
 
-terminal BOOL;               // boolean type
-terminal INT;                // integer type
-terminal UNIT;               // none type
-terminal LBRACK, RBRACK;     // array index or type annotation
-terminal DOT;                // field selector
-terminal SEMICOLON, COMMA, LBRACE, RBRACE, ASSIGN, LPAREN, RPAREN, COLON;
-terminal IMPORT;             // import declaration
-terminal IF, ELSE;           // conditional statement keywords
-terminal WHILE;              // loop keywords
-terminal RETURN;             // return
-terminal NEW;                // array creation
-terminal PLUS, MINUS, MULT;  // arithmetic
-terminal DIV, MOD;           // integer division
-terminal LT, GT, LEQ, GEQ;   // comparators
-terminal EQ, NEQ;            // equality
-terminal AND, OR, NOT;       // logical connectives
-terminal LEFT, RIGHT;        // pair access
+// Terminals
+
+terminal ASSIGN;                       // assignment keyword
+terminal PRINT;
+terminal INPUT;
+terminal LPAREN, RPAREN;
+terminal LBRACE, RBRACE;
+terminal LBRACK, RBRACK;               // array index or type annotation
+terminal DOT;                          // field selector
+terminal SEMICOLON, COMMA, COLON;      // separators
+terminal IF, ELSE;                     // conditional statement keywords
+terminal WHILE;                        // loop keyword
+terminal DEF;                          // definition keyword
+terminal RETURN;                       // return keyword
+terminal NEW;                          // creation keyword
+terminal PLUS, MINUS, MULT, DIV, MOD;  // arithmetic
+terminal LT, GT, LEQ, GEQ;             // comparators
+terminal EQ, NEQ;                      // equality
+terminal AND, OR, NOT;                 // logical connectives
+terminal LEFT, RIGHT;                  // pair access
 
 terminal java.lang.Number INT_LITERAL;
 terminal java.lang.Boolean BOOL_LITERAL;
@@ -55,216 +58,119 @@ terminal java.lang.String STRING_LITERAL;
 terminal java.lang.String IDENTIFIER;     // names
 terminal NONE_LITERAL;
 
-// 19.2) The Syntactic Grammar
-non terminal goal;
-// 19.3) Lexical Structure
-non terminal literal;
-// 19.4) Types, Values, and Variables
-non terminal type, primitive_type;
-// 19.5) Names
-non terminal name;
-// 19.6) Packages
-non terminal compilation_unit;
-// 19.8.2) Field Declarations
-non terminal field_declaration, variable_declarators, variable_declarator;
-non terminal variable_declarator_id, variable_initializer;
-// 19.8.3) Function Declarations
-non terminal function_declaration;
-non terminal formal_parameter_list_opt, formal_parameter_list;
-non terminal formal_parameter;
-// 19.11) Blocks and Statements
-non terminal block;
-non terminal block_statements_opt, block_statements, block_statement;
-non terminal local_variable_declaration_statement, local_variable_declaration;
-non terminal statement, statement_no_short_if;
-non terminal statement_without_trailing_substatement;
-non terminal empty_statement;
-non terminal labeled_statement, labeled_statement_no_short_if;
-non terminal expression_statement, statement_expression;
-non terminal if_then_statement;
-non terminal if_then_else_statement, if_then_else_statement_no_short_if;
-non terminal while_statement, while_statement_no_short_if;
-non terminal for_statement, for_statement_no_short_if;
-non terminal statement_expression_list;
-non terminal identifier_opt;
-non terminal break_statement, continue_statement;
-non terminal return_statement, throw_statement;
-non terminal synchronized_statement, try_statement;
-non terminal catches_opt, catches, catch_clause;
-non terminal finally;
-non terminal pair_creation_expression, pair_access;
-// 19.12) Expressions
-non terminal primary, primary_no_new_array;
-non terminal class_instance_creation_expression;
-non terminal argument_list_opt, argument_list;
-non terminal array_creation_expression;
-non terminal dim_exprs, dim_expr, dims_opt, dims;
-non terminal field_access, method_invocation, array_access;
-non terminal postfix_expression;
-non terminal postincrement_expression, postdecrement_expression;
-non terminal unary_expression, unary_expression_not_plus_minus;
-non terminal preincrement_expression, predecrement_expression;
-non terminal cast_expression;
-non terminal multiplicative_expression, additive_expression;
-non terminal shift_expression, comparison_expression, equality_expression;
-non terminal and_expression, exclusive_or_expression, inclusive_or_expression;
-non terminal conditional_and_expression, conditional_or_expression;
-non terminal conditional_expression, assignment_expression;
+// Variables
+
+non terminal program;
+non terminal statement, statement_list;
 non terminal assignment;
-non terminal left_hand_side;
-non terminal assignment_operator;
-non terminal expression_opt, expression;
-non terminal constant_expression;
+non terminal call_statement;
+non terminal literal;
+non terminal lhs;
+non terminal return_statement;
+non terminal if_statement;
+non terminal while_statement;
+non terminal block;
+non terminal expression, expression_list;
+non terminal binop;
+non terminal unop;
+non terminal postfix;
+non terminal event;
+non terminal name, name_list;
+non terminal definition, definition_list;
 
-start with goal;
+start with program;
 
 // 19.2) The Syntactic Grammar
-goal	::= compilation_unit
+program	::= definition_list block
+    | block
 	;
 
-// 19.3) Lexical Structure.
+definition_list ::= definition
+    |   definition definition_list
+    ;
+
+definition ::= DEF IDENTIFIER LPAREN RPAREN COLON block
+    |   DEF IDENTIFIER LPAREN name_list RPAREN COLON block
+    ;
+
+block ::= LBRACE RBRACE
+    |   LBRACE statement_list RBRACE
+    ;
+
+statement_list ::= statement statement_list
+    |   statement
+    ;
+
+statement ::= assignment
+    |   if_statement
+    |   while_statement
+    |   return_statement
+    |   call_statement
+    ;
+
+assignment ::= lhs ASSIGN expression;
+
+if_statement ::= IF expression COLON block ELSE COLON block;
+
+while_statement ::= WHILE expression COLON block;
+
+return_statement ::= RETURN expression
+    |   RETURN
+    ;
+
+call_statement ::= name LPAREN expression_list RPAREN
+    |   name LPAREN RPAREN
+    ;
+
+expression_list ::= expression COMMA expression_list
+    |   expression
+    ;
+
+expression ::= expression postfix
+    |   expression binop expression
+    |   unop expression
+    |   name LPAREN expression_list RPAREN
+    |   name LPAREN RPAREN
+    |   literal
+    |   NEW
+    |   name
+    |   LPAREN expression RPAREN
+    ;
+
+binop ::= AND
+    |   OR
+    |   PLUS
+    |   MINUS
+    |   MULT
+    |   DIV
+    |   MOD
+    |   LT
+    |   GT
+    |   EQ
+    |   NEQ
+    |   GEQ
+    |   LEQ
+    ;
+
+unop ::= MINUS
+    |   NOT
+    ;
+
+postfix ::= DOT LEFT
+    |   DOT RIGHT
+    ;
+
+lhs ::= IDENTIFIER
+    |   lhs postfix
+    ;
+
+name ::= IDENTIFIER
+    |   PRINT
+    |   INPUT
+    ;
+
 literal ::=	INT_LITERAL
 	|	BOOL_LITERAL
 	|	STRING_LITERAL
 	|	NONE_LITERAL
-	;
-
-// 19.4) Types, Values, and Variables
-type	::=	primitive_type
-	;
-primitive_type ::=
-		INT
-	|	BOOL
-    |   UNIT
-	;
-
-// 19.8.2) Field Declarations
-field_declaration ::= 
-		type variable_declarators SEMICOLON
-	;
-variable_declarators ::=
-		variable_declarator
-	|	variable_declarators COMMA variable_declarator
-	;
-variable_declarator ::=
-		variable_declarator_id
-	|	variable_declarator_id EQ variable_initializer
-	;
-variable_declarator_id ::=
-		IDENTIFIER
-	|	variable_declarator_id LBRACK RBRACK
-	;
-variable_initializer ::=
-		expression
-	;
-
-// 19.8.3) Function Declarations
-function_declaration ::= IDENTIFIER LPAREN formal_parameter_list_opt RPAREN COLON block
-	;
-formal_parameter_list_opt ::=
-	|	formal_parameter_list
-	;
-formal_parameter_list ::=
-		formal_parameter
-	|	formal_parameter_list COMMA formal_parameter
-	;
-formal_parameter ::=
-		type IDENTIFIER
-	;
-
-// 19.11) Blocks and Statements
-block ::=	LBRACE block_statements RBRACE
-	;
-block_statements ::=
-		block_statement
-	|	block_statements statement
-	;
-block_statement ::=	
-	  type assignment SEMICOLON
-    | statement_expression SEMICOLON
-    | assignment SEMICOLON
-	| WHILE expression COLON block
-	| IF expression COLON block ELSE COLON block 
-    | RETURN expression_opt SEMICOLON
-	;
-assignment_expression ::=
-		conditional_expression
-	|	assignment
-	;
-argument_list_opt ::=
-	|	argument_list
-	;
-argument_list ::=
-		expression
-	|	argument_list COMMA expression
-	;
-pair_creation_expression ::=
-		NEW 
-	;
-pair_access ::=
-		primary DOT LEFT
-	|	primary DOT RIGHT
-	;
-
-// 19.12) Expressions
-postfix_expression ::=
-		primary
-	|	name
-	;
-unary_expression ::=
-	|	PLUS unary_expression
-	|	MINUS unary_expression
-	|	NOT unary_expression
-	;
-multiplicative_expression ::=
-		unary_expression
-	|	multiplicative_expression MULT unary_expression
-	|	multiplicative_expression DIV unary_expression
-	|	multiplicative_expression MOD unary_expression
-	;
-additive_expression ::=
-		multiplicative_expression
-	|	additive_expression PLUS multiplicative_expression
-	|	additive_expression MINUS multiplicative_expression
-	;
-comparison_expression ::=
-		shift_expression
-	|	comparison_expression LT shift_expression
-	|	comparison_expression GT shift_expression
-	|	comparison_expression LEQ shift_expression
-	|	comparison_expression GEQ shift_expression
-	;
-equality_expression ::=
-		comparison_expression
-	|	equality_expression EQ comparison_expression
-	|	equality_expression NEQ comparison_expression
-	;
-inclusive_or_expression ::=
-		exclusive_or_expression
-	|	inclusive_or_expression OR exclusive_or_expression
-	;
-conditional_and_expression ::=
-		inclusive_or_expression
-	|	conditional_and_expression AND inclusive_or_expression
-	;
-conditional_or_expression ::=
-		conditional_and_expression
-	|	conditional_or_expression OR conditional_and_expression
-	;
-conditional_expression ::=
-		conditional_or_expression
-	;
-assignment ::=	left_hand_side ASSIGN assignment_expression
-	;
-left_hand_side ::=
-		name
-	|	field_access
-	;
-expression_opt ::=
-	|	expression
-	;
-expression ::=	assignment_expression
-	;
-constant_expression ::=
-		expression
 	;

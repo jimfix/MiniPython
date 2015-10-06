@@ -86,25 +86,24 @@ SStringCharacter = [^\r\n\'\\]
 
 <YYINITIAL> {
 
-  /* keywords */
+  /* type keywords */
   "bool"                         { return symbol(BOOL); }
-  "break"                        { return symbol(BREAK); }
-  "continue"                     { return symbol(CONTINUE); }
-  "else"                         { return symbol(ELSE); }
-  "except"                       { return symbol(EXCEPT); }
-  "finally"                      { return symbol(FINALLY); }
-  "for"                          { return symbol(FOR); }
-  "import"                       { return symbol(IMPORT); }
   "int"                          { return symbol(INT); }
+  "string"                       { return symbol(STRING); }
+  "unit"                         { return symbol(UNIT); }
+  "print"                        { return symbol(PRINT); }
+  "input"                        { return symbol(INPUT); }
+  
+  /* assignment keywords */
+  "def"                          { return symbol(DEF); }
   "new"                          { return symbol(NEW); }
-  "if"                           { return symbol(IF); }
-  "raise"                        { return symbol(RAISE); }
   "return"                       { return symbol(RETURN); }
-  "while"                        { return symbol(WHILE); }
-  "throws"                       { return symbol(THROWS); }
-  "try"                          { return symbol(TRY); }
   "x"                            { return symbol(CROSS); }
-  "list"                         { return symbol(LIST); }
+  
+  /* conditional keywords */
+  "if"                           { return symbol(IF); }
+  "else"                         { return symbol(ELSE); }
+  "while"                        { return symbol(WHILE); }
   
   /* boolean literals */
   "True"                         { return symbol(BOOL_LITERAL, true); }
