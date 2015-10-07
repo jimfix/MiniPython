@@ -102,6 +102,7 @@ name_list ::= name_list COMMA name
 statement ::= assignment
     |   if_statement
     |   while_statement
+    | 	expression
     ;
 
 assignment ::= name ASSIGN expression;
