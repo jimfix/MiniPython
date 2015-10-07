@@ -83,33 +83,33 @@ precedence left MULT, DIV, MOD;
 
 start with program;
 
-program	::= definition_list statement_list;
+program  ::= definition_list statement_list;
 
 definition_list ::= definition definition_list
-	|	/* empty */
+    |  /* empty */
     ;
 
 statement_list ::= statement_list statement
-    |	/* empty */
+    |  /* empty */
     ;
 
 definition ::= DEF name LPAREN name_list RPAREN COLON;
 
 name_list ::= name_list COMMA name
-	|	/* empty */
-	;
+    |  /* empty */
+    ;
 
 statement ::= assignment
     |   if_statement
     |   while_statement
-    | 	expression
+    |   expression
     ;
 
 assignment ::= name ASSIGN expression;
 
 if_statement ::= IF expression COLON statement
-	|	IF expression COLON statement ELSE COLON statement
-	;
+    |  IF expression COLON statement ELSE COLON statement
+    ;
 
 while_statement ::= WHILE expression COLON statement;
 
@@ -142,12 +142,13 @@ unop ::= MINUS
 postfix ::= DOT LEFT
     |   DOT RIGHT
     ;
-name ::= IDENTIFIER
-	|	name postfix
-	;
 
-literal ::=	INT_LITERAL
-	|	BOOL_LITERAL
-	|	STRING_LITERAL
-	|	NONE_LITERAL
-	;
+name ::= IDENTIFIER
+    |  name postfix
+    ;
+
+literal ::=  INT_LITERAL
+    |  BOOL_LITERAL
+    |  STRING_LITERAL
+    |  NONE_LITERAL
+    ;
