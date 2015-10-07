@@ -38,24 +38,6 @@ import java_cup.runtime.*;
   private Symbol symbol(int type, Object value) {
     return new PythonSymbol(type, yyline+1, yycolumn+1, value);
   }
-
-  /** 
-   * assumes correct representation of a long value for 
-   * specified radix in scanner buffer from <code>start</code> 
-   * to <code>end</code> 
-   */
-  private long parseLong(int start, int end, int radix) {
-    long result = 0;
-    long digit;
-
-    for (int i = start; i < end; i++) {
-      digit  = Character.digit(yycharat(i),radix);
-      result*= radix;
-      result+= digit;
-    }
-
-    return result;
-  }
 %}
 
 /* main character classes */

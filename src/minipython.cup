@@ -39,7 +39,7 @@ terminal INPUT;
 terminal LPAREN, RPAREN;
 terminal LBRACE, RBRACE;
 terminal LBRACK, RBRACK;               // array index or type annotation
-terminal DOT;                          // field selector
+terminal DOT, LEFT, RIGHT;                          // field selector
 terminal SEMICOLON, COMMA, COLON;      // separators
 terminal IF, ELSE;                     // conditional statement keywords
 terminal WHILE;                        // loop keyword
@@ -50,7 +50,6 @@ terminal PLUS, MINUS, MULT, DIV, MOD;  // arithmetic
 terminal LT, GT, LEQ, GEQ;             // comparators
 terminal EQ, NEQ;                      // equality
 terminal AND, OR, NOT;                 // logical connectives
-terminal LEFT, RIGHT;                  // pair access
 
 terminal java.lang.Number INT_LITERAL;
 terminal java.lang.Boolean BOOL_LITERAL;
