@@ -9,7 +9,7 @@ Set up by typing:
 jflex unicode.flex
 jflex minipython.flex
 java java_cup.Main -interface < minipython.cup
-javac *.java
+javac TestParser.java TestLexer.java
 
 The parser can be tested with:
 java TestParser <inputfiles>
