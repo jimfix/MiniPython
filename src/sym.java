@@ -6,54 +6,50 @@
 /** CUP generated interface containing symbol constants. */
 public interface sym {
   /* terminals */
-  public static final int STRING_LITERAL = 39;
-  public static final int MULT = 23;
-  public static final int INPUT = 4;
-  public static final int LPAREN = 5;
-  public static final int NONE_LITERAL = 41;
-  public static final int MINUS = 22;
-  public static final int RPAREN = 6;
-  public static final int NOT = 34;
-  public static final int SEMICOLON = 12;
-  public static final int AND = 32;
-  public static final int LT = 26;
-  public static final int OR = 33;
-  public static final int COMMA = 13;
-  public static final int DIV = 24;
-  public static final int GEQ = 29;
-  public static final int PLUS = 21;
+  public static final int STRING_LITERAL = 36;
+  public static final int MULT = 22;
+  public static final int LPAREN = 4;
+  public static final int NONE_LITERAL = 38;
+  public static final int MINUS = 21;
+  public static final int RPAREN = 5;
+  public static final int NOT = 33;
+  public static final int SEMICOLON = 13;
+  public static final int AND = 31;
+  public static final int LT = 25;
+  public static final int OR = 32;
+  public static final int COMMA = 14;
+  public static final int DIV = 23;
+  public static final int GEQ = 28;
+  public static final int PLUS = 20;
   public static final int ASSIGN = 2;
-  public static final int IF = 15;
-  public static final int DOT = 11;
-  public static final int LEFT = 35;
+  public static final int IF = 16;
+  public static final int DOT = 10;
+  public static final int LEFT = 11;
   public static final int EOF = 0;
-  public static final int RETURN = 19;
-  public static final int NEW = 20;
   public static final int error = 1;
-  public static final int MOD = 25;
-  public static final int NEQ = 31;
-  public static final int EQ = 30;
-  public static final int LBRACK = 9;
-  public static final int COLON = 14;
-  public static final int LBRACE = 7;
-  public static final int ELSE = 16;
-  public static final int RBRACK = 10;
-  public static final int WHILE = 17;
-  public static final int RBRACE = 8;
-  public static final int LEQ = 28;
-  public static final int DEF = 18;
-  public static final int RIGHT = 36;
-  public static final int GT = 27;
-  public static final int BOOL_LITERAL = 38;
+  public static final int MOD = 24;
+  public static final int NEQ = 30;
+  public static final int EQ = 29;
+  public static final int LBRACK = 8;
+  public static final int COLON = 15;
+  public static final int LBRACE = 6;
+  public static final int ELSE = 17;
+  public static final int RBRACK = 9;
+  public static final int WHILE = 18;
+  public static final int RBRACE = 7;
+  public static final int LEQ = 27;
+  public static final int DEF = 19;
+  public static final int RIGHT = 12;
+  public static final int GT = 26;
+  public static final int BOOL_LITERAL = 35;
   public static final int PRINT = 3;
-  public static final int INT_LITERAL = 37;
-  public static final int IDENTIFIER = 40;
+  public static final int INT_LITERAL = 34;
+  public static final int IDENTIFIER = 37;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
   "ASSIGN",
   "PRINT",
-  "INPUT",
   "LPAREN",
   "RPAREN",
   "LBRACE",
@@ -61,6 +57,8 @@ public interface sym {
   "LBRACK",
   "RBRACK",
   "DOT",
+  "LEFT",
+  "RIGHT",
   "SEMICOLON",
   "COMMA",
   "COLON",
@@ -68,8 +66,6 @@ public interface sym {
   "ELSE",
   "WHILE",
   "DEF",
-  "RETURN",
-  "NEW",
   "PLUS",
   "MINUS",
   "MULT",
@@ -84,8 +80,6 @@ public interface sym {
   "AND",
   "OR",
   "NOT",
-  "LEFT",
-  "RIGHT",
   "INT_LITERAL",
   "BOOL_LITERAL",
   "STRING_LITERAL",

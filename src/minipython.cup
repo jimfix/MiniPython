@@ -35,7 +35,6 @@ parser code  {:
 
 terminal ASSIGN;                       // assignment keyword
 terminal PRINT;
-terminal INPUT;
 terminal LPAREN, RPAREN;
 terminal LBRACE, RBRACE;
 terminal LBRACK, RBRACK;               // array index or type annotation
@@ -44,8 +43,6 @@ terminal SEMICOLON, COMMA, COLON;      // separators
 terminal IF, ELSE;                     // conditional statement keywords
 terminal WHILE;                        // loop keyword
 terminal DEF;                          // definition keyword
-terminal RETURN;                       // return keyword
-terminal NEW;                          // creation keyword
 terminal PLUS, MINUS, MULT, DIV, MOD;  // arithmetic
 terminal LT, GT, LEQ, GEQ;             // comparators
 terminal EQ, NEQ;                      // equality
@@ -62,14 +59,10 @@ terminal NONE_LITERAL;
 non terminal program;
 non terminal statement, statement_list;
 non terminal assignment;
-non terminal call_statement;
 non terminal literal;
-non terminal lhs;
-non terminal return_statement;
 non terminal if_statement;
 non terminal while_statement;
-non terminal block;
-non terminal expression, expression_list;
+non terminal expression;
 non terminal binop;
 non terminal unop;
 non terminal postfix;
@@ -90,59 +83,39 @@ precedence left MULT, DIV, MOD;
 
 start with program;
 
-program	::= definition_list block
-    | block
+program	::= definition_list statement_list;
+
+definition_list ::= definition definition_list
+	|	/* empty */
+    ;
+
+statement_list ::= statement_list statement
+    |	/* empty */
+    ;
+
+definition ::= DEF name LPAREN name_list RPAREN COLON;
+
+name_list ::= name_list COMMA name
+	|	/* empty */
 	;
-
-definition_list ::= definition
-    |   definition definition_list
-    ;
-
-definition ::= DEF IDENTIFIER LPAREN RPAREN COLON block
-    |   DEF IDENTIFIER LPAREN name_list RPAREN COLON block
-    ;
-
-block ::= LBRACE RBRACE
-    |   LBRACE statement_list RBRACE
-    ;
-
-statement_list ::= statement
-    |   statement statement_list
-    ;
 
 statement ::= assignment
     |   if_statement
     |   while_statement
-    |   return_statement
-    |   call_statement
     ;
 
-assignment ::= lhs ASSIGN expression;
+assignment ::= name ASSIGN expression;
 
-if_statement ::= IF expression COLON block ELSE COLON block;
+if_statement ::= IF expression COLON statement
+	|	IF expression COLON statement ELSE COLON statement
+	;
 
-while_statement ::= WHILE expression COLON block;
+while_statement ::= WHILE expression COLON statement;
 
-return_statement ::= RETURN
-    |   RETURN expression
-    ;
-
-call_statement ::= name LPAREN RPAREN
-    |   name LPAREN expression_list RPAREN
-    ;
-
-expression_list ::= expression
-    |   expression COMMA expression_list
-    ;
-
-expression ::= expression postfix
-    |   expression binop expression
+expression ::= expression binop expression
     |   unop expression
-    |   name LPAREN expression_list RPAREN
-    |   name LPAREN RPAREN
-    |   literal
-    |   NEW
     |   name
+    |   literal
     |   LPAREN expression RPAREN
     ;
 
@@ -168,15 +141,9 @@ unop ::= MINUS
 postfix ::= DOT LEFT
     |   DOT RIGHT
     ;
-
-lhs ::= IDENTIFIER
-    |   lhs postfix
-    ;
-
 name ::= IDENTIFIER
-    |   PRINT
-    |   INPUT
-    ;
+	|	name postfix
+	;
 
 literal ::=	INT_LITERAL
 	|	BOOL_LITERAL

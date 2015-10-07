@@ -68,14 +68,12 @@ SStringCharacter = [^\r\n\'\\]
 
 <YYINITIAL> {
 
-  /* type keywords */
+  /* general keywords */
   "print"                        { return symbol(PRINT); }
-  "input"                        { return symbol(INPUT); }
   
   /* assignment keywords */
   "def"                          { return symbol(DEF); }
-  "new"                          { return symbol(NEW); }
-  "return"                       { return symbol(RETURN); }
+/*  "return"                       { return symbol(RETURN); } */
   
   /* conditional keywords */
   "if"                           { return symbol(IF); }
