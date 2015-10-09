@@ -85,7 +85,7 @@ precedence left MULT, DIV, MOD;
 
 start with program;
 
-program  ::= definition_list
+program  ::= definition_list block
     |   block
     ;
 
