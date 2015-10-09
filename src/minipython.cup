@@ -35,6 +35,7 @@ parser code  {:
 
 terminal ASSIGN;                       // assignment keyword
 terminal PRINT;
+terminal RETURN;
 terminal LPAREN, RPAREN;
 terminal LBRACE, RBRACE;
 terminal LBRACK, RBRACK;               // array index or type annotation
@@ -57,17 +58,18 @@ terminal NONE_LITERAL;
 /* Variables */
 
 non terminal program;
+non terminal block;
+non terminal definition, definition_list;
 non terminal statement, statement_list;
-non terminal assignment;
-non terminal literal;
-non terminal if_statement;
-non terminal while_statement;
+non terminal if_statement, while_statement;
+non terminal return_statement;
+non terminal name, name_list;
 non terminal expression;
+non terminal assignment;
 non terminal binop;
 non terminal unop;
 non terminal postfix;
-non terminal name, name_list;
-non terminal definition, definition_list;
+non terminal literal;
 
 /* Precedences */
 
@@ -83,35 +85,44 @@ precedence left MULT, DIV, MOD;
 
 start with program;
 
-program  ::= definition_list statement_list;
+program  ::= definition_list
+    |   block
+    ;
+
+block ::= LBRACE RBRACE
+    |   LBRACE statement_list RBRACE
+    ;
 
 definition_list ::= definition definition_list
-    |  /* empty */
+    |   definition
     ;
 
-statement_list ::= statement_list statement
-    |  /* empty */
+statement_list ::= statement statement_list
+    |   statement
     ;
 
-definition ::= DEF name LPAREN name_list RPAREN COLON;
-
-name_list ::= name_list COMMA name
-    |  /* empty */
+definition ::= DEF name LPAREN RPAREN COLON block
+    |   DEF name LPAREN name_list RPAREN COLON block
     ;
 
 statement ::= assignment
     |   if_statement
     |   while_statement
+    |   return_statement
     |   expression
     ;
 
 assignment ::= name ASSIGN expression;
 
-if_statement ::= IF expression COLON statement
-    |  IF expression COLON statement ELSE COLON statement
+if_statement ::= IF expression COLON block
+    |  IF expression COLON block ELSE COLON block
     ;
 
-while_statement ::= WHILE expression COLON statement;
+while_statement ::= WHILE expression COLON block;
+
+return_statement ::= RETURN expression
+    |   RETURN
+    ;
 
 expression ::= expression binop expression
     |   unop expression

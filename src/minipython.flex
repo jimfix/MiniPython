@@ -73,7 +73,7 @@ SStringCharacter = [^\r\n\'\\]
   
   /* assignment keywords */
   "def"                          { return symbol(DEF); }
-/*  "return"                       { return symbol(RETURN); } */
+  "return"                       { return symbol(RETURN); }
   
   /* conditional keywords */
   "if"                           { return symbol(IF); }
