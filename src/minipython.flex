@@ -70,6 +70,7 @@ SStringCharacter = [^\r\n\'\\]
 
   /* general keywords */
   "print"                        { return symbol(PRINT); }
+  "input"                        { return symbol(INPUT); }
   
   /* assignment keywords */
   "def"                          { return symbol(DEF); }

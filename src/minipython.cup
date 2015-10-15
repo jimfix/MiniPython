@@ -34,7 +34,7 @@ parser code  {:
 /* Terminals */
 
 terminal ASSIGN;                       // assignment keyword
-terminal PRINT;
+terminal PRINT, INPUT;
 terminal RETURN;
 terminal LPAREN, RPAREN;
 terminal LBRACE, RBRACE;
@@ -63,8 +63,9 @@ non terminal definition, definition_list;
 non terminal statement, statement_list;
 non terminal if_statement, while_statement;
 non terminal return_statement;
-non terminal name, name_list;
-non terminal expression;
+non terminal name;
+non terminal formals;
+non terminal expression, expression_list;
 non terminal assignment;
 non terminal binop;
 non terminal unop;
@@ -101,15 +102,18 @@ statement_list ::= statement statement_list
     |   statement
     ;
 
-definition ::= DEF name LPAREN RPAREN COLON block
-    |   DEF name LPAREN name_list RPAREN COLON block
+definition ::= DEF IDENTIFIER LPAREN RPAREN COLON block
+    |   DEF IDENTIFIER LPAREN formals RPAREN COLON block
     ;
 
 statement ::= assignment
+	|	IDENTIFIER LPAREN expression_list RPAREN
+	|	IDENTIFIER LPAREN RPAREN
     |   if_statement
     |   while_statement
     |   return_statement
     |   expression
+    |	PRINT LPAREN expression RPAREN
     ;
 
 assignment ::= name ASSIGN expression;
@@ -124,11 +128,18 @@ return_statement ::= RETURN expression
     |   RETURN
     ;
 
+expression_list ::= expression expression_list
+	|	expression
+	;
+
 expression ::= expression binop expression
     |   unop expression
     |   name
     |   literal
     |   LPAREN expression RPAREN
+    |	IDENTIFIER LPAREN expression_list RPAREN
+    |	IDENTIFIER LPAREN RPAREN
+    |	INPUT LPAREN expression RPAREN
     ;
 
 binop ::= AND
@@ -150,12 +161,16 @@ unop ::= MINUS
     |   NOT
     ;
 
-postfix ::= DOT LEFT
-    |   DOT RIGHT
-    ;
+formals ::= IDENTIFIER
+	|	IDENTIFIER COMMA formals
+	;
 
 name ::= IDENTIFIER
     |  name postfix
+    ;
+
+postfix ::= DOT LEFT
+    |   DOT RIGHT
     ;
 
 literal ::=  INT_LITERAL
