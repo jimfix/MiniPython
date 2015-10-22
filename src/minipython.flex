@@ -68,10 +68,6 @@ SStringCharacter = [^\r\n\'\\]
 
 <YYINITIAL> {
 
-  /* general keywords */
-  "print"                        { return symbol(PRINT); }
-  "input"                        { return symbol(INPUT); }
-  
   /* assignment keywords */
   "def"                          { return symbol(DEF); }
   "return"                       { return symbol(RETURN); }
@@ -98,7 +94,7 @@ SStringCharacter = [^\r\n\'\\]
   "]"                            { return symbol(RBRACK); }
   ";"                            { return symbol(SEMICOLON); }
   ","                            { return symbol(COMMA); }
-  "."                            { return symbol(DOT); }
+//  "."                            { return symbol(DOT); }
   
   /* operators */
   "="                            { return symbol(ASSIGN); }

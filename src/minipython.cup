@@ -34,12 +34,11 @@ parser code  {:
 /* Terminals */
 
 terminal ASSIGN;                       // assignment keyword
-terminal PRINT, INPUT;
 terminal RETURN;
 terminal LPAREN, RPAREN;
 terminal LBRACE, RBRACE;
 terminal LBRACK, RBRACK;               // array index or type annotation
-terminal DOT, LEFT, RIGHT;                          // field selector
+//terminal DOT, LEFT, RIGHT;                          // field selector
 terminal SEMICOLON, COMMA, COLON;      // separators
 terminal IF, ELSE;                     // conditional statement keywords
 terminal WHILE;                        // loop keyword
@@ -69,7 +68,7 @@ non terminal expression, expression_list;
 non terminal assignment;
 non terminal binop;
 non terminal unop;
-non terminal postfix;
+//non terminal postfix;
 non terminal literal;
 
 /* Precedences */
@@ -86,95 +85,96 @@ precedence left MULT, DIV, MOD;
 
 start with program;
 
-program  ::= definition_list block
-    |   block
+program  ::= definition_list:dl block:b    {: RESULT = new Program(dl,b); :}
+    |   block {: RESULT = new Program(b); :}
     ;
 
-block ::= LBRACE RBRACE
-    |   LBRACE statement_list RBRACE
+block ::= LBRACE RBRACE {: RESULT = null; :}
+    |   LBRACE statement_list:sl RBRACE {: RESULT = sl; :}
     ;
 
-definition_list ::= definition definition_list
-    |   definition
+definition_list ::= definition:d definition_list:dl {: RESULT = new DefnList(d,dl); :}
+    |   definition:d {: RESULT = d; :}
     ;
 
-statement_list ::= statement statement_list
-    |   statement
+statement_list ::= statement:s statement_list:sl {: RESULT = new Block(s,sl); :}
+    |   statement {: RESULT = new Block(s); :}
     ;
 
-definition ::= DEF IDENTIFIER LPAREN RPAREN COLON block
-    |   DEF IDENTIFIER LPAREN formals RPAREN COLON block
+definition ::= DEF IDENTIFIER:f LPAREN RPAREN COLON block:b {: RESULT = new Defn(f,b); :}
+    |   DEF IDENTIFIER:f LPAREN formals:xs RPAREN COLON block:b {: RESULT = new Defn(f,xs,b,); :}
     ;
 
-statement ::= assignment
-	|	IDENTIFIER LPAREN expression_list RPAREN
-	|	IDENTIFIER LPAREN RPAREN
-    |   if_statement
-    |   while_statement
-    |   return_statement
-    |   expression
-    |	PRINT LPAREN expression RPAREN
+statement ::= assignment:assign {: RESULT = assign; :}
+    |    IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(f,el); :}
+    |    IDENTIFIER:f LPAREN RPAREN {: RESULT = New Call(f); :}
+    |   if_statement:if {: RESULT = if; :}
+    |   while_statement:while {: RESULT = while; :}
+    |   return_statement:return {: RESULT = return; :}
+    |   expression:exp {: RESULT = exp; :}
     ;
 
-assignment ::= name ASSIGN expression;
-
-if_statement ::= IF expression COLON block
-    |  IF expression COLON block ELSE COLON block
+assignment ::= name:n ASSIGN expression:exp {: RESULT = new Assign(n,exp); :}
     ;
 
-while_statement ::= WHILE expression COLON block;
-
-return_statement ::= RETURN expression
-    |   RETURN
+if_statement ::= IF expression:exp COLON block:b {: RESULT = new If(exp,b); :}
+    |  IF expression COLON block:b1 ELSE COLON block:b2 {: RESULT = If(exp,b1,b2); :}
     ;
 
-expression_list ::= expression expression_list
-	|	expression
-	;
-
-expression ::= expression binop expression
-    |   unop expression
-    |   name
-    |   literal
-    |   LPAREN expression RPAREN
-    |	IDENTIFIER LPAREN expression_list RPAREN
-    |	IDENTIFIER LPAREN RPAREN
-    |	INPUT LPAREN expression RPAREN
+while_statement ::= WHILE expression:exp COLON block:b {: RESULT = new While(exp,b); :}
     ;
 
-binop ::= AND
-    |   OR
-    |   PLUS
-    |   MINUS
-    |   MULT
-    |   DIV
-    |   MOD
-    |   LT
-    |   GT
-    |   EQ
-    |   NEQ
-    |   GEQ
-    |   LEQ
+return_statement ::= RETURN expression:exp {: RESULT = new Return(exp); :}
+    |   RETURN {: RESULT = new Return(); :}
     ;
 
-unop ::= MINUS
-    |   NOT
+expression_list ::= expression:exp expression_list:el {: RESULT = new ExpnList(exp,el); :}
+    |    expression:exp {: RESULT = exp; :}
     ;
 
-formals ::= IDENTIFIER
-	|	IDENTIFIER COMMA formals
-	;
-
-name ::= IDENTIFIER
-    |  name postfix
+expression ::= expression:e1 binop expression:e2 {: RESULT = new Binop(e1,e2); :}
+    |   unop expression:exp {: RESULT = new Unop(exp); :}
+    |   name:n {: RESULT = n; :}
+    |   literal:l {: RESULT = l; :}
+    |   LPAREN expression:exp RPAREN {: RESULT = exp; :}
+    |    IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(f,el); :}
+    |    IDENTIFIER:f LPAREN RPAREN {: RESULT = new Call(f); :}
     ;
 
-postfix ::= DOT LEFT
-    |   DOT RIGHT
+binop ::= AND:and {: RESULT = and.toString(); :}
+    |   OR:or {: RESULT = or.toString(); :}
+    |   PLUS:plus {: RESULT = plus.toString(); :}
+    |   MINUS:minus {: RESULT = minus.toString(); :}
+    |   MULT:mult {: RESULT = mult.toString(); :}
+    |   DIV:div {: RESULT = div.toString(); :}
+    |   MOD:mod {: RESULT = mod.toString(); :}
+    |   LT:lt {: RESULT = lt.toString(); :}
+    |   GT:gt {: RESULT = gt.toString(); :}
+    |   EQ:eq {: RESULT = eq.toString(); :}
+    |   NEQ:neq {: RESULT = neq.toString(); :}
+    |   GEQ:geq {: RESULT = geq.toString(); :}
+    |   LEQ:leq {: RESULT = leq.toString(); :}
     ;
 
-literal ::=  INT_LITERAL
-    |  BOOL_LITERAL
-    |  STRING_LITERAL
-    |  NONE_LITERAL
+unop ::= MINUS:minus {: RESULT = minus.toString(); :}
+    |   NOT:not {: RESULT = not.toString(); :}
+    ;
+
+formals ::= IDENTIFIER:x {: RESULT = new Formals(x); :}
+    |    IDENTIFIER:x COMMA formals:xs {: RESULT = new Formals(x,xs); :}
+    ;
+
+name ::= IDENTIFIER:n {: RESULT = new Name(n); :}
+//    |  name:n postfix:post {: RESULT = new Name(n,post); :}
+    ;
+
+/* postfix ::= DOT:dot LEFT:l
+    |   DOT:dot RIGHT:r
+    ;
+*/
+
+literal ::=  INT_LITERAL:int {: RESULT = new Literal(int.intValue(); :}
+    |  BOOL_LITERAL:bool {: RESULT = new Literal(bool.booleanValue(); :}
+    |  STRING_LITERAL:string {: RESULT = new Literal(string); :}
+    |  NONE_LITERAL:none {: RESULT = new Literal(none); :}
     ;
