@@ -94,11 +94,11 @@ block ::= LBRACE RBRACE {: RESULT = null; :}
     ;
 
 definition_list ::= definition:d definition_list:dl {: RESULT = new DefnList(d,dl); :}
-    |   definition:d {: RESULT = d; :}
+    |   definition:d {: RESULT = new Defn(d); :}
     ;
 
-statement_list ::= statement:s statement_list:sl {: RESULT = new Block(s,sl); :}
-    |   statement {: RESULT = new Block(s); :}
+statement_list ::= statement:s statement_list:sl {: RESULT = new StateList(s,sl); :}
+    |   statement {: RESULT = new Statement(s); :}
     ;
 
 definition ::= DEF IDENTIFIER:f LPAREN RPAREN COLON block:b {: RESULT = new Defn(f,b); :}
