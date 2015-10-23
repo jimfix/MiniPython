@@ -39,7 +39,7 @@ terminal LPAREN, RPAREN;
 terminal LBRACE, RBRACE;
 terminal LBRACK, RBRACK;               // array index or type annotation
 //terminal DOT, LEFT, RIGHT;                          // field selector
-terminal SEMICOLON, COMMA, COLON;      // separators
+terminal COMMA, COLON;      // separators
 terminal IF, ELSE;                     // conditional statement keywords
 terminal WHILE;                        // loop keyword
 terminal DEF;                          // definition keyword
@@ -73,13 +73,23 @@ non terminal literal;
 
 /* Precedences */
 
-precedence left IF, ELSE;
+precedence left DEF;
+precedence left COLON;
+precedence left LBRACE, RBRACE;
+precedence left LPAREN, RPAREN;
+precedence left LBRACK, RBRACK;
+precedence left ASSIGN, RETURN;
+precedence left IF, ELSE, WHILE;
+precedence left COMMA;
+precedence nonassoc LT, GT, LEQ, GEQ, NEQ, EQ;
 precedence left OR;
 precedence left AND;
 precedence left NOT;
-precedence left LT, GT, LEQ, GEQ, NEQ, EQ;
 precedence left PLUS, MINUS;
 precedence left MULT, DIV, MOD;
+//precedence left DOT, LEFT, RIGHT;
+precedence left INT_LITERAL, BOOL_LITERAL, STRING_LITERAL, IDENTIFIER, NONE_LITERAL;
+
 
 /* The Grammar Rules */
 
@@ -136,9 +146,9 @@ expression ::= expression:e1 binop:by expression:e2 {: RESULT = new Binop(e1,by,
     |   unop:on expression:exp {: RESULT = new Unop(on,exp); :}
     |   name:n {: RESULT = n; :}
     |   literal:l {: RESULT = l; :}
-    |   LPAREN expression:exp RPAREN {: RESULT = exp; :}
-    |    IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(f,el); :}
-    |    IDENTIFIER:f LPAREN RPAREN {: RESULT = new Call(f); :}
+//    |   LPAREN expression:exp RPAREN {: RESULT = exp; :}
+//    |   IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(f,el); :}
+//    |   IDENTIFIER:f LPAREN RPAREN {: RESULT = new Call(f); :}
     ;
 
 binop ::= AND:and {: RESULT = and.toString(); :}
