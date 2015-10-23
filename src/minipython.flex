@@ -92,7 +92,6 @@ SStringCharacter = [^\r\n\'\\]
   "}"                            { return symbol(RBRACE); }
   "["                            { return symbol(LBRACK); }
   "]"                            { return symbol(RBRACK); }
-  ";"                            { return symbol(SEMICOLON); }
   ","                            { return symbol(COMMA); }
 //  "."                            { return symbol(DOT); }
   
