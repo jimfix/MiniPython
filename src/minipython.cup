@@ -94,11 +94,11 @@ block ::= LBRACE RBRACE {: RESULT = null; :}
     ;
 
 definition_list ::= definition:d definition_list:dl {: RESULT = new DefnList(d,dl); :}
-    |   definition:d {: RESULT = new Defn(d); :}
+    |   definition:d {: RESULT = d; :}
     ;
 
 statement_list ::= statement:s statement_list:sl {: RESULT = new StateList(s,sl); :}
-    |   statement {: RESULT = new Statement(s); :}
+    |   statement {: RESULT = s; :}
     ;
 
 definition ::= DEF IDENTIFIER:f LPAREN RPAREN COLON block:b {: RESULT = new Defn(f,b); :}
@@ -164,7 +164,7 @@ formals ::= IDENTIFIER:x {: RESULT = new Formals(x); :}
     |    IDENTIFIER:x COMMA formals:xs {: RESULT = new Formals(x,xs); :}
     ;
 
-name ::= IDENTIFIER:n {: RESULT = new Name(n); :}
+name ::= IDENTIFIER:n {: RESULT = n.toString(); :}
 //    |  name:n postfix:post {: RESULT = new Name(n,post); :}
     ;
 
