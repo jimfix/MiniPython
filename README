@@ -6,36 +6,12 @@ You need JFlex, the lexical analyzer, and CUP, the parser generator, for this to
 
 Set up by typing:
 
+javac Assign.java Binop.java Block.java Call.java Defn.java DefnList.java Expn.java ExpnList.java Formals.java If.java Literal.java Lookup.java Program.java Return.java StateList.java Statement.java Unop.java While.java
 jflex unicode.flex
 jflex minipython.flex
 java java_cup.Main -interface < minipython.cup
-javac TestParser.java TestLexer.java
+javac sym.java PythonSymbol.java Scanner.java
+javac Python.java
 
 The parser can be tested with:
-java TestParser <inputfiles>
-
-The scanner (without parser attached) can be tested with:
-java TestLexer <inputfiles>
-
-
-files:
-
-unicode.flex
-  JFlex specification for the Unicode preprocessing phase
-  (see section 3.3 of the Java Language Specification).
-  Demonstrates how to implement a FilterReader with JFlex.
-
-minipython.flex
-  JFlex specification for the "MiniPython" lexer.
-
-minipython.cup
-  CUP specification for the "MiniPython" parser.
-  
-TestParser.java
-  a simple main class to run the parser (no other useful output though).
-
-TestLexer.java
-  a simple test driver for the scanner; produces debug output.
-
-lexer-output.good
-  lexer output for input file TestLexer.java, for testing.
+java Python <inputfile>
