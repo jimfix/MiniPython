@@ -1,4 +1,4 @@
 
-public class Formals {
+public abstract class Formals {
 
 }

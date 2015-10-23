@@ -132,8 +132,8 @@ expression_list ::= expression:exp expression_list:el {: RESULT = new ExpnList(e
     |    expression:exp {: RESULT = exp; :}
     ;
 
-expression ::= expression:e1 binop expression:e2 {: RESULT = new Binop(e1,e2); :}
-    |   unop expression:exp {: RESULT = new Unop(exp); :}
+expression ::= expression:e1 binop:by expression:e2 {: RESULT = new Binop(e1,by,e2); :}
+    |   unop:on expression:exp {: RESULT = new Unop(on,exp); :}
     |   name:n {: RESULT = n; :}
     |   literal:l {: RESULT = l; :}
     |   LPAREN expression:exp RPAREN {: RESULT = exp; :}
