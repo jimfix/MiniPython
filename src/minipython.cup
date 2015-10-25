@@ -52,7 +52,7 @@ terminal java.lang.Number INT_LITERAL;
 terminal java.lang.Boolean BOOL_LITERAL;
 terminal java.lang.String STRING_LITERAL;
 terminal java.lang.String IDENTIFIER;     // names
-terminal NONE_LITERAL;
+//terminal NONE_LITERAL;
 
 /* Variables */
 
@@ -88,7 +88,7 @@ precedence left NOT;
 precedence left PLUS, MINUS;
 precedence left MULT, DIV, MOD;
 //precedence left DOT, LEFT, RIGHT;
-precedence left INT_LITERAL, BOOL_LITERAL, STRING_LITERAL, IDENTIFIER, NONE_LITERAL;
+precedence left INT_LITERAL, BOOL_LITERAL, STRING_LITERAL, IDENTIFIER;
 
 
 /* The Grammar Rules */
@@ -183,8 +183,8 @@ name ::= IDENTIFIER:n {: RESULT = n.toString(); :}
     ;
 */
 
-literal ::=  INT_LITERAL:int {: RESULT = new Literal(int.intValue(); :}
-    |  BOOL_LITERAL:bool {: RESULT = new Literal(bool.booleanValue(); :}
+literal ::=  INT_LITERAL:int {: RESULT = new Literal(int.intValue()); :}
+    |  BOOL_LITERAL:bool {: RESULT = new Literal(bool.booleanValue()); :}
     |  STRING_LITERAL:string {: RESULT = new Literal(string); :}
-    |  NONE_LITERAL:none {: RESULT = new Literal(none); :}
+//    |  NONE_LITERAL:none {: RESULT = new Literal(none); :}
     ;

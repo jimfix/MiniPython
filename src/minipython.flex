@@ -81,9 +81,9 @@ SStringCharacter = [^\r\n\'\\]
   "True"                         { return symbol(BOOL_LITERAL, true); }
   "False"                        { return symbol(BOOL_LITERAL, false); }
   
-  /* none literal */
+/*  /* none literal */
   "None"                         { return symbol(NONE_LITERAL); }
-  
+*/  
   
   /* separators */
   "("                            { return symbol(LPAREN); }
