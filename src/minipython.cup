@@ -112,12 +112,12 @@ statement_list ::= statement:s statement_list:sl {: RESULT = new StateList(s,sl)
     ;
 
 definition ::= DEF IDENTIFIER:f LPAREN RPAREN COLON block:b {: RESULT = new Defn(f,b); :}
-    |   DEF IDENTIFIER:f LPAREN formals:xs RPAREN COLON block:b {: RESULT = new Defn(f,xs,b,); :}
+    |   DEF IDENTIFIER:f LPAREN formals:xs RPAREN COLON block:b {: RESULT = new Defn(f,xs,b); :}
     ;
 
 statement ::= assignment:assign {: RESULT = assign; :}
     |    IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(f,el); :}
-    |    IDENTIFIER:f LPAREN RPAREN {: RESULT = New Call(f); :}
+    |    IDENTIFIER:f LPAREN RPAREN {: RESULT = new Call(f); :}
     |   if_statement:if {: RESULT = if; :}
     |   while_statement:while {: RESULT = while; :}
     |   return_statement:return {: RESULT = return; :}
@@ -128,7 +128,7 @@ assignment ::= name:n ASSIGN expression:exp {: RESULT = new Assign(n,exp); :}
     ;
 
 if_statement ::= IF expression:exp COLON block:b {: RESULT = new If(exp,b); :}
-    |  IF expression COLON block:b1 ELSE COLON block:b2 {: RESULT = If(exp,b1,b2); :}
+    |  IF expression COLON block:b1 ELSE COLON block:b2 {: RESULT = new If(exp,b1,b2); :}
     ;
 
 while_statement ::= WHILE expression:exp COLON block:b {: RESULT = new While(exp,b); :}
