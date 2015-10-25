@@ -115,12 +115,12 @@ definition ::= DEF IDENTIFIER:f LPAREN RPAREN COLON block:b {: RESULT = new Defn
     |   DEF IDENTIFIER:f LPAREN formals:xs RPAREN COLON block:b {: RESULT = new Defn(f,xs,b); :}
     ;
 
-statement ::= assignment:assign {: RESULT = assign; :}
+statement ::= assignment:as {: RESULT = as; :}
     |    IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(f,el); :}
     |    IDENTIFIER:f LPAREN RPAREN {: RESULT = new Call(f); :}
-    |   if_statement:if {: RESULT = if; :}
-    |   while_statement:while {: RESULT = while; :}
-    |   return_statement:return {: RESULT = return; :}
+    |   if_statement:i {: RESULT = i; :}
+    |   while_statement:w {: RESULT = w; :}
+    |   return_statement:r {: RESULT = r; :}
     |   expression:exp {: RESULT = exp; :}
     ;
 
@@ -151,23 +151,23 @@ expression ::= expression:e1 binop:by expression:e2 {: RESULT = new Binop(e1,by,
 //    |   IDENTIFIER:f LPAREN RPAREN {: RESULT = new Call(f); :}
     ;
 
-binop ::= AND:and {: RESULT = and.toString(); :}
-    |   OR:or {: RESULT = or.toString(); :}
-    |   PLUS:plus {: RESULT = plus.toString(); :}
-    |   MINUS:minus {: RESULT = minus.toString(); :}
-    |   MULT:mult {: RESULT = mult.toString(); :}
-    |   DIV:div {: RESULT = div.toString(); :}
-    |   MOD:mod {: RESULT = mod.toString(); :}
-    |   LT:lt {: RESULT = lt.toString(); :}
-    |   GT:gt {: RESULT = gt.toString(); :}
-    |   EQ:eq {: RESULT = eq.toString(); :}
-    |   NEQ:neq {: RESULT = neq.toString(); :}
-    |   GEQ:geq {: RESULT = geq.toString(); :}
-    |   LEQ:leq {: RESULT = leq.toString(); :}
+binop ::= AND:a {: RESULT = a.toString(); :}
+    |   OR:o {: RESULT = o.toString(); :}
+    |   PLUS:p {: RESULT = p.toString(); :}
+    |   MINUS:m1 {: RESULT = m1.toString(); :}
+    |   MULT:m2 {: RESULT = m2.toString(); :}
+    |   DIV:d {: RESULT = d.toString(); :}
+    |   MOD:m3 {: RESULT = m3.toString(); :}
+    |   LT:l1 {: RESULT = l1.toString(); :}
+    |   GT:g1 {: RESULT = g1.toString(); :}
+    |   EQ:e {: RESULT = e.toString(); :}
+    |   NEQ:n {: RESULT = n.toString(); :}
+    |   GEQ:g2 {: RESULT = g2.toString(); :}
+    |   LEQ:l2 {: RESULT = l2.toString(); :}
     ;
 
-unop ::= MINUS:minus {: RESULT = minus.toString(); :}
-    |   NOT:not {: RESULT = not.toString(); :}
+unop ::= MINUS:m {: RESULT = m.toString(); :}
+    |   NOT:n {: RESULT = n.toString(); :}
     ;
 
 formals ::= IDENTIFIER:x {: RESULT = new Formals(x); :}
@@ -183,8 +183,8 @@ name ::= IDENTIFIER:n {: RESULT = n.toString(); :}
     ;
 */
 
-literal ::=  INT_LITERAL:int {: RESULT = new Literal(int.intValue()); :}
-    |  BOOL_LITERAL:bool {: RESULT = new Literal(bool.booleanValue()); :}
-    |  STRING_LITERAL:string {: RESULT = new Literal(string); :}
+literal ::=  INT_LITERAL:i {: RESULT = new Literal(i.intValue()); :}
+    |  BOOL_LITERAL:b {: RESULT = new Literal(b.booleanValue()); :}
+    |  STRING_LITERAL:s {: RESULT = new Literal(s); :}
 //    |  NONE_LITERAL:none {: RESULT = new Literal(none); :}
     ;
