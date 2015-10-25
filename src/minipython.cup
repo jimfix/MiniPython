@@ -96,7 +96,7 @@ precedence left INT_LITERAL, BOOL_LITERAL, STRING_LITERAL, IDENTIFIER;
 start with program;
 
 program  ::= definition_list:dl block:b    {: RESULT = new Program(dl,b); :}
-    |   block {: RESULT = new Program(b); :}
+    |   block:b {: RESULT = new Program(b); :}
     ;
 
 block ::= LBRACE RBRACE {: RESULT = null; :}
@@ -108,7 +108,7 @@ definition_list ::= definition:d definition_list:dl {: RESULT = new DefnList(d,d
     ;
 
 statement_list ::= statement:s statement_list:sl {: RESULT = new StateList(s,sl); :}
-    |   statement {: RESULT = s; :}
+    |   statement:s {: RESULT = s; :}
     ;
 
 definition ::= DEF IDENTIFIER:f LPAREN RPAREN COLON block:b {: RESULT = new Defn(f,b); :}
@@ -128,7 +128,7 @@ assignment ::= name:n ASSIGN expression:exp {: RESULT = new Assign(n,exp); :}
     ;
 
 if_statement ::= IF expression:exp COLON block:b {: RESULT = new If(exp,b); :}
-    |  IF expression COLON block:b1 ELSE COLON block:b2 {: RESULT = new If(exp,b1,b2); :}
+    |  IF expression:exp COLON block:b1 ELSE COLON block:b2 {: RESULT = new If(exp,b1,b2); :}
     ;
 
 while_statement ::= WHILE expression:exp COLON block:b {: RESULT = new While(exp,b); :}
