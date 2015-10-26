@@ -1,4 +1,4 @@
-public class While {
+public class While extends Statement{
 
 	Expn   exp;
 	Block  body;

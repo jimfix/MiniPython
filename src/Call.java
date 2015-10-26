@@ -1,4 +1,4 @@
-public class Call {
+public class Call extends Statement {
     
     String name;
     ExpnList explist;

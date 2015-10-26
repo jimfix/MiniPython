@@ -1,4 +1,4 @@
-public class If {
+public class If extends Statement {
 
 	Expn   exp;
 	Block  first;

@@ -1,4 +1,4 @@
-public class Unop {
+public class Unop extends Expn {
 
 	Expn exp;
 	String on;

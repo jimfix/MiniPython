@@ -62,16 +62,16 @@ non terminal Defn definition;
 non terminal DefnList definition_list;
 non terminal Statement statement;
 non terminal StateList statement_list;
-non terminal If if_statement;
-non terminal While while_statement;
-non terminal Return return_statement;
-non terminal String name;
+non terminal Statement if_statement;
+non terminal Statement while_statement;
+non terminal Statement return_statement;
+non terminal java.lang.String name;
 non terminal Formals formals;
 non terminal Expn expression;
 non terminal ExpnList expression_list;
 non terminal Assign assignment;
-non terminal Binop binop;
-non terminal Unop unop;
+non terminal java.lang.String binop;
+non terminal java.lang.String unop;
 //non terminal postfix;
 non terminal Literal literal;
 
@@ -103,16 +103,15 @@ program  ::= definition_list:dl block:b    {: RESULT = new Program(dl,b); :}
     |   block:b {: RESULT = new Program(b); :}
     ;
 
-block ::= LBRACE RBRACE {: RESULT = null; :}
-    |   LBRACE statement_list:sl RBRACE {: RESULT = sl; :}
+block ::= LBRACE statement_list:sl RBRACE {: RESULT = sl; :}
     ;
 
 definition_list ::= definition:d definition_list:dl {: RESULT = new DefnList(d,dl); :}
-    |   definition:d {: RESULT = d; :}
+    |   definition:d {: RESULT = new DefnList(d,null); :}
     ;
 
 statement_list ::= statement:s statement_list:sl {: RESULT = new StateList(s,sl); :}
-    |   statement:s {: RESULT = s; :}
+    |   statement:s {: RESULT = new StateList(s,null); :}
     ;
 
 definition ::= DEF IDENTIFIER:f LPAREN RPAREN COLON block:b {: RESULT = new Defn(f,b); :}
@@ -125,7 +124,7 @@ statement ::= assignment:as {: RESULT = as; :}
     |   if_statement:i {: RESULT = i; :}
     |   while_statement:w {: RESULT = w; :}
     |   return_statement:r {: RESULT = r; :}
-    |   expression:exp {: RESULT = exp; :}
+    |   expression:exp {: RESULT = new Assign("it",exp); :}
     ;
 
 assignment ::= name:n ASSIGN expression:exp {: RESULT = new Assign(n,exp); :}
@@ -143,12 +142,12 @@ return_statement ::= RETURN expression:exp {: RESULT = new Return(exp); :}
     ;
 
 expression_list ::= expression:exp expression_list:el {: RESULT = new ExpnList(exp,el); :}
-    |    expression:exp {: RESULT = exp; :}
+    |    expression:exp {: RESULT = new ExpnList(exp,null); :}
     ;
 
 expression ::= expression:e1 binop:by expression:e2 {: RESULT = new Binop(e1,by,e2); :}
     |   unop:on expression:exp {: RESULT = new Unop(on,exp); :}
-    |   name:n {: RESULT = n; :}
+    |   name:n {: RESULT = new Lookup(n); :}
     |   literal:l {: RESULT = l; :}
 //    |   LPAREN expression:exp RPAREN {: RESULT = exp; :}
 //    |   IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(f,el); :}

@@ -1,4 +1,4 @@
-public class StateList {
+public class StateList extends Block {
 
 	Statement  stmt;
 	StateList  stmts;

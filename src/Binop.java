@@ -1,4 +1,4 @@
-public class Binop {
+public class Binop extends Expn {
 
 	Expn exp1;
 	Expn exp2;
