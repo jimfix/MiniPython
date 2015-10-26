@@ -56,20 +56,24 @@ terminal java.lang.String IDENTIFIER;     // names
 
 /* Variables */
 
-non terminal program;
-non terminal block;
-non terminal definition, definition_list;
-non terminal statement, statement_list;
-non terminal if_statement, while_statement;
-non terminal return_statement;
-non terminal name;
-non terminal formals;
-non terminal expression, expression_list;
-non terminal assignment;
-non terminal binop;
-non terminal unop;
+non terminal Program program;
+non terminal Block block;
+non terminal Defn definition;
+non terminal DefnList definition_list;
+non terminal Statement statement;
+non terminal StateList statement_list;
+non terminal If if_statement;
+non terminal While while_statement;
+non terminal Return return_statement;
+non terminal String name;
+non terminal Formals formals;
+non terminal Expn expression;
+non terminal ExpnList expression_list;
+non terminal Assign assignment;
+non terminal Binop binop;
+non terminal Unop unop;
 //non terminal postfix;
-non terminal literal;
+non terminal Literal literal;
 
 /* Precedences */
 
