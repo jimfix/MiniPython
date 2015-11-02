@@ -9,7 +9,12 @@ public class Binop extends Expn {
 		this.exp2 = e2;
 		this.by = by;
 	}
-	
+
+	public Binop(Expn e1, sym by, Expn e2) {
+		this.exp1 = e1;
+		this.exp2 = e2;
+		this.by = "+";
+	}
 	
 	public String toString() {
         String s = "Binop(";

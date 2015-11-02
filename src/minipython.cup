@@ -124,7 +124,7 @@ statement ::= assignment:as {: RESULT = as; :}
     |   if_statement:i {: RESULT = i; :}
     |   while_statement:w {: RESULT = w; :}
     |   return_statement:r {: RESULT = r; :}
-    |   expression:exp {: RESULT = new Assign("it",exp); :}
+//    |   expression:exp {: RESULT = new Assign("it",exp); :}
     ;
 
 assignment ::= name:n ASSIGN expression:exp {: RESULT = new Assign(n,exp); :}
@@ -149,28 +149,30 @@ expression ::= expression:e1 binop:by expression:e2 {: RESULT = new Binop(e1,by,
     |   unop:on expression:exp {: RESULT = new Unop(on,exp); :}
     |   name:n {: RESULT = new Lookup(n); :}
     |   literal:l {: RESULT = l; :}
-//    |   LPAREN expression:exp RPAREN {: RESULT = exp; :}
-//    |   IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(f,el); :}
-//    |   IDENTIFIER:f LPAREN RPAREN {: RESULT = new Call(f); :}
+    |   LPAREN expression:exp RPAREN {: RESULT = exp; :}
+    |   IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new FunCall(f,el); :}
+    |   IDENTIFIER:f LPAREN RPAREN {: RESULT = new Call(f); :}
     ;
 
-binop ::= AND:a {: RESULT = a.toString(); :}
-    |   OR:o {: RESULT = o.toString(); :}
-    |   PLUS:p {: RESULT = p.toString(); :}
-    |   MINUS:m1 {: RESULT = m1.toString(); :}
-    |   MULT:m2 {: RESULT = m2.toString(); :}
-    |   DIV:d {: RESULT = d.toString(); :}
-    |   MOD:m3 {: RESULT = m3.toString(); :}
-    |   LT:l1 {: RESULT = l1.toString(); :}
-    |   GT:g1 {: RESULT = g1.toString(); :}
-    |   EQ:e {: RESULT = e.toString(); :}
-    |   NEQ:n {: RESULT = n.toString(); :}
-    |   GEQ:g2 {: RESULT = g2.toString(); :}
-    |   LEQ:l2 {: RESULT = l2.toString(); :}
+/* FunCall & ProCall */
+
+binop ::= AND {: RESULT = "AND"; :}
+    |   OR {: RESULT = "OR"; :}
+    |   PLUS {: RESULT = "PLUS"; :}
+    |   MINUS {: RESULT = "MINUS"; :}
+    |   MULT {: RESULT = "MULT"; :}
+    |   DIV {: RESULT = "DIV"; :}
+    |   MOD {: RESULT = "MOD"; :}
+    |   LT {: RESULT = "LT"; :}
+    |   GT {: RESULT = "GT"; :}
+    |   EQ {: RESULT = "EQ"; :}
+    |   NEQ {: RESULT = "NEQ"; :}
+    |   GEQ {: RESULT = "GEQ"; :}
+    |   LEQ {: RESULT = "LEQ"; :}
     ;
 
-unop ::= MINUS:m {: RESULT = m.toString(); :}
-    |   NOT:n {: RESULT = n.toString(); :}
+unop ::= NOT:n {: RESULT = n.toString(); :}
+//    |   MINUS:m {: RESULT = m.toString(); :}
     ;
 
 formals ::= IDENTIFIER:x {: RESULT = new Formals(x); :}

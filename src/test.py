@@ -1,2 +1,5 @@
-def f(n): { x = 6 return 6 }
-{ a = 7 b = 10 }
+def fact(n):
+{ if n==0:
+{ return 1 }
+else: { return n * fact(n-1)}}
+{ fact(5) }
