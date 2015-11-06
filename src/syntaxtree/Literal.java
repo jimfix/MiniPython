@@ -1,3 +1,4 @@
+package syntaxtree;
 public class Literal extends Expn {
 
 	Integer intValue;

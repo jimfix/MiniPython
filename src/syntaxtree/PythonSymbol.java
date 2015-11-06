@@ -1,3 +1,4 @@
+package syntaxtree;
 public class PythonSymbol extends java_cup.runtime.Symbol {
   private int line;
   private int column;

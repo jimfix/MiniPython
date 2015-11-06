@@ -1,3 +1,4 @@
+package syntaxtree;
 public class Defn {
 
     String   name;

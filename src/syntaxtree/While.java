@@ -1,3 +1,4 @@
+package syntaxtree;
 public class While extends Statement{
 
 	Expn   exp;

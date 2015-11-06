@@ -1,3 +1,4 @@
+package syntaxtree;
 public class Program {
 
     DefnList  defnlist;

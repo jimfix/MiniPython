@@ -1,3 +1,4 @@
+package syntaxtree;
 public class Call extends Statement {
     
     String name;

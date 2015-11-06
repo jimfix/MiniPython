@@ -1,3 +1,4 @@
+package syntaxtree;
 public class StateList extends Block {
 
 	Statement  stmt;

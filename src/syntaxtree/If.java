@@ -1,3 +1,4 @@
+package syntaxtree;
 public class If extends Statement {
 
 	Expn   exp;

@@ -72,7 +72,7 @@ non terminal ExpnList expression_list;
 non terminal Assign assignment;
 non terminal java.lang.String binop;
 non terminal java.lang.String unop;
-non terminal java.lang.String postfix;
+//non terminal java.lang.String postfix;
 non terminal Literal literal;
 
 /* Precedences */
@@ -119,8 +119,8 @@ definition ::= DEF IDENTIFIER:f LPAREN RPAREN COLON block:b {: RESULT = new Defn
     ;
 
 statement ::= assignment:as {: RESULT = as; :}
-    |    IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(f,el); :}
-    |    IDENTIFIER:f LPAREN RPAREN {: RESULT = new Call(f); :}
+    |   IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(f,el); :}
+    |   IDENTIFIER:f LPAREN RPAREN {: RESULT = new Call(f); :}
     |   if_statement:i {: RESULT = i; :}
     |   while_statement:w {: RESULT = w; :}
     |   return_statement:r {: RESULT = r; :}
@@ -150,8 +150,8 @@ expression ::= expression:e1 binop:by expression:e2 {: RESULT = new Binop(e1,by,
     |   name:n {: RESULT = new Lookup(n); :}
     |   literal:l {: RESULT = l; :}
     |   LPAREN expression:exp RPAREN {: RESULT = exp; :}
-    |   IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(f,el); :}
-    |   IDENTIFIER:f LPAREN RPAREN {: RESULT = new Call(f); :}
+//    |   IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(f,el); :}
+//    |   IDENTIFIER:f LPAREN RPAREN {: RESULT = new Call(f); :}
     ;
 
 /* FunCall & ProCall */
@@ -179,7 +179,7 @@ formals ::= IDENTIFIER:x {: RESULT = new Formals(x); :}
     |    IDENTIFIER:x COMMA formals:xs {: RESULT = new Formals(x,xs); :}
     ;
 
-name ::= IDENTIFIER:n {: RESULT = new Formals(n); :}
+name ::= IDENTIFIER:n {: RESULT = n.toString(); :}
 //    |  name:n postfix:post {: RESULT = new Name(n,post); :}
     ;
 /*
