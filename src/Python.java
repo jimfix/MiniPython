@@ -1,5 +1,7 @@
 import java.io.*;
+
 import java_cup.runtime.*;
+import syntaxtree.Program;
 import visitor.PrettyPrintVisitor;
 
 public class Python {
