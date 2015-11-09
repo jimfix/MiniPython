@@ -4,7 +4,7 @@ import syntaxtree.*;
 
 public class PrettyPrintVisitor implements Visitor {
 
-	public void visit(Program n) {
+	public void visit(TheProgram n) {
 		for ( int i = 0; i < n.defnlist.size(); i++) {
 			System.out.println();
 			n.defnlist.elementAt(i).accept(this);
@@ -129,7 +129,7 @@ public class PrettyPrintVisitor implements Visitor {
 		System.out.print(")");
 	}
 
-	public void visit(Times n) {
+	public void visit(Mult n) {
 		System.out.print("(");
 		n.exp1.accept(this);
 		System.out.print(" * ");

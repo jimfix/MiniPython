@@ -1,9 +1,6 @@
-
-import java.io.FileReader;
-
-import java_cup.parser;
+import java.io.*;
 import java_cup.runtime.*;
-import syntaxtree.Program;
+import visitor.PrettyPrintVisitor;
 
 public class Python {
     public static void main(String[] args) {
@@ -11,7 +8,7 @@ public class Python {
         try {
             parser parser = new parser(new Scanner(new FileReader(args[0])));
             program = (Program) parser.parse().value;
-            System.out.println(program);
+            program.accept(new PrettyPrintVisitor());
         }
         catch (Exception e) {
             System.out.println("Exception ");

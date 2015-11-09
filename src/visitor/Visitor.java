@@ -3,7 +3,7 @@ package visitor;
 import syntaxtree.*;
 
 public interface Visitor {
-	public void visit(Program n);
+	public void visit(TheProgram n);
 	public void visit(Name n);
 	public void visit(Defn n);
 	public void visit(Formal n);
@@ -18,7 +18,7 @@ public interface Visitor {
 	public void visit(LessThan n);
 	public void visit(Plus n);
 	public void visit(Minus n);
-	public void visit(Times n);
+	public void visit(Mult n);
 	public void visit(Call n);
 	public void visit(IntLiteral n);
 	public void visit(True n);

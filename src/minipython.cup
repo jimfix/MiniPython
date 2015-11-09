@@ -34,7 +34,7 @@ parser code  {:
 /* Terminals */
 
 terminal ASSIGN;                       // assignment keyword
-terminal RETURN;
+//terminal RETURN;
 terminal LPAREN, RPAREN;
 terminal LBRACE, RBRACE;
 terminal LBRACK, RBRACK;               // array index or type annotation
@@ -43,10 +43,10 @@ terminal COMMA, COLON;                 // separators
 terminal IF, ELSE;                     // conditional statement keywords
 terminal WHILE;                        // loop keyword
 terminal DEF;                          // definition keyword
-terminal PLUS, MINUS, MULT, DIV, MOD;  // arithmetic
-terminal LT, GT, LEQ, GEQ;             // comparators
-terminal EQ, NEQ;                      // equality
-terminal AND, OR, NOT;                 // logical connectives
+terminal PLUS, MINUS, MULT/*, DIV, MOD*/;  // arithmetic
+//terminal LT, GT, LEQ, GEQ;             // comparators
+//terminal EQ, NEQ;                        // equality
+terminal /*AND, OR,*/ NOT;                 // logical connectives
 
 terminal java.lang.Number INT_LITERAL;
 terminal java.lang.Boolean BOOL_LITERAL;
@@ -56,7 +56,7 @@ terminal java.lang.String NONE_LITERAL;
 
 /* Variables */
 
-non terminal Program program;
+non terminal TheProgram program;
 non terminal Block block;
 non terminal Defn definition;
 non terminal DefnList definition_list;
@@ -70,8 +70,6 @@ non terminal Formals formals;
 non terminal Expn expression;
 non terminal ExpnList expression_list;
 non terminal Assign assignment;
-non terminal java.lang.String binop;
-non terminal java.lang.String unop;
 //non terminal java.lang.String postfix;
 non terminal Literal literal;
 
@@ -82,15 +80,15 @@ precedence left COLON;
 precedence left LBRACE, RBRACE;
 precedence left LPAREN, RPAREN;
 precedence left LBRACK, RBRACK;
-precedence left ASSIGN, RETURN;
+precedence left ASSIGN/*, RETURN*/;
 precedence left IF, ELSE, WHILE;
 precedence left COMMA;
-precedence nonassoc LT, GT, LEQ, GEQ, NEQ, EQ;
-precedence left OR;
-precedence left AND;
+//precedence nonassoc LT, GT, LEQ, GEQ, NEQ, EQ;
+//precedence left OR;
+//precedence left AND;
 precedence left NOT;
 precedence left PLUS, MINUS;
-precedence left MULT, DIV, MOD;
+precedence left MULT/*, DIV, MOD*/;
 //precedence left DOT, LEFT, RIGHT;
 precedence left INT_LITERAL, BOOL_LITERAL, STRING_LITERAL, IDENTIFIER;
 
@@ -99,28 +97,28 @@ precedence left INT_LITERAL, BOOL_LITERAL, STRING_LITERAL, IDENTIFIER;
 
 start with program;
 
-program  ::= definition_list:dl block:b    {: RESULT = new Program(dl,b); :}
-    |   block:b {: RESULT = new Program(b); :}
+program  ::= definition_list:dl block:b    {: RESULT = new TheProgram(dl,b); :}
+    |   block:b {: RESULT = new TheProgram(null,b); :}
     ;
 
 block ::= LBRACE statement_list:sl RBRACE {: RESULT = sl; :}
     ;
 
-definition_list ::= definition:d definition_list:dl {: RESULT = new DefnList(d,dl); :}
-    |   definition:d {: RESULT = new DefnList(d,null); :}
+definition_list ::= definition:d definition_list:dl {: RESULT = new DefnList(); RESULT.addElement(d); :}
+    |   definition:d {: RESULT = new DefnList(); RESULT.addElement(d); :}
     ;
 
-statement_list ::= statement:s statement_list:sl {: RESULT = new StateList(s,sl); :}
-    |   statement:s {: RESULT = new StateList(s,null); :}
+statement_list ::= statement:s statement_list:sl {: RESULT = new StateList(); RESULT.addElement(s);  :}
+    |   statement:s {: RESULT = new StateList(); RESULT.addElement(s); :}
     ;
 
-definition ::= DEF IDENTIFIER:f LPAREN RPAREN COLON block:b {: RESULT = new Defn(f,b); :}
-    |   DEF IDENTIFIER:f LPAREN formals:xs RPAREN COLON block:b {: RESULT = new Defn(f,xs,b); :}
+definition ::= DEF IDENTIFIER:f LPAREN RPAREN COLON block:b {: RESULT = new Defn(null,f,null,null,b,null); :}
+    |   DEF IDENTIFIER:f LPAREN formals:xs RPAREN COLON block:b {: RESULT = new Defn(null,f,xs,null,b,null); :}
     ;
 
 statement ::= assignment:as {: RESULT = as; :}
-    |   IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(f,el); :}
-    |   IDENTIFIER:f LPAREN RPAREN {: RESULT = new Call(f); :}
+    |   IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(null,f,el); :}
+    |   IDENTIFIER:f LPAREN RPAREN {: RESULT = new Call(null,f,null); :}
     |   if_statement:i {: RESULT = i; :}
     |   while_statement:w {: RESULT = w; :}
     |   return_statement:r {: RESULT = r; :}
@@ -130,33 +128,29 @@ statement ::= assignment:as {: RESULT = as; :}
 assignment ::= name:n ASSIGN expression:exp {: RESULT = new Assign(n,exp); :}
     ;
 
-if_statement ::= IF expression:exp COLON block:b {: RESULT = new If(exp,b); :}
+if_statement ::= IF expression:exp COLON block:b {: RESULT = new If(exp,b,null); :}
     |  IF expression:exp COLON block:b1 ELSE COLON block:b2 {: RESULT = new If(exp,b1,b2); :}
     ;
 
 while_statement ::= WHILE expression:exp COLON block:b {: RESULT = new While(exp,b); :}
     ;
 
-return_statement ::= RETURN expression:exp {: RESULT = new Return(exp); :}
-    |   RETURN {: RESULT = new Return(); :}
+expression_list ::= expression:exp expression_list:el {: RESULT = new ExpnList(); RESULT.addElement(exp); :}
+    |    expression:exp {: RESULT = new ExpnList(); RESULT.addElement(exp); :}
     ;
 
-expression_list ::= expression:exp expression_list:el {: RESULT = new ExpnList(exp,el); :}
-    |    expression:exp {: RESULT = new ExpnList(exp,null); :}
-    ;
-
-expression ::= expression:e1 binop:by expression:e2 {: RESULT = new Binop(e1,by,e2); :}
-    |   unop:on expression:exp {: RESULT = new Unop(on,exp); :}
-    |   name:n {: RESULT = new Lookup(n); :}
+expression ::= expression:e1 PLUS expression:e2 {: RESULT = new Plus(e1,e2); :}
+    |   expression:e1 MINUS expression:e2 {: RESULT = new Minus(e1,e2); :}
+    |   expression:e1 MULT expression:e2 {: RESULT = new Mult(e1,e2); :}
+    |   NOT expression:e {: RESULT = new Not(e); :}
+    |   name:n {: RESULT = new Name(null,n); :}
     |   literal:l {: RESULT = l; :}
     |   LPAREN expression:exp RPAREN {: RESULT = exp; :}
 //    |   IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(f,el); :}
 //    |   IDENTIFIER:f LPAREN RPAREN {: RESULT = new Call(f); :}
     ;
 
-/* FunCall & ProCall */
-
-binop ::= AND {: RESULT = "AND"; :}
+/*binop ::= AND {: RESULT = "AND"; :}
     |   OR {: RESULT = "OR"; :}
     |   PLUS {: RESULT = "PLUS"; :}
     |   MINUS {: RESULT = "MINUS"; :}
@@ -170,13 +164,13 @@ binop ::= AND {: RESULT = "AND"; :}
     |   GEQ {: RESULT = "GEQ"; :}
     |   LEQ {: RESULT = "LEQ"; :}
     ;
-
-unop ::= NOT:n {: RESULT = n.toString(); :}
-//    |   MINUS:m {: RESULT = m.toString(); :}
+*/
+unop ::= NOT:n {: RESULT = "NOT"; :}
+//    |   MINUS:m {: RESULT = "MINUS"; :}
     ;
 
-formals ::= IDENTIFIER:x {: RESULT = new Formals(x); :}
-    |    IDENTIFIER:x COMMA formals:xs {: RESULT = new Formals(x,xs); :}
+formals ::= IDENTIFIER:x {: RESULT = new FormalList(); RESULT.addElement(x); :}
+    |    IDENTIFIER:x COMMA formals:xs {: RESULT = new FormalList(); RESULT.addElement(x); :}
     ;
 
 name ::= IDENTIFIER:n {: RESULT = n.toString(); :}
@@ -188,8 +182,8 @@ postfix ::= DOT:dot LEFT:l
     ;
 */
 
-literal ::=  INT_LITERAL:i {: RESULT = new Literal(i.intValue()); :}
-    |  BOOL_LITERAL:b {: RESULT = new Literal(b.booleanValue()); :}
-    |  STRING_LITERAL:s {: RESULT = new Literal(s); :}
-    |  NONE_LITERAL:none {: RESULT = new Literal(none); :}
+literal ::=  INT_LITERAL:i {: RESULT = new IntLiteral(i); :}
+    |  BOOL_LITERAL:b {: RESULT = b.toString(); :}
+    |  STRING_LITERAL:s {: RESULT = s.toString(); :}
+    |  NONE_LITERAL:none {: RESULT = none.toString(); :}
     ;
