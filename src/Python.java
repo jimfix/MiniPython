@@ -1,6 +1,9 @@
-package syntaxtree;
-import java.io.*;
+
+import java.io.FileReader;
+
+import java_cup.parser;
 import java_cup.runtime.*;
+import syntaxtree.Program;
 
 public class Python {
     public static void main(String[] args) {
