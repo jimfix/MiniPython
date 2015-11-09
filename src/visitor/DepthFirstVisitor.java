@@ -4,7 +4,7 @@ import syntaxtree.*;
 
 public class DepthFirstVisitor implements Visitor {
 
-	public void visit(TheProgram n) {
+	public void visit(Program n) {
 		for ( int i = 0; i < n.defnlist.size(); i++) {
 			n.defnlist.elementAt(i).accept(this);
 		}

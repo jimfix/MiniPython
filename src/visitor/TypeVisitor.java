@@ -3,7 +3,7 @@ package visitor;
 import syntaxtree.*;
 
 public interface TypeVisitor {
-	public Type visit(TheProgram n);
+	public Type visit(Program n);
 	public Type visit(Name n);
 	public Type visit(Defn n);
 	public Type visit(Formal n);

@@ -3,12 +3,12 @@ package syntaxtree;
 import visitor.TypeVisitor;
 import visitor.Visitor;
 
-public class TheProgram {
+public class Program {
 
 	public DefnList  defnlist;
 	public Block block;
 
-	public TheProgram(DefnList dl, Block b) {
+	public Program(DefnList dl, Block b) {
 		this.defnlist = dl;
 		this.block = b;
 	}

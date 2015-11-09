@@ -56,7 +56,7 @@ terminal java.lang.String NONE_LITERAL;
 
 /* Variables */
 
-non terminal TheProgram program;
+non terminal Program program;
 non terminal Block block;
 non terminal Defn definition;
 non terminal DefnList definition_list;
@@ -97,8 +97,8 @@ precedence left INT_LITERAL, BOOL_LITERAL, STRING_LITERAL, IDENTIFIER;
 
 start with program;
 
-program  ::= definition_list:dl block:b    {: RESULT = new TheProgram(dl,b); :}
-    |   block:b {: RESULT = new TheProgram(null,b); :}
+program  ::= definition_list:dl block:b    {: RESULT = new Program(dl,b); :}
+    |   block:b {: RESULT = new Program(null,b); :}
     ;
 
 block ::= LBRACE statement_list:sl RBRACE {: RESULT = sl; :}
