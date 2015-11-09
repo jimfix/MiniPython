@@ -1,16 +1,14 @@
 package syntaxtree;
-
-import visitor.TypeVisitor;
 import visitor.Visitor;
+import visitor.TypeVisitor;
 
-public class Name {
-
-	public Identifier ident;
+public class Formal {
 	public Type type;
+	public Identifier ident;
 
-	public Name(Type t, Identifier i) {
-		this.ident = i;
+	public Formal(Type t, Identifier i) {
 		this.type = t;
+		this.ident = i;
 	}
 
 	public void accept(Visitor v) {

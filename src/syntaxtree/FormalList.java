@@ -2,19 +2,19 @@ package syntaxtree;
 
 import java.util.Vector;
 
-public class StateList {
+public class FormalList {
 	private Vector list;
 
-	public StateList() {
+	public FormalList() {
 		list = new Vector();
 	}
 
-	public void addElement(Statement n) {
+	public void addElement(Formal n) {
 		list.addElement(n);
 	}
 
-	public Statement elementAt(int i)  { 
-		return (Statement)list.elementAt(i); 
+	public Formal elementAt(int i)  { 
+		return (Formal)list.elementAt(i); 
 	}
 
 	public int size() { 

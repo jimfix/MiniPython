@@ -1,20 +1,23 @@
 package syntaxtree;
+
+import java.util.Vector;
+
 public class DefnList {
+	private Vector list;
 
-    DefnList   defnlist;
-    Defn       defn;
-    
-    public DefnList(Defn d, DefnList dl) {
-    	this.defn = d;
-    	this.defnlist = dl;
-    }
+	public DefnList() {
+		list = new Vector();
+	}
 
-    public String toString() {
-        String s = "DefnList(";
-        s += this.defn;
-        s += ",[";
-        s += this.defnlist;
-        s += "])";
-        return s;
-    }
+	public void addElement(Defn n) {
+		list.addElement(n);
+	}
+
+	public Defn elementAt(int i)  { 
+		return (Defn)list.elementAt(i); 
+	}
+
+	public int size() { 
+		return list.size(); 
+	}
 }

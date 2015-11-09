@@ -1,20 +1,23 @@
 package syntaxtree;
+
+import visitor.TypeVisitor;
+import visitor.Visitor;
+
 public class While extends Statement{
 
-	Expn   exp;
-	Block  body;
+	public Expn   exp;
+	public Statement  state;
 
-	public While(Expn e, Block m) {
+	public While(Expn e, Statement s) {
 		this.exp = e;
-		this.body = m;
+		this.state = s;
 	}
 
-	public String toString() {
-		String s = "While(";
-		s += this.exp;
-		s += ",[";
-		s += this.body;
-		s += "])";
-		return s;
+	public void accept(Visitor v) {
+		v.visit(this);
+	}
+
+	public Type accept(TypeVisitor v) {
+		return v.visit(this);
 	}
 }

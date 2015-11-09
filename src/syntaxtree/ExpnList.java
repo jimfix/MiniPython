@@ -1,20 +1,23 @@
 package syntaxtree;
+
+import java.util.Vector;
+
 public class ExpnList {
+	private Vector list;
 
-    ExpnList   explist;
-    Expn       exp;
-    
-    public ExpnList(Expn e, ExpnList el) {
-    	this.exp = e;
-    	this.explist = el;
-    }
+	public ExpnList() {
+		list = new Vector();
+	}
 
-    public String toString() {
-        String s = "ExpnList(";
-        s += this.exp;
-        s += ",[";
-        s += this.explist;
-        s += "])";
-        return s;
-    }
+	public void addElement(Expn n) {
+		list.addElement(n);
+	}
+
+	public Expn elementAt(int i)  { 
+		return (Expn)list.elementAt(i); 
+	}
+
+	public int size() { 
+		return list.size(); 
+	}
 }

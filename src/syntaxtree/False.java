@@ -2,13 +2,7 @@ package syntaxtree;
 import visitor.Visitor;
 import visitor.TypeVisitor;
 
-public class Block extends Statement {
-	public StateList sl;
-
-	public Block(StateList asl) {
-		sl=asl;
-	}
-
+public class False extends Expn {
 	public void accept(Visitor v) {
 		v.visit(this);
 	}

@@ -1,32 +1,32 @@
 package syntaxtree;
+
+import visitor.TypeVisitor;
+import visitor.Visitor;
+
 public class Defn {
 
-    String   name;
-    Formals  formals;
-    Block    body;
-    
-    public Defn(String f, Formals xs, Block b) {
-        this.name = f;
-        this.formals = xs;
-        this.body = b;
-    }
+	public Type   type;
+	public Identifier ident;
+	public FormalList formals;
+	public NameList vars;
+	public StateList statelist;
+	public Expn exp;
 
-    public Defn(String f, Block b) {
-        this.name = f;
-        this.formals = null;
-        this.body = b;
-    }
-    
-    public String toString() {
-        String s = "Defn(";
-        s += this.name;
-        s += ",[";
-        if(this.formals != null) {
-            s += this.formals;
-            s += "],[";
-        }
-        s += this.body;
-        s += "])";
-        return s;
-    }
+	public Defn(Type ty, Identifier i, FormalList fs, NameList v, 
+			StateList sl, Expn e) {
+		this.type = ty;
+		this.ident = i;
+		this.formals = fs;
+		this.vars = v;
+		this.statelist = sl;
+		this.exp = e;
+	}
+
+	public void accept(Visitor v) {
+		v.visit(this);
+	}
+
+	public Type accept(TypeVisitor v) {
+		return v.visit(this);
+	}
 }

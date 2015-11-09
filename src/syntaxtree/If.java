@@ -1,34 +1,24 @@
 package syntaxtree;
+
+import visitor.TypeVisitor;
+import visitor.Visitor;
+
 public class If extends Statement {
 
-	Expn   exp;
-	Block  first;
-	Block  second;
+	public Expn   exp;
+	public Statement  s1;
+	public Statement s2;
 
-	public If(Expn e, Block m) {
+	public If(Expn e, Statement m, Statement n) {
 		this.exp = e;
-		this.first = m;
-		this.second = null;
+		this.s1 = m;
+		this.s2 = n;
+	}
+	public void accept(Visitor v) {
+		v.visit(this);
 	}
 
-	public If(Expn e, Block m, Block n) {
-		this.exp = e;
-		this.first = m;
-		this.second = n;
-	}
-
-	public String toString() {
-		String s = "If(";
-		s += this.exp;
-		s += ",[";
-		s += this.first;
-		s += "]";
-		if(this.second != null) {
-			s += ",Else[";
-			s += this.second;
-			s += "]";
-		}
-		s += ")";
-		return s;
+	public Type accept(TypeVisitor v) {
+		return v.visit(this);
 	}
 }

@@ -1,16 +1,11 @@
 package syntaxtree;
-
-import visitor.TypeVisitor;
 import visitor.Visitor;
+import visitor.TypeVisitor;
 
-public class Name {
-
-	public Identifier ident;
-	public Type type;
-
-	public Name(Type t, Identifier i) {
-		this.ident = i;
-		this.type = t;
+public class IdentifierExpn extends Expn {
+	public String s;
+	public IdentifierExpn(String as) { 
+		s=as;
 	}
 
 	public void accept(Visitor v) {

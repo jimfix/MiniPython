@@ -1,16 +1,12 @@
 package syntaxtree;
-
-import visitor.TypeVisitor;
 import visitor.Visitor;
+import visitor.TypeVisitor;
 
-public class Name {
+public class Identifier {
+	public String s;
 
-	public Identifier ident;
-	public Type type;
-
-	public Name(Type t, Identifier i) {
-		this.ident = i;
-		this.type = t;
+	public Identifier(String as) { 
+		s=as;
 	}
 
 	public void accept(Visitor v) {
@@ -19,5 +15,9 @@ public class Name {
 
 	public Type accept(TypeVisitor v) {
 		return v.visit(this);
+	}
+
+	public String toString(){
+		return s;
 	}
 }

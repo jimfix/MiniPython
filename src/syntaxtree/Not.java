@@ -1,16 +1,12 @@
 package syntaxtree;
-
-import visitor.TypeVisitor;
 import visitor.Visitor;
+import visitor.TypeVisitor;
 
-public class Name {
+public class Not extends Expn {
+	public Expn exp;
 
-	public Identifier ident;
-	public Type type;
-
-	public Name(Type t, Identifier i) {
-		this.ident = i;
-		this.type = t;
+	public Not(Expn not) {
+		this.exp = not; 
 	}
 
 	public void accept(Visitor v) {

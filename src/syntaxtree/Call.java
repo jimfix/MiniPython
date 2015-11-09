@@ -1,28 +1,25 @@
 package syntaxtree;
-public class Call extends Statement {
-    
-    String name;
-    ExpnList explist;
 
-    public Call(String f, ExpnList exps) {
-        this.name = f;
-        this.explist = exps;
-    }
+import visitor.TypeVisitor;
+import visitor.Visitor;
 
-    public Call(String f) {
-        this.name = f;
-        this.explist = null;
-    }
-    
-    public String toString() {
-        String s = "Call(";
-        s += this.name;
-        s += ",[";
-        if(this.explist != null) {
-            s += this.explist;
-        }
-        s += "])";
-        return s;
-    }
-    
+public class Call extends Expn {
+
+	public Expn exp;
+	public Identifier ident;
+	public ExpnList explist;
+
+	public Call(Expn exp, Identifier i, ExpnList exps) {
+		this.exp = exp;
+		this.ident = i;
+		this.explist = exps;
+	}
+
+	public void accept(Visitor v) {
+		v.visit(this);
+	}
+
+	public Type accept(TypeVisitor v) {
+		return v.visit(this);
+	}    
 }

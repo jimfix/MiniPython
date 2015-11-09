@@ -1,28 +1,23 @@
 package syntaxtree;
+
+import visitor.TypeVisitor;
+import visitor.Visitor;
+
 public class Program {
 
-    DefnList  defnlist;
-    Block     block;
+	public DefnList  defnlist;
+	public Block block;
 
-    public Program(DefnList dl, Block b) {
-        this.defnlist = dl;
-        this.block = b;
-    }
+	public Program(DefnList dl, Block b) {
+		this.defnlist = dl;
+		this.block = b;
+	}
 
-    public Program(Block b) {
-        this.defnlist = null;
-        this.block = b;
-    }
+	public void accept(Visitor v) {
+		v.visit(this);
+	}
 
-    public String toString() {
-        String s = "Program(";
-        if (this.defnlist != null) {
-            s += "[";
-            s += this.defnlist;
-            s += "],";
-        }
-        s += this.block;
-        s += ")";
-        return s;
-    }
+	public Type accept(TypeVisitor v) {
+		return v.visit(this);
+	}
 }
