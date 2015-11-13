@@ -3,7 +3,6 @@ import Parser.*;
 import AST.*;
 import AST.Visitor.*;
 import java_cup.runtime.Symbol;
-
 import java.util.*;
 
 public class TestParser {
@@ -16,7 +15,7 @@ public class TestParser {
 	    // replace p.parse() with p.debug_parse() in next line to see trace of
 	    // parser shift/reduce actions during parse
             root = p.parse();
-            List<Statement> program = (List<Statement>)root.value;
+            Program program = (Program)root.value;
             for (Statement statement: program) {
                 statement.accept(new PrettyPrintVisitor());
 				System.out.print("\n");

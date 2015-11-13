@@ -10,7 +10,7 @@ public class TestScanner {
             Symbol t = s.next_token();
             while (t.sym != sym.EOF){ 
                 // print each token that we scan
-                System.out.print(s.symbolToString(t) + " ");
+                System.out.print(t.toString() + " ");
                 t = s.next_token(); 
             }
             System.out.print("\nLexical analysis completed"); 

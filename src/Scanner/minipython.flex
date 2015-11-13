@@ -15,20 +15,20 @@
 package Scanner;
 
 import java_cup.runtime.*;
+import Parser.sym;
 
 %%
 
 %public
-%class Scanner
+%final
+%class scanner
 %implements sym
-
 %unicode
-
+%cup
+%cupdebug
 %line
 %column
 
-%cup
-%cupdebug
 
 %{
   StringBuilder string = new StringBuilder();
@@ -111,7 +111,7 @@ SStringCharacter = [^\r\n\'\\]
   "or"                           { return symbol(OR); }
   "+"                            { return symbol(PLUS); }
   "-"                            { return symbol(MINUS); }
-  "*"                            { return symbol(MULT); }
+  "*"                            { return symbol(TIMES); }
   "//"                           { return symbol(DIV); }
   "%"                            { return symbol(MOD); }
   
@@ -181,9 +181,3 @@ SStringCharacter = [^\r\n\'\\]
 [^]                              { throw new RuntimeException("Illegal character \""+yytext()+
                                                               "\" at line "+yyline+", column "+yycolumn); }
 <<EOF>>                          { return symbol(EOF); }
-
-/* lexical errors (put last so other matches take precedence) */
-. { System.err.println(
-    "\nunexpected character in input: '" + yytext() + "' at line " +
-    (yyline+1) + " column " + (yycolumn+1));
-  }

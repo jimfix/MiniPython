@@ -72,14 +72,14 @@ nonterminal Block block;
 nonterminal Defn definition;
 nonterminal DefnList definition_list;
 nonterminal Statement statement;
-nonterminal StateList statement_list;
-nonterminal Statement if_statement;
-nonterminal Statement while_statement;
-nonterminal Statement return_statement;
+nonterminal StatementList statement_list;
+nonterminal If if_statement;
+nonterminal While while_statement;
+nonterminal Return return_statement;
 nonterminal String name;
-nonterminal Formals formals;
-nonterminal Expn expression;
-nonterminal ExpnList expression_list;
+nonterminal FormalList formals;
+nonterminal Exp expression;
+nonterminal ExpList expression_list;
 nonterminal Assign assignment;
 //nonterminal String postfix;
 nonterminal Literal literal;
@@ -115,7 +115,7 @@ program  ::= definition_list:dl block:b    {: RESULT = new Program(dl,b,dlleft);
 block ::= LBRACE statement_list:sl RBRACE {: RESULT = sl; :}
     ;
 
-definition_list ::= definition:d {: List<Defn> deflist = new LinkedList<Defn>; deflist.add(d); RESULT = deflist; :}
+definition_list ::= definition:d {: List<Defn> deflist = new LinkedList<Defn>(); deflist.add(d); RESULT = deflist; :}
     |   definition_list definition:d {: deflist.add(d); RESULT = deflist; :}
     ;
 
@@ -123,8 +123,8 @@ statement_list ::= statement:s {: List<Statement> stli = new LinkedList<Statemen
     |   statement_list statement:s {: stli.add(s); RESULT = stli; :}
     ;
 
-definition ::= DEF:def IDENTIFIER:f LPAREN RPAREN COLON block:b {: RESULT = new Defn(null,f,null,null,b,null,defleft); :}
-    |   DEF:def IDENTIFIER:f LPAREN formals:xs RPAREN COLON block:b {: RESULT = new Defn(null,f,xs,null,b,null,defleft); :}
+definition ::= DEF:df IDENTIFIER:f LPAREN RPAREN COLON block:b {: RESULT = new Defn(null,f,null,null,b,null,dfleft); :}
+    |   DEF:df IDENTIFIER:f LPAREN formals:xs RPAREN COLON block:b {: RESULT = new Defn(null,f,xs,null,b,null,dfleft); :}
     ;
 
 statement ::= assignment:as {: RESULT = as; :}
@@ -139,14 +139,14 @@ statement ::= assignment:as {: RESULT = as; :}
 assignment ::= name:n ASSIGN expression:exp {: RESULT = new Assign(n,exp,nleft); :}
     ;
 
-if_statement ::= IF:if expression:exp COLON block:b {: RESULT = new If(exp,b,null,ifleft); :}
-    |  IF:if expression:exp COLON block:b1 ELSE COLON block:b2 {: RESULT = new If(exp,b1,b2,ifleft); :}
+if_statement ::= IF:i expression:exp COLON block:b {: RESULT = new If(exp,b,null,ileft); :}
+    |  IF:i expression:exp COLON block:b1 ELSE COLON block:b2 {: RESULT = new If(exp,b1,b2,ileft); :}
     ;
 
 while_statement ::= WHILE:wh expression:exp COLON block:b {: RESULT = new While(exp,b,whleft); :}
     ;
 
-expression_list ::= expression:exp {: List<Exp> expnlist = new LinkedList<Exp>; expnlist.add(exp); RESULT = expnlist; :}
+expression_list ::= expression:exp {: List<Exp> expnlist = new LinkedList<Exp>(); expnlist.add(exp); RESULT = expnlist; :}
     |    expression_list expression:exp {: expnlist.add(exp); RESULT = expnlist; :}
     ;
 
@@ -177,7 +177,7 @@ expression ::= expression:e1 PLUS expression:e2 {: RESULT = new Plus(e1,e2,e1lef
     ;
 */
 
-formals ::= IDENTIFIER:x {: List<Formal> fl = new LinkedList<Formal>; fl.add(x); RESULT = fl; :}
+formals ::= IDENTIFIER:x {: List<Formal> fl = new LinkedList<Formal>(); fl.add(x); RESULT = fl; :}
     |    formals COMMA IDENTIFIER:x {: fl.add(x); RESULT = fl; :}
     ;
 
