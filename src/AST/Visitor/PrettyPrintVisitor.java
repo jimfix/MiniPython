@@ -1,41 +1,30 @@
 package AST.Visitor;
 
-import AST.*;
-import src.syntaxtree.And;
-import src.syntaxtree.ArrayAssign;
-import src.syntaxtree.ArrayLength;
-import src.syntaxtree.ArrayLookup;
-import src.syntaxtree.Assign;
-import src.syntaxtree.Block;
-import src.syntaxtree.BooleanType;
-import src.syntaxtree.Call;
-import src.syntaxtree.ClassDeclExtends;
-import src.syntaxtree.ClassDeclSimple;
-import src.syntaxtree.Display;
-import src.syntaxtree.False;
-import src.syntaxtree.Formal;
-import src.syntaxtree.Identifier;
-import src.syntaxtree.IdentifierExp;
-import src.syntaxtree.IdentifierType;
-import src.syntaxtree.If;
-import src.syntaxtree.IntArrayType;
-import src.syntaxtree.IntegerLiteral;
-import src.syntaxtree.IntegerType;
-import src.syntaxtree.LessThan;
-import src.syntaxtree.MainClass;
-import src.syntaxtree.MethodDecl;
-import src.syntaxtree.Minus;
-import src.syntaxtree.NewArray;
-import src.syntaxtree.NewObject;
-import src.syntaxtree.Not;
-import src.syntaxtree.Plus;
-import src.syntaxtree.Print;
-import src.syntaxtree.Program;
-import src.syntaxtree.This;
-import src.syntaxtree.Times;
-import src.syntaxtree.True;
-import src.syntaxtree.VarDecl;
-import src.syntaxtree.While;
+import AST.And;
+import AST.Assign;
+import AST.Block;
+import AST.BooleanType;
+import AST.Call;
+import AST.Defn;
+import AST.Display;
+import AST.False;
+import AST.Formal;
+import AST.Identifier;
+import AST.IdentifierExp;
+import AST.IdentifierType;
+import AST.If;
+import AST.IntegerLiteral;
+import AST.IntegerType;
+import AST.LessThan;
+import AST.Minus;
+import AST.Not;
+import AST.Plus;
+import AST.Print;
+import AST.Program;
+import AST.Times;
+import AST.True;
+import AST.Name;
+import AST.While;
 
 // Sample print visitor from MiniJava web site with small modifications for UW CSE.
 // HP 10/11
@@ -49,77 +38,17 @@ public class PrettyPrintVisitor implements Visitor {
     System.out.print(";");
   }
   
-  // MainClass m;
-  // ClassDeclList cl;
   public void visit(Program n) {
-    n.m.accept(this);
-    for ( int i = 0; i < n.cl.size(); i++ ) {
-        System.out.println();
-        n.cl.get(i).accept(this);
-    }
-  }
-  
-  // Identifier i1,i2;
-  // Statement s;
-  public void visit(MainClass n) {
-    System.out.print("class ");
-    n.i1.accept(this);
-    System.out.println(" {");
-    System.out.print("  public static void main (String [] ");
-    n.i2.accept(this);
-    System.out.println(") {");
-    System.out.print("    ");
-    n.s.accept(this);
-    System.out.println("  }");
-    System.out.println("}");
-  }
-
-  // Identifier i;
-  // VarDeclList vl;
-  // MethodDeclList ml;
-  public void visit(ClassDeclSimple n) {
-    System.out.print("class ");
-    n.i.accept(this);
-    System.out.println(" { ");
-    for ( int i = 0; i < n.vl.size(); i++ ) {
-        System.out.print("  ");
-        n.vl.get(i).accept(this);
-        if ( i+1 < n.vl.size() ) { System.out.println(); }
-    }
-    for ( int i = 0; i < n.ml.size(); i++ ) {
-        System.out.println();
-        n.ml.get(i).accept(this);
-    }
-    System.out.println();
-    System.out.println("}");
-  }
- 
-  // Identifier i;
-  // Identifier j;
-  // VarDeclList vl;
-  // MethodDeclList ml;
-  public void visit(ClassDeclExtends n) {
-    System.out.print("class ");
-    n.i.accept(this);
-    System.out.println(" extends ");
-    n.j.accept(this);
-    System.out.println(" { ");
-    for ( int i = 0; i < n.vl.size(); i++ ) {
-        System.out.print("  ");
-        n.vl.get(i).accept(this);
-        if ( i+1 < n.vl.size() ) { System.out.println(); }
-    }
-    for ( int i = 0; i < n.ml.size(); i++ ) {
-        System.out.println();
-        n.ml.get(i).accept(this);
-    }
-    System.out.println();
-    System.out.println("}");
-  }
+		for ( int i = 0; i < n.defnlist.size(); i++) {
+			System.out.println();
+			n.defnlist.get(i).accept(this);
+		}
+		n.block.accept(this);
+	}  
 
   // Type t;
   // Identifier i;
-  public void visit(VarDecl n) {
+  public void visit(Name n) {
     n.t.accept(this);
     System.out.print(" ");
     n.i.accept(this);
@@ -132,7 +61,7 @@ public class PrettyPrintVisitor implements Visitor {
   // VarDeclList vl;
   // StatementList sl;
   // Exp e;
-  public void visit(MethodDecl n) {
+  public void visit(Defn n) {
     System.out.print("  public ");
     n.t.accept(this);
     System.out.print(" ");
@@ -165,10 +94,6 @@ public class PrettyPrintVisitor implements Visitor {
     n.t.accept(this);
     System.out.print(" ");
     n.i.accept(this);
-  }
-
-  public void visit(IntArrayType n) {
-    System.out.print("int []");
   }
 
   public void visit(BooleanType n) {
@@ -233,17 +158,6 @@ public class PrettyPrintVisitor implements Visitor {
     System.out.print(";");
   }
 
-  // Identifier i;
-  // Exp e1,e2;
-  public void visit(ArrayAssign n) {
-    n.i.accept(this);
-    System.out.print("[");
-    n.e1.accept(this);
-    System.out.print("] = ");
-    n.e2.accept(this);
-    System.out.print(";");
-  }
-
   // Exp e1,e2;
   public void visit(And n) {
     System.out.print("(");
@@ -289,20 +203,6 @@ public class PrettyPrintVisitor implements Visitor {
     System.out.print(")");
   }
 
-  // Exp e1,e2;
-  public void visit(ArrayLookup n) {
-    n.e1.accept(this);
-    System.out.print("[");
-    n.e2.accept(this);
-    System.out.print("]");
-  }
-
-  // Exp e;
-  public void visit(ArrayLength n) {
-    n.e.accept(this);
-    System.out.print(".length");
-  }
-
   // Exp e;
   // Identifier i;
   // ExpList el;
@@ -334,24 +234,6 @@ public class PrettyPrintVisitor implements Visitor {
   // String s;
   public void visit(IdentifierExp n) {
     System.out.print(n.s);
-  }
-
-  public void visit(This n) {
-    System.out.print("this");
-  }
-
-  // Exp e;
-  public void visit(NewArray n) {
-    System.out.print("new int [");
-    n.e.accept(this);
-    System.out.print("]");
-  }
-
-  // Identifier i;
-  public void visit(NewObject n) {
-    System.out.print("new ");
-    System.out.print(n.i.s);
-    System.out.print("()");
   }
 
   // Exp e;

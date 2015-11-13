@@ -1,0 +1,197 @@
+package Parser;
+
+import AST.*;
+import java.util.*;
+import java_cup.runtime.*;
+
+/*
+   September 2015 - changed considerably to work with a limited Python syntax
+                    (authors: Jeremy Cosel and James Fix)
+ */
+
+/* MiniPython3 parser for CUP.  
+ * Copyright (C) 2015 Jeremy Cosel (jcosel@reed.edu)
+ * Modified from the Java 1.2 parser for CUP which had this copyright:
+ *    Copyright (C) 1998 C. Scott Ananian <cananian@alumni.princeton.edu>
+ *    This program is released under the terms of the GPL; see the file
+ *    COPYING for more details.  There is NO WARRANTY on this code.
+ */
+
+parser code  {:
+  /* Override default error message routine to handle line numbers correctly */
+  /* This routine is also called in the process of handling fatal errors. */
+
+  /** Report a non fatal error (or warning).  This method takes a message 
+   *  string and an additional object (to be used by specializations 
+   *  implemented in subclasses).  Prints the same simple error message
+   *  as the base class version, but correctly labels the line number.
+   *
+   * @param message an error message.
+   * @param info    an extra object reserved for use by specialized subclasses.
+   */
+  public void report_error(String message, Object info)
+    {
+      System.err.print(message);
+      System.err.flush();
+      if (info instanceof Symbol)
+    if (((Symbol)info).left != -1)
+      System.err.println(" at line " + ((Symbol)info).left +
+                 " of input");
+    else System.err.println("");
+      else System.err.println("");
+    }
+:};
+
+/* Terminals */
+
+terminal ASSIGN;                       // assignment keyword
+//terminal RETURN;
+terminal LPAREN, RPAREN;
+terminal LBRACE, RBRACE;
+terminal LBRACK, RBRACK;               // array index or type annotation
+//terminal DOT, LEFT, RIGHT;             // field selector
+terminal COMMA, COLON;                 // separators
+terminal IF, ELSE;                     // conditional statement keywords
+terminal WHILE;                        // loop keyword
+terminal DEF;                          // definition keyword
+terminal PLUS, MINUS, TIMES/*, DIV, MOD*/;  // arithmetic
+//terminal LT, GT, LEQ, GEQ;             // comparators
+//terminal EQ, NEQ;                        // equality
+terminal /*AND, OR,*/ NOT;                 // logical connectives
+
+terminal Number INT_LITERAL;
+terminal Boolean BOOL_LITERAL;
+terminal String STRING_LITERAL;
+terminal String IDENTIFIER;
+terminal String NONE_LITERAL;
+
+/* Variables */
+
+nonterminal Program program;
+nonterminal Block block;
+nonterminal Defn definition;
+nonterminal DefnList definition_list;
+nonterminal Statement statement;
+nonterminal StateList statement_list;
+nonterminal Statement if_statement;
+nonterminal Statement while_statement;
+nonterminal Statement return_statement;
+nonterminal String name;
+nonterminal Formals formals;
+nonterminal Expn expression;
+nonterminal ExpnList expression_list;
+nonterminal Assign assignment;
+//nonterminal String postfix;
+nonterminal Literal literal;
+
+/* Precedences */
+
+precedence left DEF;
+precedence left COLON;
+precedence left LBRACE, RBRACE;
+precedence left LPAREN, RPAREN;
+precedence left LBRACK, RBRACK;
+precedence left ASSIGN/*, RETURN*/;
+precedence left IF, ELSE, WHILE;
+precedence left COMMA;
+//precedence nonassoc LT, GT, LEQ, GEQ, NEQ, EQ;
+//precedence left OR;
+//precedence left AND;
+precedence left NOT;
+precedence left PLUS, MINUS;
+precedence left TIMES/*, DIV, MOD*/;
+//precedence left DOT, LEFT, RIGHT;
+precedence left INT_LITERAL, BOOL_LITERAL, STRING_LITERAL, IDENTIFIER;
+
+
+/* The Grammar Rules */
+
+start with program;
+
+program  ::= definition_list:dl block:b    {: RESULT = new Program(dl,b,dlleft); :}
+    |   block:b {: RESULT = new Program(null,b,bleft); :}
+    ;
+
+block ::= LBRACE statement_list:sl RBRACE {: RESULT = sl; :}
+    ;
+
+definition_list ::= definition:d {: List<Defn> deflist = new LinkedList<Defn>; deflist.add(d); RESULT = deflist; :}
+    |   definition_list definition:d {: deflist.add(d); RESULT = deflist; :}
+    ;
+
+statement_list ::= statement:s {: List<Statement> stli = new LinkedList<Statement>(); stli.add(s); RESULT = stli; :}
+    |   statement_list statement:s {: stli.add(s); RESULT = stli; :}
+    ;
+
+definition ::= DEF:def IDENTIFIER:f LPAREN RPAREN COLON block:b {: RESULT = new Defn(null,f,null,null,b,null,defleft); :}
+    |   DEF:def IDENTIFIER:f LPAREN formals:xs RPAREN COLON block:b {: RESULT = new Defn(null,f,xs,null,b,null,defleft); :}
+    ;
+
+statement ::= assignment:as {: RESULT = as; :}
+    |   IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(null,f,el,fleft); :}
+    |   IDENTIFIER:f LPAREN RPAREN {: RESULT = new Call(null,f,null,fleft); :}
+    |   if_statement:i {: RESULT = i; :}
+    |   while_statement:w {: RESULT = w; :}
+    |   return_statement:r {: RESULT = r; :}
+//    |   expression:exp {: RESULT = new Assign("it",exp); :}
+    ;
+
+assignment ::= name:n ASSIGN expression:exp {: RESULT = new Assign(n,exp,nleft); :}
+    ;
+
+if_statement ::= IF:if expression:exp COLON block:b {: RESULT = new If(exp,b,null,ifleft); :}
+    |  IF:if expression:exp COLON block:b1 ELSE COLON block:b2 {: RESULT = new If(exp,b1,b2,ifleft); :}
+    ;
+
+while_statement ::= WHILE:wh expression:exp COLON block:b {: RESULT = new While(exp,b,whleft); :}
+    ;
+
+expression_list ::= expression:exp {: List<Exp> expnlist = new LinkedList<Exp>; expnlist.add(exp); RESULT = expnlist; :}
+    |    expression_list expression:exp {: expnlist.add(exp); RESULT = expnlist; :}
+    ;
+
+expression ::= expression:e1 PLUS expression:e2 {: RESULT = new Plus(e1,e2,e1left); :}
+    |   expression:e1 MINUS expression:e2 {: RESULT = new Minus(e1,e2,e1left); :}
+    |   expression:e1 TIMES expression:e2 {: RESULT = new Times(e1,e2,e1left); :}
+    |   NOT:not expression:e {: RESULT = new Not(e,notleft); :}
+    |   name:n {: RESULT = n; :}
+    |   literal:l {: RESULT = l; :}
+    |   LPAREN expression:exp RPAREN {: RESULT = exp; :}
+//    |   IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(f,el); :}
+//    |   IDENTIFIER:f LPAREN RPAREN {: RESULT = new Call(f); :}
+    ;
+
+/*binop ::= AND {: RESULT = "AND"; :}
+    |   OR {: RESULT = "OR"; :}
+    |   PLUS {: RESULT = "PLUS"; :}
+    |   MINUS {: RESULT = "MINUS"; :}
+    |   MULT {: RESULT = "MULT"; :}
+    |   DIV {: RESULT = "DIV"; :}
+    |   MOD {: RESULT = "MOD"; :}
+    |   LT {: RESULT = "LT"; :}
+    |   GT {: RESULT = "GT"; :}
+    |   EQ {: RESULT = "EQ"; :}
+    |   NEQ {: RESULT = "NEQ"; :}
+    |   GEQ {: RESULT = "GEQ"; :}
+    |   LEQ {: RESULT = "LEQ"; :}
+    ;
+*/
+
+formals ::= IDENTIFIER:x {: List<Formal> fl = new LinkedList<Formal>; fl.add(x); RESULT = fl; :}
+    |    formals COMMA IDENTIFIER:x {: fl.add(x); RESULT = fl; :}
+    ;
+
+name ::= IDENTIFIER:n {: new IdentifierExp(n,nleft); :}
+//    |  name:n postfix:post {: RESULT = new Name(n,post,nleft); :}
+    ;
+/*
+postfix ::= DOT:dot LEFT:l
+    |   DOT:dot RIGHT:r
+    ;
+*/
+
+literal ::=  INT_LITERAL:i {: RESULT = new IntegerLiteral(i); :}
+    |  BOOL_LITERAL:b {: RESULT = b.toString(); :}
+    |  STRING_LITERAL:s {: RESULT = s.toString(); :}
+    |  NONE_LITERAL:none {: RESULT = none.toString(); :}
+    ;

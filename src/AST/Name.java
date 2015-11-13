@@ -1,12 +1,13 @@
 package AST;
 import AST.Visitor.Visitor;
 
-public class NewObject extends Exp {
+public class Name extends ASTNode {
+  public Type t;
   public Identifier i;
   
-  public NewObject(Identifier ai, int ln) {
+  public Name(Type at, Identifier ai, int ln) {
     super(ln);
-    i=ai;
+    t=at; i=ai;
   }
 
   public void accept(Visitor v) {
