@@ -44,8 +44,8 @@ parser code  {:
 
 /* Terminals */
 
-terminal ASSIGN;                       // assignment keyword
-//terminal RETURN;
+terminal ASSIGN;                     // assignment keyword
+terminal PRINT;
 terminal LPAREN, RPAREN;
 terminal LBRACE, RBRACE;
 terminal LBRACK, RBRACK;               // array index or type annotation
@@ -55,34 +55,36 @@ terminal IF, ELSE;                     // conditional statement keywords
 terminal WHILE;                        // loop keyword
 terminal DEF;                          // definition keyword
 terminal PLUS, MINUS, TIMES/*, DIV, MOD*/;  // arithmetic
-//terminal LT, GT, LEQ, GEQ;             // comparators
+terminal LT/*, GT, LEQ, GEQ*/;             // comparators
 //terminal EQ, NEQ;                        // equality
-terminal /*AND, OR,*/ NOT;                 // logical connectives
+terminal AND,/* OR, */NOT;                 // logical connectives
 
-terminal Number INT_LITERAL;
-terminal Boolean BOOL_LITERAL;
-terminal String STRING_LITERAL;
-terminal String IDENTIFIER;
-terminal String NONE_LITERAL;
+terminal java.lang.Integer INT_LITERAL;
+terminal java.lang.Boolean BOOL_LITERAL;
+terminal java.lang.String STRING_LITERAL;
+terminal Identifier IDENTIFIER;
+terminal java.lang.String NONE_LITERAL;
 
 /* Variables */
 
-nonterminal Program program;
-nonterminal Block block;
-nonterminal Defn definition;
-nonterminal DefnList definition_list;
-nonterminal Statement statement;
-nonterminal StatementList statement_list;
-nonterminal If if_statement;
-nonterminal While while_statement;
-nonterminal Return return_statement;
-nonterminal String name;
-nonterminal FormalList formals;
-nonterminal Exp expression;
-nonterminal ExpList expression_list;
-nonterminal Assign assignment;
-//nonterminal String postfix;
-nonterminal Literal literal;
+nonterminal AST.Program program;
+nonterminal AST.Block block;
+nonterminal AST.Defn definition;
+nonterminal AST.DefnList definition_list;
+nonterminal AST.Statement statement;
+nonterminal AST.StatementList statement_list;
+nonterminal AST.If if_statement;
+nonterminal AST.While while_statement;
+nonterminal AST.Print print_statement;
+nonterminal AST.Identifier name;
+nonterminal AST.FormalList formals;
+nonterminal AST.Exp expression;
+nonterminal AST.ExpList expression_list;
+nonterminal AST.Assign assignment;
+//nonterminal java.lang.String postfix;
+nonterminal AST.IntegerLiteral int_literal;
+nonterminal bool_literal;
+nonterminal string_literal;
 
 /* Precedences */
 
@@ -94,9 +96,9 @@ precedence left LBRACK, RBRACK;
 precedence left ASSIGN/*, RETURN*/;
 precedence left IF, ELSE, WHILE;
 precedence left COMMA;
-//precedence nonassoc LT, GT, LEQ, GEQ, NEQ, EQ;
+precedence nonassoc LT/*, GT, LEQ, GEQ, NEQ, EQ*/;
 //precedence left OR;
-//precedence left AND;
+precedence left AND;
 precedence left NOT;
 precedence left PLUS, MINUS;
 precedence left TIMES/*, DIV, MOD*/;
@@ -109,18 +111,18 @@ precedence left INT_LITERAL, BOOL_LITERAL, STRING_LITERAL, IDENTIFIER;
 start with program;
 
 program  ::= definition_list:dl block:b    {: RESULT = new Program(dl,b,dlleft); :}
-    |   block:b {: RESULT = new Program(null,b,bleft); :}
+    |   block:b {: RESULT = new Program(new DefnList(bleft),b,bleft); :}
     ;
 
-block ::= LBRACE statement_list:sl RBRACE {: RESULT = sl; :}
+block ::= LBRACE:l statement_list:sl RBRACE {: RESULT = new Block(sl,lleft); :}
     ;
 
-definition_list ::= definition:d {: List<Defn> deflist = new LinkedList<Defn>(); deflist.add(d); RESULT = deflist; :}
-    |   definition_list definition:d {: deflist.add(d); RESULT = deflist; :}
+definition_list ::= definition:d {: DefnList dl = new DefnList(dleft); dl.add(d); RESULT = dl; :}
+    |   definition_list:dl definition:d {: dl.add(d); RESULT = dl; :}
     ;
 
-statement_list ::= statement:s {: List<Statement> stli = new LinkedList<Statement>(); stli.add(s); RESULT = stli; :}
-    |   statement_list statement:s {: stli.add(s); RESULT = stli; :}
+statement_list ::= statement:s {: StatementList sl = new StatementList(sleft); sl.add(s); RESULT = sl; :}
+    |   statement_list:sl statement:s {: sl.add(s); RESULT = sl; :}
     ;
 
 definition ::= DEF:df IDENTIFIER:f LPAREN RPAREN COLON block:b {: RESULT = new Defn(null,f,null,null,b,null,dfleft); :}
@@ -128,12 +130,10 @@ definition ::= DEF:df IDENTIFIER:f LPAREN RPAREN COLON block:b {: RESULT = new D
     ;
 
 statement ::= assignment:as {: RESULT = as; :}
-    |   IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(null,f,el,fleft); :}
-    |   IDENTIFIER:f LPAREN RPAREN {: RESULT = new Call(null,f,null,fleft); :}
     |   if_statement:i {: RESULT = i; :}
     |   while_statement:w {: RESULT = w; :}
-    |   return_statement:r {: RESULT = r; :}
-//    |   expression:exp {: RESULT = new Assign("it",exp); :}
+    |   print_statement:p {: RESULT = p; :}
+    |   expression:exp {: RESULT = exp; :}
     ;
 
 assignment ::= name:n ASSIGN expression:exp {: RESULT = new Assign(n,exp,nleft); :}
@@ -146,29 +146,32 @@ if_statement ::= IF:i expression:exp COLON block:b {: RESULT = new If(exp,b,null
 while_statement ::= WHILE:wh expression:exp COLON block:b {: RESULT = new While(exp,b,whleft); :}
     ;
 
-expression_list ::= expression:exp {: List<Exp> expnlist = new LinkedList<Exp>(); expnlist.add(exp); RESULT = expnlist; :}
-    |    expression_list expression:exp {: expnlist.add(exp); RESULT = expnlist; :}
+print_statement ::= PRINT:pr expression:exp {: RESULT = new Print(exp,prleft); :}
+    ;
+
+expression_list ::= expression:exp {: ExpList el = new ExpList(expleft); el.add(exp); RESULT = el; :}
+    |    expression_list:el expression:exp {: el.add(exp); RESULT = el; :}
     ;
 
 expression ::= expression:e1 PLUS expression:e2 {: RESULT = new Plus(e1,e2,e1left); :}
     |   expression:e1 MINUS expression:e2 {: RESULT = new Minus(e1,e2,e1left); :}
     |   expression:e1 TIMES expression:e2 {: RESULT = new Times(e1,e2,e1left); :}
+    |   expression:e1 AND expression:e2 {: RESULT = new And(e1,e2,e1left); :}
+    |   expression:e1 LT expression:e2 {: RESULT = new LessThan(e1,e2,e1left); :}
     |   NOT:not expression:e {: RESULT = new Not(e,notleft); :}
-    |   name:n {: RESULT = n; :}
-    |   literal:l {: RESULT = l; :}
+    |   name:n {: RESULT = new Name(null,n,nleft); :}
+    |   int_literal:i {: RESULT = i; :}
+//    |   bool_literal:b {: RESULT = b; :}
+//    |   string_literal:s {: RESULT = s; :}
     |   LPAREN expression:exp RPAREN {: RESULT = exp; :}
-//    |   IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(f,el); :}
-//    |   IDENTIFIER:f LPAREN RPAREN {: RESULT = new Call(f); :}
+    |   IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(null,f,el,fleft); :}
+    |   IDENTIFIER:f LPAREN RPAREN {: RESULT = new Call(null,f,new ExpList(fleft),fleft); :}
     ;
 
-/*binop ::= AND {: RESULT = "AND"; :}
+/*binop ::=
     |   OR {: RESULT = "OR"; :}
-    |   PLUS {: RESULT = "PLUS"; :}
-    |   MINUS {: RESULT = "MINUS"; :}
-    |   MULT {: RESULT = "MULT"; :}
     |   DIV {: RESULT = "DIV"; :}
     |   MOD {: RESULT = "MOD"; :}
-    |   LT {: RESULT = "LT"; :}
     |   GT {: RESULT = "GT"; :}
     |   EQ {: RESULT = "EQ"; :}
     |   NEQ {: RESULT = "NEQ"; :}
@@ -177,11 +180,11 @@ expression ::= expression:e1 PLUS expression:e2 {: RESULT = new Plus(e1,e2,e1lef
     ;
 */
 
-formals ::= IDENTIFIER:x {: List<Formal> fl = new LinkedList<Formal>(); fl.add(x); RESULT = fl; :}
-    |    formals COMMA IDENTIFIER:x {: fl.add(x); RESULT = fl; :}
+formals ::= IDENTIFIER:x {: FormalList fl = new FormalList(xleft); fl.add(new Formal(null,x,xleft)); RESULT = fl; :}
+    |    formals:fl COMMA IDENTIFIER:x {: fl.add(new Formal(null,x,flleft)); RESULT = fl; :}
     ;
 
-name ::= IDENTIFIER:n {: new IdentifierExp(n,nleft); :}
+name ::= IDENTIFIER:n {: new IdentifierExp(n.toString(),nleft); :}
 //    |  name:n postfix:post {: RESULT = new Name(n,post,nleft); :}
     ;
 /*
@@ -190,8 +193,10 @@ postfix ::= DOT:dot LEFT:l
     ;
 */
 
-literal ::=  INT_LITERAL:i {: RESULT = new IntegerLiteral(i); :}
-    |  BOOL_LITERAL:b {: RESULT = b.toString(); :}
-    |  STRING_LITERAL:s {: RESULT = s.toString(); :}
-    |  NONE_LITERAL:none {: RESULT = none.toString(); :}
+int_literal ::=  INT_LITERAL:i {: RESULT = new IntegerLiteral(i,ileft); :}
     ;
+//bool_literal ::= BOOL_LITERAL:b {: RESULT = b.toString(); :}
+//    ;
+//string_literal ::= STRING_LITERAL:s {: RESULT = s.toString(); :}
+//    ;
+//NONE_LITERAL:none {: RESULT = none.toString(); :}
