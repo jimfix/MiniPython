@@ -23,14 +23,12 @@ import AST.Print;
 import AST.Program;
 import AST.Times;
 import AST.True;
-import AST.Name;
 import AST.While;
 
 public interface Visitor {
   // Display added for toy example language.  Not used in MiniJava AST
   public void visit(Display n);
   public void visit(Program n);
-  public void visit(Name n);
   public void visit(Defn n);
   public void visit(Formal n);
   public void visit(BooleanType n);

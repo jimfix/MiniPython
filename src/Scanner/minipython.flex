@@ -80,20 +80,19 @@ SStringCharacter = [^\r\n\'\\]
   "while"                        { return symbol(WHILE); }
   
   /* boolean literals */
-  "True"                         { return symbol(BOOL_LITERAL, true); }
-  "False"                        { return symbol(BOOL_LITERAL, false); }
+//  "True"                         { return symbol(BOOL_LITERAL, true); }
+//  "False"                        { return symbol(BOOL_LITERAL, false); }
   
-/*  /* none literal */
-  "None"                         { return symbol(NONE_LITERAL); }
-*/  
+  /* none literal */
+//  "None"                         { return symbol(NONE_LITERAL); }  
   
   /* separators */
   "("                            { return symbol(LPAREN); }
   ")"                            { return symbol(RPAREN); }
   "{"                            { return symbol(LBRACE); }
   "}"                            { return symbol(RBRACE); }
-  "["                            { return symbol(LBRACK); }
-  "]"                            { return symbol(RBRACK); }
+//  "["                            { return symbol(LBRACK); }
+//  "]"                            { return symbol(RBRACK); }
   ","                            { return symbol(COMMA); }
 //  "."                            { return symbol(DOT); }
   

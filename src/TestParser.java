@@ -3,13 +3,15 @@ import Parser.*;
 import AST.*;
 import AST.Visitor.*;
 import java_cup.runtime.Symbol;
+
+import java.io.FileReader;
 import java.util.*;
 
 public class TestParser {
 	public static void main(String [] args) {
 		try {
 			// create a scanner on the input file
-			scanner s = new scanner(System.in);
+			scanner s = new scanner(new FileReader(args[0]));
 			parser p = new parser(s);
 			Symbol root;
 			// replace p.parse() with p.debug_parse() in next line to see trace of

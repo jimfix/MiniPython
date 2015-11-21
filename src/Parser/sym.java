@@ -8,40 +8,38 @@ package Parser;
 /** CUP generated interface containing symbol constants. */
 public interface sym {
   /* terminals */
-  public static final int TIMES = 17;
-  public static final int RBRACK = 8;
-  public static final int ELSE = 12;
-  public static final int BOOL_LITERAL = 20;
-  public static final int PLUS = 15;
-  public static final int RBRACE = 6;
-  public static final int RPAREN = 4;
-  public static final int WHILE = 13;
-  public static final int NOT = 18;
-  public static final int LBRACK = 7;
+  public static final int TIMES = 16;
+  public static final int AND = 18;
+  public static final int LT = 17;
+  public static final int ELSE = 11;
+  public static final int PLUS = 14;
+  public static final int RBRACE = 7;
+  public static final int RPAREN = 5;
+  public static final int WHILE = 12;
+  public static final int NOT = 19;
   public static final int IDENTIFIER = 22;
-  public static final int IF = 11;
-  public static final int LPAREN = 3;
-  public static final int COLON = 10;
-  public static final int LBRACE = 5;
+  public static final int IF = 10;
+  public static final int LPAREN = 4;
+  public static final int COLON = 9;
+  public static final int LBRACE = 6;
   public static final int STRING_LITERAL = 21;
-  public static final int INT_LITERAL = 19;
-  public static final int COMMA = 9;
+  public static final int INT_LITERAL = 20;
+  public static final int COMMA = 8;
   public static final int EOF = 0;
-  public static final int DEF = 14;
-  public static final int MINUS = 16;
+  public static final int DEF = 13;
+  public static final int MINUS = 15;
+  public static final int PRINT = 3;
   public static final int error = 1;
   public static final int ASSIGN = 2;
-  public static final int NONE_LITERAL = 23;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
   "ASSIGN",
+  "PRINT",
   "LPAREN",
   "RPAREN",
   "LBRACE",
   "RBRACE",
-  "LBRACK",
-  "RBRACK",
   "COMMA",
   "COLON",
   "IF",
@@ -51,12 +49,12 @@ public interface sym {
   "PLUS",
   "MINUS",
   "TIMES",
+  "LT",
+  "AND",
   "NOT",
   "INT_LITERAL",
-  "BOOL_LITERAL",
   "STRING_LITERAL",
-  "IDENTIFIER",
-  "NONE_LITERAL"
+  "IDENTIFIER"
   };
 }
 

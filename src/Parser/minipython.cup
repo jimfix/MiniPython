@@ -48,7 +48,7 @@ terminal ASSIGN;                     // assignment keyword
 terminal PRINT;
 terminal LPAREN, RPAREN;
 terminal LBRACE, RBRACE;
-terminal LBRACK, RBRACK;               // array index or type annotation
+//terminal LBRACK, RBRACK;               // array index or type annotation
 //terminal DOT, LEFT, RIGHT;             // field selector
 terminal COMMA, COLON;                 // separators
 terminal IF, ELSE;                     // conditional statement keywords
@@ -60,10 +60,10 @@ terminal LT/*, GT, LEQ, GEQ*/;             // comparators
 terminal AND,/* OR, */NOT;                 // logical connectives
 
 terminal java.lang.Integer INT_LITERAL;
-terminal java.lang.Boolean BOOL_LITERAL;
+//terminal java.lang.Boolean BOOL_LITERAL;
 terminal java.lang.String STRING_LITERAL;
 terminal Identifier IDENTIFIER;
-terminal java.lang.String NONE_LITERAL;
+//terminal java.lang.String NONE_LITERAL;
 
 /* Variables */
 
@@ -76,15 +76,14 @@ nonterminal AST.StatementList statement_list;
 nonterminal AST.If if_statement;
 nonterminal AST.While while_statement;
 nonterminal AST.Print print_statement;
-nonterminal AST.Identifier name;
 nonterminal AST.FormalList formals;
 nonterminal AST.Exp expression;
 nonterminal AST.ExpList expression_list;
 nonterminal AST.Assign assignment;
 //nonterminal java.lang.String postfix;
 nonterminal AST.IntegerLiteral int_literal;
-nonterminal bool_literal;
-nonterminal string_literal;
+//nonterminal bool_literal;
+//nonterminal string_literal;
 
 /* Precedences */
 
@@ -92,7 +91,7 @@ precedence left DEF;
 precedence left COLON;
 precedence left LBRACE, RBRACE;
 precedence left LPAREN, RPAREN;
-precedence left LBRACK, RBRACK;
+//precedence left LBRACK, RBRACK;
 precedence left ASSIGN/*, RETURN*/;
 precedence left IF, ELSE, WHILE;
 precedence left COMMA;
@@ -103,7 +102,7 @@ precedence left NOT;
 precedence left PLUS, MINUS;
 precedence left TIMES/*, DIV, MOD*/;
 //precedence left DOT, LEFT, RIGHT;
-precedence left INT_LITERAL, BOOL_LITERAL, STRING_LITERAL, IDENTIFIER;
+precedence left INT_LITERAL,/*BOOL_LITERAL*/ STRING_LITERAL, IDENTIFIER;
 
 
 /* The Grammar Rules */
@@ -125,18 +124,18 @@ statement_list ::= statement:s {: StatementList sl = new StatementList(sleft); s
     |   statement_list:sl statement:s {: sl.add(s); RESULT = sl; :}
     ;
 
-definition ::= DEF:df IDENTIFIER:f LPAREN RPAREN COLON block:b {: RESULT = new Defn(null,f,null,null,b,null,dfleft); :}
-    |   DEF:df IDENTIFIER:f LPAREN formals:xs RPAREN COLON block:b {: RESULT = new Defn(null,f,xs,null,b,null,dfleft); :}
+definition ::= DEF:df IDENTIFIER:f LPAREN RPAREN COLON block:b {: RESULT = new Defn(null,f,null,b,null,dfleft); :}
+    |   DEF:df IDENTIFIER:f LPAREN formals:xs RPAREN COLON block:b {: RESULT = new Defn(null,f,xs,b,null,dfleft); :}
     ;
 
 statement ::= assignment:as {: RESULT = as; :}
     |   if_statement:i {: RESULT = i; :}
     |   while_statement:w {: RESULT = w; :}
     |   print_statement:p {: RESULT = p; :}
-    |   expression:exp {: RESULT = exp; :}
+    |   expression:exp {: RESULT = new Assign(new Identifier("_",expleft),exp,expleft); :}
     ;
 
-assignment ::= name:n ASSIGN expression:exp {: RESULT = new Assign(n,exp,nleft); :}
+assignment ::= IDENTIFIER:i ASSIGN expression:exp {: RESULT = new Assign(i,exp,ileft); :}
     ;
 
 if_statement ::= IF:i expression:exp COLON block:b {: RESULT = new If(exp,b,null,ileft); :}
@@ -159,13 +158,13 @@ expression ::= expression:e1 PLUS expression:e2 {: RESULT = new Plus(e1,e2,e1lef
     |   expression:e1 AND expression:e2 {: RESULT = new And(e1,e2,e1left); :}
     |   expression:e1 LT expression:e2 {: RESULT = new LessThan(e1,e2,e1left); :}
     |   NOT:not expression:e {: RESULT = new Not(e,notleft); :}
-    |   name:n {: RESULT = new Name(null,n,nleft); :}
     |   int_literal:i {: RESULT = i; :}
 //    |   bool_literal:b {: RESULT = b; :}
 //    |   string_literal:s {: RESULT = s; :}
     |   LPAREN expression:exp RPAREN {: RESULT = exp; :}
     |   IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(null,f,el,fleft); :}
-    |   IDENTIFIER:f LPAREN RPAREN {: RESULT = new Call(null,f,new ExpList(fleft),fleft); :}
+    |   STRING_LITERAL:f {: RESULT = new IdentifierExp(f,fleft); :}
+//    |  name:n postfix:post {: RESULT = new Name(n,post,nleft); :}
     ;
 
 /*binop ::=
@@ -184,9 +183,6 @@ formals ::= IDENTIFIER:x {: FormalList fl = new FormalList(xleft); fl.add(new Fo
     |    formals:fl COMMA IDENTIFIER:x {: fl.add(new Formal(null,x,flleft)); RESULT = fl; :}
     ;
 
-name ::= IDENTIFIER:n {: new IdentifierExp(n.toString(),nleft); :}
-//    |  name:n postfix:post {: RESULT = new Name(n,post,nleft); :}
-    ;
 /*
 postfix ::= DOT:dot LEFT:l
     |   DOT:dot RIGHT:r

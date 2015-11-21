@@ -23,7 +23,6 @@ import AST.Print;
 import AST.Program;
 import AST.Times;
 import AST.True;
-import AST.Name;
 import AST.While;
 
 // Sample print visitor from MiniJava web site with small modifications for UW CSE.
@@ -48,15 +47,6 @@ public class PrettyPrintVisitor implements Visitor {
 
 	// Type t;
 	// Identifier i;
-	public void visit(Name n) {
-		n.t.accept(this);
-		System.out.print(" ");
-		n.i.accept(this);
-		System.out.print(";");
-	}
-
-	// Type t;
-	// Identifier i;
 	// FormalList fl;
 	// VarDeclList vl;
 	// Block b;
@@ -72,11 +62,6 @@ public class PrettyPrintVisitor implements Visitor {
 			if (i+1 < n.fl.size()) { System.out.print(", "); }
 		}
 		System.out.println(") { ");
-		for ( int i = 0; i < n.vl.size(); i++ ) {
-			System.out.print("    ");
-			n.vl.get(i).accept(this);
-			System.out.println("");
-		}
 		System.out.print("    ");
 		n.b.accept(this);
 		System.out.print("    return ");
