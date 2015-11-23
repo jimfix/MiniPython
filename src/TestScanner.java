@@ -1,4 +1,7 @@
 import Scanner.*;
+
+import java.io.FileReader;
+
 import Parser.sym;
 import java_cup.runtime.Symbol;
 
@@ -6,7 +9,7 @@ public class TestScanner {
     public static void main(String [] args) {
         try {
             // create a scanner on the input file
-            scanner s = new scanner(System.in);
+            scanner s = new scanner(new FileReader(args[0]));
             Symbol t = s.next_token();
             while (t.sym != sym.EOF){ 
                 // print each token that we scan

@@ -8,34 +8,44 @@ package Parser;
 /** CUP generated interface containing symbol constants. */
 public interface sym {
   /* terminals */
-  public static final int TIMES = 16;
-  public static final int AND = 18;
-  public static final int LT = 17;
-  public static final int ELSE = 11;
-  public static final int PLUS = 14;
-  public static final int RBRACE = 7;
-  public static final int RPAREN = 5;
-  public static final int WHILE = 12;
-  public static final int NOT = 19;
-  public static final int IDENTIFIER = 22;
-  public static final int IF = 10;
-  public static final int LPAREN = 4;
-  public static final int COLON = 9;
-  public static final int LBRACE = 6;
-  public static final int STRING_LITERAL = 21;
-  public static final int INT_LITERAL = 20;
-  public static final int COMMA = 8;
+  public static final int TIMES = 17;
+  public static final int GEQ = 23;
+  public static final int MOD = 19;
+  public static final int AND = 26;
+  public static final int LT = 20;
+  public static final int ELSE = 12;
+  public static final int PLUS = 15;
+  public static final int OR = 27;
+  public static final int RBRACE = 8;
+  public static final int RPAREN = 6;
+  public static final int WHILE = 13;
+  public static final int NOT = 28;
+  public static final int IDENTIFIER = 31;
+  public static final int RETURN = 4;
+  public static final int IF = 11;
+  public static final int GT = 21;
+  public static final int LPAREN = 5;
+  public static final int COLON = 10;
+  public static final int LBRACE = 7;
+  public static final int STRING_LITERAL = 30;
+  public static final int INT_LITERAL = 29;
+  public static final int COMMA = 9;
   public static final int EOF = 0;
-  public static final int DEF = 13;
-  public static final int MINUS = 15;
+  public static final int DEF = 14;
+  public static final int DIV = 18;
+  public static final int MINUS = 16;
   public static final int PRINT = 3;
   public static final int error = 1;
+  public static final int EQ = 24;
   public static final int ASSIGN = 2;
+  public static final int LEQ = 22;
+  public static final int NEQ = 25;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
   "ASSIGN",
   "PRINT",
+  "RETURN",
   "LPAREN",
   "RPAREN",
   "LBRACE",
@@ -49,8 +59,16 @@ public interface sym {
   "PLUS",
   "MINUS",
   "TIMES",
+  "DIV",
+  "MOD",
   "LT",
+  "GT",
+  "LEQ",
+  "GEQ",
+  "EQ",
+  "NEQ",
   "AND",
+  "OR",
   "NOT",
   "INT_LITERAL",
   "STRING_LITERAL",

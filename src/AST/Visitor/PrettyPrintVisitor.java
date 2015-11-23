@@ -3,26 +3,34 @@ package AST.Visitor;
 import AST.And;
 import AST.Assign;
 import AST.Block;
+import AST.BooleanLiteral;
 import AST.BooleanType;
 import AST.Call;
 import AST.Defn;
 import AST.Display;
-import AST.False;
+import AST.Div;
+import AST.Equals;
 import AST.Formal;
+import AST.GreaterEquals;
+import AST.GreaterThan;
 import AST.Identifier;
 import AST.IdentifierExp;
 import AST.IdentifierType;
 import AST.If;
 import AST.IntegerLiteral;
 import AST.IntegerType;
+import AST.LessEquals;
 import AST.LessThan;
 import AST.Minus;
+import AST.Mod;
 import AST.Not;
+import AST.NotEquals;
+import AST.Or;
 import AST.Plus;
 import AST.Print;
 import AST.Program;
+import AST.StringLiteral;
 import AST.Times;
-import AST.True;
 import AST.While;
 
 // Sample print visitor from MiniJava web site with small modifications for UW CSE.
@@ -37,6 +45,9 @@ public class PrettyPrintVisitor implements Visitor {
 		System.out.print(";");
 	}
 
+	// Program ->
+	// DefnList defnlist;
+	// Block block;
 	public void visit(Program n) {
 		for ( int i = 0; i < n.defnlist.size(); i++) {
 			System.out.println();
@@ -45,14 +56,13 @@ public class PrettyPrintVisitor implements Visitor {
 		n.block.accept(this);
 	}  
 
+	// Defn ->
 	// Type t;
 	// Identifier i;
 	// FormalList fl;
-	// VarDeclList vl;
 	// Block b;
 	// Exp e;
 	public void visit(Defn n) {
-		System.out.print("  public ");
 		n.t.accept(this);
 		System.out.print(" ");
 		n.i.accept(this);
@@ -70,6 +80,7 @@ public class PrettyPrintVisitor implements Visitor {
 		System.out.print("  }");
 	}
 
+	// Formal ->
 	// Type t;
 	// Identifier i;
 	public void visit(Formal n) {
@@ -91,6 +102,7 @@ public class PrettyPrintVisitor implements Visitor {
 		System.out.print(n.s);
 	}
 
+	// Block ->
 	// StatementList sl;
 	public void visit(Block n) {
 		System.out.println("{ ");
@@ -102,6 +114,7 @@ public class PrettyPrintVisitor implements Visitor {
 		System.out.print("    } ");
 	}
 
+	// If ->
 	// Exp e;
 	// Statement s1,s2;
 	public void visit(If n) {
@@ -115,6 +128,7 @@ public class PrettyPrintVisitor implements Visitor {
 		n.s2.accept(this);
 	}
 
+	// While ->
 	// Exp e;
 	// Statement s;
 	public void visit(While n) {
@@ -124,6 +138,7 @@ public class PrettyPrintVisitor implements Visitor {
 		n.s.accept(this);
 	}
 
+	// Print ->
 	// Exp e;
 	public void visit(Print n) {
 		System.out.print("System.out.println(");
@@ -131,6 +146,7 @@ public class PrettyPrintVisitor implements Visitor {
 		System.out.print(");");
 	}
 
+	// Assign ->
 	// Identifier i;
 	// Exp e;
 	public void visit(Assign n) {
@@ -140,6 +156,7 @@ public class PrettyPrintVisitor implements Visitor {
 		System.out.print(";");
 	}
 
+	// And ->
 	// Exp e1,e2;
 	public void visit(And n) {
 		System.out.print("(");
@@ -149,6 +166,27 @@ public class PrettyPrintVisitor implements Visitor {
 		System.out.print(")");
 	}
 
+	// Or ->
+	// Exp e1,e2;
+	public void visit(Or n) {
+		System.out.print("(");
+		n.e1.accept(this);
+		System.out.print(" || ");
+		n.e2.accept(this);
+		System.out.print(")");
+	}
+	
+	// GreaterThan ->
+	// Exp e1,e2;
+	public void visit(GreaterThan n) {
+		System.out.print("(");
+		n.e1.accept(this);
+		System.out.print(" > ");
+		n.e2.accept(this);
+		System.out.print(")");
+	}
+
+	// LessThan ->
 	// Exp e1,e2;
 	public void visit(LessThan n) {
 		System.out.print("(");
@@ -158,6 +196,47 @@ public class PrettyPrintVisitor implements Visitor {
 		System.out.print(")");
 	}
 
+	// Equals ->
+	// Exp e1,e2;
+	public void visit(Equals n) {
+		System.out.print("(");
+		n.e1.accept(this);
+		System.out.print(" == ");
+		n.e2.accept(this);
+		System.out.print(")");
+	}
+	
+	// NotEquals ->
+	// Exp e1,e2;
+	public void visit(NotEquals n) {
+		System.out.print("(");
+		n.e1.accept(this);
+		System.out.print(" != ");
+		n.e2.accept(this);
+		System.out.print(")");
+	}
+
+	// GreaterEquals ->
+	// Exp e1,e2;
+	public void visit(GreaterEquals n) {
+		System.out.print("(");
+		n.e1.accept(this);
+		System.out.print(" >= ");
+		n.e2.accept(this);
+		System.out.print(")");
+	}
+	
+	// LessEquals ->
+	// Exp e1,e2;
+	public void visit(LessEquals n) {
+		System.out.print("(");
+		n.e1.accept(this);
+		System.out.print(" <= ");
+		n.e2.accept(this);
+		System.out.print(")");
+	}
+	
+	// Plus ->
 	// Exp e1,e2;
 	public void visit(Plus n) {
 		System.out.print("(");
@@ -167,6 +246,7 @@ public class PrettyPrintVisitor implements Visitor {
 		System.out.print(")");
 	}
 
+	// Minus ->
 	// Exp e1,e2;
 	public void visit(Minus n) {
 		System.out.print("(");
@@ -176,6 +256,7 @@ public class PrettyPrintVisitor implements Visitor {
 		System.out.print(")");
 	}
 
+	// Times ->
 	// Exp e1,e2;
 	public void visit(Times n) {
 		System.out.print("(");
@@ -185,6 +266,27 @@ public class PrettyPrintVisitor implements Visitor {
 		System.out.print(")");
 	}
 
+	// Div ->
+	// Exp e1,e2;
+	public void visit(Div n) {
+		System.out.print("(");
+		n.e1.accept(this);
+		System.out.print(" // ");
+		n.e2.accept(this);
+		System.out.print(")");
+	}
+	
+	// Mod ->
+	// Exp e1,e2;
+	public void visit(Mod n) {
+		System.out.print("(");
+		n.e1.accept(this);
+		System.out.print(" % ");
+		n.e2.accept(this);
+		System.out.print(")");
+	}
+	
+	// Call ->
 	// Exp e;
 	// Identifier i;
 	// ExpList el;
@@ -200,30 +302,38 @@ public class PrettyPrintVisitor implements Visitor {
 		System.out.print(")");
 	}
 
+	// IntegerLiteral ->
 	// int i;
 	public void visit(IntegerLiteral n) {
 		System.out.print(n.i);
 	}
-
-	public void visit(True n) {
-		System.out.print("true");
+	
+	// BooleanLiteral ->
+	// boolean b;
+	public void visit(BooleanLiteral n) {
+		System.out.print(n.b);
+	}
+	
+	// StringLiteral ->
+	// String s;
+	public void visit(StringLiteral n) {
+		System.out.print(n.s);
 	}
 
-	public void visit(False n) {
-		System.out.print("false");
-	}
-
+	// IdentifierExp ->
 	// String s;
 	public void visit(IdentifierExp n) {
 		System.out.print(n.s);
 	}
 
+	// Not ->
 	// Exp e;
 	public void visit(Not n) {
 		System.out.print("!");
 		n.e.accept(this);
 	}
 
+	// Identifier ->
 	// String s;
 	public void visit(Identifier n) {
 		System.out.print(n.s);
