@@ -44,20 +44,20 @@ parser code  {:
 
 /* Terminals */
 
-terminal ASSIGN;                     // assignment keyword
-terminal PRINT, RETURN;
-terminal LPAREN, RPAREN;
-terminal LBRACE, RBRACE;
+terminal java.lang.String ASSIGN;                     // assignment keyword
+terminal java.lang.String PRINT, RETURN;
+terminal java.lang.String LPAREN, RPAREN;
+terminal java.lang.String LBRACE, RBRACE;
 //terminal LBRACK, RBRACK;               // array index or type annotation
 //terminal DOT, LEFT, RIGHT;             // field selector
-terminal COMMA, COLON;                 // separators
-terminal IF, ELSE;                     // conditional statement keywords
-terminal WHILE;                        // loop keyword
-terminal DEF;                          // definition keyword
-terminal PLUS, MINUS, TIMES, DIV, MOD;  // arithmetic
-terminal LT, GT, LEQ, GEQ;             // comparators
-terminal EQ, NEQ;                        // equality
-terminal AND, OR, NOT;                 // logical connectives
+terminal java.lang.String COMMA, COLON;                 // separators
+terminal java.lang.String IF, ELSE;                     // conditional statement keywords
+terminal java.lang.String WHILE;                        // loop keyword
+terminal java.lang.String DEF;                          // definition keyword
+terminal java.lang.String PLUS, MINUS, TIMES, DIV, MOD;  // arithmetic
+terminal java.lang.String LT, GT, LEQ, GEQ;             // comparators
+terminal java.lang.String EQ, NEQ;                        // equality
+terminal java.lang.String AND, OR, NOT;                 // logical connectives
 
 terminal java.lang.Integer INT_LITERAL;
 terminal java.lang.Boolean BOOL_LITERAL;
@@ -81,9 +81,6 @@ nonterminal AST.Exp expression;
 nonterminal AST.ExpList expression_list;
 nonterminal AST.Assign assignment;
 //nonterminal java.lang.String postfix;
-nonterminal AST.IntegerLiteral int_literal;
-nonterminal bool_literal;
-nonterminal string_literal;
 
 /* Precedences */
 
@@ -166,9 +163,8 @@ expression ::= expression:e1 PLUS expression:e2 {: RESULT = new Plus(e1,e2,e1lef
     |   expression:e1 GEQ expression:e2 {: RESULT = new GreaterEquals(e1,e2,e1left); :}
     |   expression:e1 LEQ expression:e2 {: RESULT = new LessEquals(e1,e2,e1left); :}
     |   NOT:not expression:e {: RESULT = new Not(e,notleft); :}
-    |   int_literal:i {: RESULT = i; :}
-    |   bool_literal:b {: RESULT = b; :}
-    |   string_literal:s {: RESULT = s; :}
+    |   INT_LITERAL:i {: RESULT = new IntegerLiteral(i,ileft); :}
+    |   BOOL_LITERAL:b {: RESULT = new BooleanLiteral(b,bleft); :}
     |   LPAREN expression:exp RPAREN {: RESULT = exp; :}
     |   IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(null,new Identifier(f,fleft),el,fleft); :}
     |   STRING_LITERAL:f {: RESULT = new IdentifierExp(f,fleft); :}
@@ -183,13 +179,8 @@ formals ::= IDENTIFIER:x {: FormalList fl = new FormalList(xleft); fl.add(new Fo
 postfix ::= DOT:dot LEFT:l
     |   DOT:dot RIGHT:r
     ;
-*/
 
-int_literal ::=  INT_LITERAL:i {: RESULT = new IntegerLiteral(i,ileft); :}
-    ;
-bool_literal ::= BOOL_LITERAL:b {: RESULT = new BooleanLiteral(b,bleft); :}
-    ;
-string_literal ::= STRING_LITERAL:s {: RESULT = new StringLiteral(s,sleft); :}
-    ;
-//NONE_LITERAL:none {: RESULT = none.toString(); :}
-//  ;
+
+NONE_LITERAL:none {: RESULT = none.toString(); :}
+  ;
+*/

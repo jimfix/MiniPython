@@ -14,20 +14,21 @@ public interface sym {
   public static final int AND = 26;
   public static final int LT = 20;
   public static final int ELSE = 12;
+  public static final int BOOL_LITERAL = 30;
   public static final int PLUS = 15;
   public static final int OR = 27;
   public static final int RBRACE = 8;
   public static final int RPAREN = 6;
   public static final int WHILE = 13;
   public static final int NOT = 28;
-  public static final int IDENTIFIER = 31;
+  public static final int IDENTIFIER = 32;
   public static final int RETURN = 4;
   public static final int IF = 11;
   public static final int GT = 21;
   public static final int LPAREN = 5;
   public static final int COLON = 10;
   public static final int LBRACE = 7;
-  public static final int STRING_LITERAL = 30;
+  public static final int STRING_LITERAL = 31;
   public static final int INT_LITERAL = 29;
   public static final int COMMA = 9;
   public static final int EOF = 0;
@@ -71,6 +72,7 @@ public interface sym {
   "OR",
   "NOT",
   "INT_LITERAL",
+  "BOOL_LITERAL",
   "STRING_LITERAL",
   "IDENTIFIER"
   };
