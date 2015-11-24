@@ -61,7 +61,6 @@ public class PrettyPrintVisitor implements Visitor {
 	// Identifier i;
 	// FormalList fl;
 	// Block b;
-	// Exp e;
 	public void visit(Defn n) {
 		n.t.accept(this);
 		System.out.print(" ");
@@ -75,7 +74,6 @@ public class PrettyPrintVisitor implements Visitor {
 		System.out.print("    ");
 		n.b.accept(this);
 		System.out.print("    return ");
-		n.e.accept(this);
 		System.out.println(";");
 		System.out.print("  }");
 	}

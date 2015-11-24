@@ -80,8 +80,8 @@ SStringCharacter = [^\r\n\'\\]
   "while"                        { return symbol(WHILE); }
   
   /* boolean literals */
-//  "True"                         { return symbol(BOOL_LITERAL, true); }
-//  "False"                        { return symbol(BOOL_LITERAL, false); }
+  "True"                         { return symbol(BOOL_LITERAL, true); }
+  "False"                        { return symbol(BOOL_LITERAL, false); }
   
   /* none literal */
 //  "None"                         { return symbol(NONE_LITERAL); }  

@@ -1,2 +1,10 @@
-def fact(n): { n = 0 } return 6
-{ print 5 }
+def 
+fact(): 
+{ 
+x = 0
+}
+return 0
+
+{
+x = 3
+}

@@ -76,6 +76,7 @@ nonterminal AST.StatementList statement_list;
 nonterminal AST.If if_statement;
 nonterminal AST.While while_statement;
 nonterminal AST.Print print_statement;
+nonterminal AST.Return return_statement;
 nonterminal AST.FormalList formals;
 nonterminal AST.Exp expression;
 nonterminal AST.ExpList expression_list;
@@ -121,7 +122,7 @@ statement_list ::= statement:s {: StatementList sl = new StatementList(sleft); s
     |   statement_list:sl statement:s {: sl.add(s); RESULT = sl; :}
     ;
 
-definition ::= DEF:df IDENTIFIER:f LPAREN RPAREN COLON block:b RETURN expression:exp {: RESULT = new Defn(null,new Identifier(f,dfleft),null,b,exp,dfleft); :}
+definition ::= DEF:df IDENTIFIER:f LPAREN RPAREN COLON block:b RETURN expression:exp {: RESULT = new Defn(null,new Identifier(f,dfleft),new DefnList(dfleft),b,exp,dfleft); :}
     |   DEF:df IDENTIFIER:f LPAREN formals:xs RPAREN COLON block:b RETURN expression:exp {: RESULT = new Defn(null,new Identifier(f,dfleft),xs,b,exp,dfleft); :}
     ;
 
@@ -129,6 +130,7 @@ statement ::= assignment:as {: RESULT = as; :}
     |   if_statement:i {: RESULT = i; :}
     |   while_statement:w {: RESULT = w; :}
     |   print_statement:p {: RESULT = p; :}
+    |   return_statement:r {: RESULT = r; :}
     |   expression:exp {: RESULT = new Assign(new Identifier("_",expleft),exp,expleft); :}
     ;
 
