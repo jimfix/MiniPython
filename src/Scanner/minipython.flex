@@ -120,7 +120,6 @@ SStringCharacter = [^\r\n\'\\]
 
 
   /* numeric literals */
-
   {DecIntegerLiteral}            { return symbol(INT_LITERAL, new Integer(yytext())); }
   
   /* comments */

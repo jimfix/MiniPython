@@ -29,6 +29,7 @@ import AST.Or;
 import AST.Plus;
 import AST.Print;
 import AST.Program;
+import AST.Return;
 import AST.StringLiteral;
 import AST.Times;
 import AST.While;
@@ -142,6 +143,14 @@ public class PrettyPrintVisitor implements Visitor {
 		System.out.print("System.out.println(");
 		n.e.accept(this);
 		System.out.print(");");
+	}
+	
+	// Return ->
+	// Exp r;
+	public void visit(Return n) {
+		System.out.print("Return");
+		n.r.accept(this);
+		System.out.print(";");
 	}
 
 	// Assign ->

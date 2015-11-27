@@ -122,8 +122,8 @@ statement_list ::= statement:s {: StatementList sl = new StatementList(sleft); s
     |   statement_list:sl statement:s {: sl.add(s); RESULT = sl; :}
     ;
 
-definition ::= DEF:df IDENTIFIER:f LPAREN RPAREN COLON block:b RETURN expression:exp {: RESULT = new Defn(null,new Identifier(f,dfleft),new DefnList(dfleft),b,exp,dfleft); :}
-    |   DEF:df IDENTIFIER:f LPAREN formals:xs RPAREN COLON block:b RETURN expression:exp {: RESULT = new Defn(null,new Identifier(f,dfleft),xs,b,exp,dfleft); :}
+definition ::= DEF:df IDENTIFIER:f LPAREN RPAREN COLON block:b {: RESULT = new Defn(null,new Identifier(f,dfleft),new FormalList(dfleft),b,dfleft); :}
+    |   DEF:df IDENTIFIER:f LPAREN formals:xs RPAREN COLON block:b {: RESULT = new Defn(null,new Identifier(f,dfleft),xs,b,dfleft); :}
     ;
 
 statement ::= assignment:as {: RESULT = as; :}
@@ -146,6 +146,9 @@ while_statement ::= WHILE:wh expression:exp COLON block:b {: RESULT = new While(
 
 print_statement ::= PRINT:pr expression:exp {: RESULT = new Print(exp,prleft); :}
     ;
+
+return_statement ::= RETURN:ret expression:exp {: RESULT = new Return(exp,retleft); :}
+	;
 
 expression_list ::= expression:exp {: ExpList el = new ExpList(expleft); el.add(exp); RESULT = el; :}
     |    expression_list:el expression:exp {: el.add(exp); RESULT = el; :}

@@ -29,6 +29,7 @@ import AST.Or;
 import AST.Plus;
 import AST.Print;
 import AST.Program;
+import AST.Return;
 import AST.StringLiteral;
 import AST.Times;
 import AST.While;
@@ -46,6 +47,7 @@ public interface Visitor {
   public void visit(If n);
   public void visit(While n);
   public void visit(Print n);
+  public void visit(Return n);
   public void visit(Assign n);
   public void visit(And n);
   public void visit(Or n);
