@@ -90,17 +90,17 @@ precedence left COLON;
 precedence left LBRACE, RBRACE;
 precedence left LPAREN, RPAREN;
 //precedence left LBRACK, RBRACK;
-precedence left ASSIGN/*, RETURN*/;
+precedence left ASSIGN, RETURN, PRINT;
 precedence left IF, ELSE, WHILE;
 precedence left COMMA;
-precedence nonassoc LT, GT, LEQ, GEQ, NEQ, EQ;
 precedence left OR;
 precedence left AND;
-precedence left NOT;
+precedence nonassoc LT, GT, LEQ, GEQ, NEQ, EQ;
 precedence left PLUS, MINUS;
 precedence left TIMES, DIV, MOD;
 //precedence left DOT, LEFT, RIGHT;
-precedence left INT_LITERAL,/*BOOL_LITERAL*/ STRING_LITERAL, IDENTIFIER;
+precedence left NOT;
+precedence left INT_LITERAL,/*BOOL_LITERAL STRING_LITERAL,*/ IDENTIFIER;
 
 
 /* The Grammar Rules */
@@ -122,8 +122,8 @@ statement_list ::= statement:s {: StatementList sl = new StatementList(sleft); s
     |   statement_list:sl statement:s {: sl.add(s); RESULT = sl; :}
     ;
 
-definition ::= DEF:df IDENTIFIER:f LPAREN RPAREN COLON block:b {: RESULT = new Defn(null,new Identifier(f,dfleft),new FormalList(dfleft),b,dfleft); :}
-    |   DEF:df IDENTIFIER:f LPAREN formals:xs RPAREN COLON block:b {: RESULT = new Defn(null,new Identifier(f,dfleft),xs,b,dfleft); :}
+definition ::= DEF:df IDENTIFIER:f LPAREN RPAREN COLON block:b {: RESULT = new Defn(new Identifier(f,dfleft),new FormalList(dfleft),b,dfleft); :}
+    |   DEF:df IDENTIFIER:f LPAREN formals:xs RPAREN COLON block:b {: RESULT = new Defn(new Identifier(f,dfleft),xs,b,dfleft); :}
     ;
 
 statement ::= assignment:as {: RESULT = as; :}
@@ -137,8 +137,8 @@ statement ::= assignment:as {: RESULT = as; :}
 assignment ::= IDENTIFIER:i ASSIGN expression:exp {: RESULT = new Assign(new Identifier(i,ileft),exp,ileft); :}
     ;
 
-if_statement ::= IF:i expression:exp COLON block:b {: RESULT = new If(exp,b,null,ileft); :}
-    |  IF:i expression:exp COLON block:b1 ELSE COLON block:b2 {: RESULT = new If(exp,b1,b2,ileft); :}
+if_statement ::= IF:i LPAREN expression:exp RPAREN COLON block:b {: RESULT = new If(exp,b,null,ileft); :}
+    |  IF:i LPAREN expression:exp RPAREN COLON block:b1 ELSE COLON block:b2 {: RESULT = new If(exp,b1,b2,ileft); :}
     ;
 
 while_statement ::= WHILE:wh expression:exp COLON block:b {: RESULT = new While(exp,b,whleft); :}
@@ -171,13 +171,13 @@ expression ::= expression:e1 PLUS expression:e2 {: RESULT = new Plus(e1,e2,e1lef
     |   INT_LITERAL:i {: RESULT = new IntegerLiteral(i,ileft); :}
     |   BOOL_LITERAL:b {: RESULT = new BooleanLiteral(b,bleft); :}
     |   LPAREN expression:exp RPAREN {: RESULT = exp; :}
-    |   IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(null,new Identifier(f,fleft),el,fleft); :}
-    |   STRING_LITERAL:f {: RESULT = new IdentifierExp(f,fleft); :}
+    |   IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(new Identifier(f,fleft),el,fleft); :}
+    |   IDENTIFIER:f {: RESULT = new IdentifierExp(new Identifier(f,fleft),fleft); :}
 //    |  name:n postfix:post {: RESULT = new Name(n,post,nleft); :}
     ;
 
-formals ::= IDENTIFIER:x {: FormalList fl = new FormalList(xleft); fl.add(new Formal(null,new Identifier(x,xleft),xleft)); RESULT = fl; :}
-    |    formals:fl COMMA IDENTIFIER:x {: fl.add(new Formal(null,new Identifier(x,flleft),flleft)); RESULT = fl; :}
+formals ::= IDENTIFIER:x {: FormalList fl = new FormalList(xleft); fl.add(new Formal(new Identifier(x,xleft),xleft)); RESULT = fl; :}
+    |    formals:fl COMMA IDENTIFIER:x {: fl.add(new Formal(new Identifier(x,flleft),flleft)); RESULT = fl; :}
     ;
 
 /*

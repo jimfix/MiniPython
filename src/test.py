@@ -1,10 +1,14 @@
-def 
-fact(): 
-{ 
-x = 0
+def fact(x): {
+    temp = 0
+    if (x < 1): {
+      temp = 1
+    }
+    else: {
+      temp = x * (x-1)
+      return temp
+    }
 }
-return 0
 
 {
-x = 3
+  print fact(n)
 }

@@ -2,10 +2,10 @@ package AST;
 import AST.Visitor.Visitor;
 
 public class IdentifierExp extends Exp {
-  public String s;
-  public IdentifierExp(String as, int ln) { 
+  public Identifier i;
+  public IdentifierExp(Identifier ai, int ln) { 
     super(ln);
-    s=as;
+    i=ai;
   }
 
   public void accept(Visitor v) {
