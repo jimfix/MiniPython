@@ -6,7 +6,6 @@ import AST.Block;
 import AST.BooleanLiteral;
 import AST.Call;
 import AST.Defn;
-import AST.Display;
 import AST.Div;
 import AST.Equals;
 import AST.Formal;
@@ -33,7 +32,6 @@ import AST.While;
 
 public interface Visitor {
   // Display added for toy example language.  Not used in MiniJava AST
-  public void visit(Display n);
   public void visit(Program n);
   public void visit(Defn n);
   public void visit(Formal n);

@@ -6,7 +6,6 @@ import AST.Block;
 import AST.BooleanLiteral;
 import AST.Call;
 import AST.Defn;
-import AST.Display;
 import AST.Div;
 import AST.Equals;
 import AST.Formal;
@@ -36,13 +35,6 @@ import AST.While;
 
 public class PrettyPrintVisitor implements Visitor {
 
-	// Display added for toy example language.  Not used in regular MiniJava
-	public void visit(Display n) {
-		System.out.print("display ");
-		n.e.accept(this);
-		System.out.print(";");
-	}
-
 	// Program ->
 	// DefnList defnlist;
 	// Block block;
@@ -53,7 +45,7 @@ public class PrettyPrintVisitor implements Visitor {
 		}
 		System.out.println();
 		System.out.println();
-		System.out.print("  main ");
+		System.out.print("  main(): ");
 		n.block.accept(this);
 	}  
 
@@ -64,12 +56,12 @@ public class PrettyPrintVisitor implements Visitor {
 	public void visit(Defn n) {
 		System.out.print(" ");
 		n.i.accept(this);
-		System.out.print(" (");
+		System.out.print("(");
 		for ( int i = 0; i < n.fl.size(); i++ ) {
 			n.fl.get(i).accept(this);
 			if (i+1 < n.fl.size()) { System.out.print(", "); }
 		}
-		System.out.print(") ");
+		System.out.print("): ");
 		n.b.accept(this);
 	}
 
@@ -122,7 +114,7 @@ public class PrettyPrintVisitor implements Visitor {
 	public void visit(Print n) {
 		System.out.print("System.out.print(");
 		n.e.accept(this);
-		System.out.print(");");
+		System.out.print(")");
 	}
 
 	// Return ->
@@ -130,7 +122,6 @@ public class PrettyPrintVisitor implements Visitor {
 	public void visit(Return n) {
 		System.out.print("return ");
 		n.r.accept(this);
-		System.out.print(";");
 	}
 
 	// Assign ->
@@ -140,7 +131,6 @@ public class PrettyPrintVisitor implements Visitor {
 		n.i.accept(this);
 		System.out.print(" = ");
 		n.e.accept(this);
-		System.out.print(";");
 	}
 
 	// And ->

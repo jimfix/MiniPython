@@ -1,5 +1,4 @@
 package AST;
-import AST.Visitor.Visitor;
 
 abstract public class ASTNode {
   // Instance variables

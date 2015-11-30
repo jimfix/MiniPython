@@ -1,11 +1,8 @@
-import Scanner.*;
-import Parser.*;
-import AST.*;
-import AST.Visitor.*;
-import java_cup.runtime.Symbol;
-
 import java.io.FileReader;
-import java.util.*;
+
+import Parser.parser;
+import Scanner.scanner;
+import java_cup.runtime.Symbol;
 
 public class TestParser {
 	public static void main(String [] args) {

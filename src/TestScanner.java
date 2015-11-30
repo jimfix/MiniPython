@@ -1,8 +1,7 @@
-import Scanner.*;
-
 import java.io.FileReader;
 
 import Parser.sym;
+import Scanner.scanner;
 import java_cup.runtime.Symbol;
 
 public class TestScanner {
