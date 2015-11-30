@@ -26,7 +26,7 @@ public class Evaluator {
 
 			// Call the appropriate "eval" method based on
 			// the first element of the list
-			
+
 			// Function Definitions
 			if (operation.equals("def")) {
 				return evalDef(exp,env); 
@@ -155,7 +155,7 @@ public class Evaluator {
 			return evalSequence(exp.get(3),env);
 		}	
 	}
-	
+
 	// evalWhile should take as input an ArrayList formatted in the
 	// same way as the output of parseWhile: ["while", condition, body].
 	// Using this information, you should write code that runs the body
@@ -262,11 +262,11 @@ public class Evaluator {
 		// the procedure in its own new environment
 		return evalSequence(proc.body,new_env);
 	}
-	
+
 	// Evaluating primitives, which are either numbers or variable names
 	public static Object evalPrimative(Object exp, Environment env) {
 		String value = (String) exp;
-		
+
 		// We'll try to convert the string to a number.  If this
 		// fails, we know it's not a number.  Don't worry about
 		// the Java syntax here
@@ -296,12 +296,12 @@ public class Evaluator {
 		}
 		throw new Error("Cannot add " + v1 + " and " + v2);
 	}
-		
+
 	public static Integer evalSub(ArrayList<Object> exp, Environment env) {
 		// Evaluate the two values we're taking the difference of
 		Object v1 = meval(exp.get(1),env);
 		Object v2 = meval(exp.get(2),env);
-		
+
 		// Check that both values are integers
 		if (v1 instanceof Integer && v2 instanceof Integer) {
 			// Perform the subtraction
@@ -326,7 +326,7 @@ public class Evaluator {
 		}
 		throw new Error("Cannot divide " + v1 + " into " + v2);
 	}
-	
+
 	public static Boolean evalEquals(ArrayList<Object> exp, Environment env) {
 		Object v1 = Evaluator.meval(exp.get(1),env);
 		Object v2 = Evaluator.meval(exp.get(2),env);
@@ -341,19 +341,19 @@ public class Evaluator {
 		}
 		return false;
 	}
-	
+
 	public static Boolean evalLessThan(ArrayList<Object> exp, Environment env) {
 		// Evaluate the two expressions we'll be comparing
 		Object v1 = meval(exp.get(1),env);
 		Object v2 = meval(exp.get(2),env);
-		
+
 		// Check that both values are indeed integers
 		if (v1 instanceof Integer && v2 instanceof Integer) {
-			
+
 			// Perform the actual calculation
 			return (Integer)v1<(Integer)v2;
 		}
-		
+
 		// Throw an error if we try to compare non-Integers
 		throw new Error("Cannot compare " + v1 + " and " + v2);
 	}

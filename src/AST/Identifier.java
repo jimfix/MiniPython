@@ -2,18 +2,18 @@ package AST;
 import AST.Visitor.Visitor;
 
 public class Identifier extends ASTNode {
-  public String s;
+	public String s;
 
-  public Identifier(String as, int ln) { 
-    super(ln);
-    s=as;
-  }
+	public Identifier(String as, int ln) { 
+		super(ln);
+		s=as;
+	}
 
-  public void accept(Visitor v) {
-    v.visit(this);
-  }
+	public void accept(Visitor v) {
+		v.visit(this);
+	}
 
-  public String toString(){
-    return s;
-  }
+	public String toString(){
+		return s;
+	}
 }
