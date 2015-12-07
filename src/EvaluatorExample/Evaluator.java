@@ -1,6 +1,9 @@
 package EvaluatorExample;
 import java.util.ArrayList;
 
+import Evaluator.Environment;
+import Evaluator.Procedure;
+
 // The Evaluator is where we actually run the code.  The Evaluator
 // takes in parsed code from the Parser as input and simulates the
 // Python program according to the rules defined here.

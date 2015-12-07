@@ -8,6 +8,10 @@ public class StringLiteral extends Exp {
 		s=as;
 	}
 
+	public String toString() {
+		return this.s;
+	}
+	
 	public <T,E>T accept(Visitor<T,E> v, E env) {
 		return v.visit(this,env);
 	}

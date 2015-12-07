@@ -1,6 +1,6 @@
 import java.io.FileReader;
 
-import EvaluatorExample.Environment;
+import Evaluator.Environment;
 import EvaluatorExample.Evaluator;
 import Parser.parser;
 import Scanner.scanner;

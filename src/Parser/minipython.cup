@@ -44,26 +44,25 @@ parser code  {:
 
 /* Terminals */
 
-terminal java.lang.String ASSIGN;                     // assignment keyword
+terminal java.lang.String ASSIGN;                       // assignment keyword
 terminal java.lang.String PRINT, RETURN;
 terminal java.lang.String LPAREN, RPAREN;
 terminal java.lang.String LBRACE, RBRACE;
-//terminal LBRACK, RBRACK;               // array index or type annotation
-//terminal DOT, LEFT, RIGHT;             // field selector
+terminal java.lang.String DOT, LEFT, RIGHT;             // field selector
 terminal java.lang.String COMMA, COLON;                 // separators
 terminal java.lang.String IF, ELSE;                     // conditional statement keywords
 terminal java.lang.String WHILE;                        // loop keyword
 terminal java.lang.String DEF;                          // definition keyword
-terminal java.lang.String PLUS, MINUS, TIMES, DIV, MOD;  // arithmetic
+terminal java.lang.String PLUS, MINUS, TIMES, DIV, MOD; // arithmetic
 terminal java.lang.String LT, GT, LEQ, GEQ;             // comparators
-terminal java.lang.String EQ, NEQ;                        // equality
+terminal java.lang.String EQ, NEQ;                      // equality
 terminal java.lang.String AND, OR, NOT;                 // logical connectives
 
 terminal java.lang.Integer INT_LITERAL;
 terminal java.lang.Boolean BOOL_LITERAL;
 terminal java.lang.String STRING_LITERAL;
 terminal java.lang.String IDENTIFIER;
-//terminal java.lang.String NONE_LITERAL;
+terminal java.lang.String NONE_LITERAL;
 
 /* Variables */
 
@@ -81,7 +80,7 @@ nonterminal AST.FormalList formals;
 nonterminal AST.Exp expression;
 nonterminal AST.ExpList expression_list;
 nonterminal AST.Assign assignment;
-//nonterminal java.lang.String postfix;
+nonterminal java.lang.String postfix;
 
 /* Precedences */
 
@@ -89,7 +88,6 @@ precedence left DEF;
 precedence left COLON;
 precedence left LBRACE, RBRACE;
 precedence left LPAREN, RPAREN;
-//precedence left LBRACK, RBRACK;
 precedence left ASSIGN, RETURN, PRINT;
 precedence left IF, ELSE, WHILE;
 precedence left COMMA;
@@ -98,9 +96,9 @@ precedence left AND;
 precedence nonassoc LT, GT, LEQ, GEQ, NEQ, EQ;
 precedence left PLUS, MINUS;
 precedence left TIMES, DIV, MOD;
-//precedence left DOT, LEFT, RIGHT;
+precedence left DOT, LEFT, RIGHT;
 precedence left NOT;
-precedence left INT_LITERAL,/*BOOL_LITERAL STRING_LITERAL,*/ IDENTIFIER;
+precedence left INT_LITERAL, BOOL_LITERAL, STRING_LITERAL, NONE_LITERAL, IDENTIFIER;
 
 
 /* The Grammar Rules */
@@ -169,10 +167,11 @@ expression ::= expression:e1 PLUS expression:e2 {: RESULT = new Plus(e1,e2); :}
     |   expression:e1 LEQ expression:e2 {: RESULT = new LessEquals(e1,e2); :}
     |   NOT:not expression:e {: RESULT = new Not(e); :}
     |   INT_LITERAL:i {: RESULT = new IntegerLiteral(i); :}
+    |   NONE_LITERAL:n {: RESULT = new StringLiteral(n); :}
     |   LPAREN expression:exp RPAREN {: RESULT = exp; :}
     |   IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(new Identifier(f),el); :}
     |   IDENTIFIER:i {: RESULT = new IdentifierExp(new Identifier(i)); :}
-//    |  name:n postfix:post {: RESULT = new Name(n,post); :}
+//    |   IDENTIFIER:i DOT postfix:post {: RESULT = ; :}
     ;
 
 formals ::= IDENTIFIER:x {: FormalList fl = new FormalList(); fl.add(new Formal(new Identifier(x))); RESULT = fl; :}
@@ -180,11 +179,7 @@ formals ::= IDENTIFIER:x {: FormalList fl = new FormalList(); fl.add(new Formal(
     ;
 
 /*
-postfix ::= DOT:dot LEFT:l
-    |   DOT:dot RIGHT:r
+postfix ::= LEFT:l {: RESULT = "left"; :}
+    |   RIGHT:r {: RESULT = "right"; :}
     ;
-
-
-NONE_LITERAL:none {: RESULT = none.toString(); :}
-  ;
 */

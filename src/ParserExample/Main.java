@@ -5,7 +5,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import EvaluatorExample.Environment;
+import Evaluator.Environment;
 import EvaluatorExample.Evaluator;
 
 public class Main {

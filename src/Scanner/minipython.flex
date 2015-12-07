@@ -85,17 +85,15 @@ SStringCharacter = [^\r\n\'\\]
   "False"                        { return symbol(BOOL_LITERAL, false); }
   
   /* none literal */
-//  "None"                         { return symbol(NONE_LITERAL); }  
+  "None"                         { return symbol(NONE_LITERAL); }  
   
   /* separators */
   "("                            { return symbol(LPAREN); }
   ")"                            { return symbol(RPAREN); }
   "{"                            { return symbol(LBRACE); }
   "}"                            { return symbol(RBRACE); }
-//  "["                            { return symbol(LBRACK); }
-//  "]"                            { return symbol(RBRACK); }
   ","                            { return symbol(COMMA); }
-//  "."                            { return symbol(DOT); }
+  "."                            { return symbol(DOT); }
   
   /* operators */
   "="                            { return symbol(ASSIGN); }

@@ -2,7 +2,6 @@ package AST;
 import AST.Visitor.Visitor;
 
 public class Call extends Exp {
-	public Exp e;
 	public Identifier i;
 	public ExpList el;
 

@@ -37,8 +37,6 @@ import AST.While;
 
 public class PrettyPrintVisitor implements Visitor<Object,Object> {
 
-	private String indent = "";
-
 	// Program ->
 	// DefnList defnlist;
 	// Block block;
