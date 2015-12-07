@@ -4,12 +4,11 @@ import AST.Visitor.Visitor;
 public class Return extends Statement {
 	public Exp r;
 
-	public Return(Exp ar, int ln) {
-		super(ln);
+	public Return(Exp ar) {
 		r=ar; 
 	}
 
-	public void accept(Visitor v) {
-		v.visit(this);
+	public <T,E>T accept(Visitor<T,E> v, E env) {
+		return v.visit(this,env);
 	}
 }

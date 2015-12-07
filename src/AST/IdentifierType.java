@@ -1,14 +1,15 @@
 package AST;
 import AST.Visitor.Visitor;
 
-public class Equals extends Exp {
-	public Exp e1,e2;
+public class IdentifierType extends Type {
+  public String s;
 
-	public Equals(Exp ae1, Exp ae2) {
-		e1=ae1; e2=ae2;
-	}
+  public IdentifierType(String as) {
+    s=as;
+  }
+
 
     public <T,E>T accept(Visitor<T,E> v, E env) {
 	return v.visit(this,env);
-    }
+  }
 }

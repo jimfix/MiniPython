@@ -1,15 +1,14 @@
 package AST;
 import AST.Visitor.Visitor;
 
-public class Formal extends ASTNode{
+public class Formal {
 	public Identifier i;
 
-	public Formal(Identifier ai, int ln) {
-		super(ln);
+	public Formal(Identifier ai) {
 		i=ai;
 	}
 
-	public void accept(Visitor v) {
-		v.visit(this);
+	public <T,E>T accept(Visitor<T,E> v, E env) {
+		return v.visit(this,env);
 	}
 }

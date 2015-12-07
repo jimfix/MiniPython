@@ -1,4 +1,4 @@
-package Evaluator;
+package EvaluatorExample;
 import java.util.ArrayList;
 
 // We use the Procedure class in order to keep track of

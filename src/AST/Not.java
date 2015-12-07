@@ -4,12 +4,11 @@ import AST.Visitor.Visitor;
 public class Not extends Exp {
 	public Exp e;
 
-	public Not(Exp ae, int ln) {
-		super(ln);
+	public Not(Exp ae) {
 		e=ae; 
 	}
 
-	public void accept(Visitor v) {
-		v.visit(this);
+	public <T,E>T accept(Visitor<T,E> v, E env) {
+		return v.visit(this,env);
 	}
 }

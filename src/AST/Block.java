@@ -4,13 +4,12 @@ import AST.Visitor.Visitor;
 public class Block extends Statement {
 	public StatementList sl;
 
-	public Block(StatementList asl, int ln) {
-		super(ln);
+	public Block(StatementList asl) {
 		sl=asl;
 	}
 
-	public void accept(Visitor v) {
-		v.visit(this);
+	public <T,E>T accept(Visitor<T,E> v, E env) {
+		return v.visit(this,env);
 	}
 }
 

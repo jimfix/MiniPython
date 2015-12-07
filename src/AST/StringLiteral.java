@@ -4,12 +4,11 @@ import AST.Visitor.Visitor;
 public class StringLiteral extends Exp {
 	public String s;
 
-	public StringLiteral(String as, int ln) {
-		super(ln);
+	public StringLiteral(String as) {
 		s=as;
 	}
 
-	public void accept(Visitor v) {
-		v.visit(this);
+	public <T,E>T accept(Visitor<T,E> v, E env) {
+		return v.visit(this,env);
 	}
 }

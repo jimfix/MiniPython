@@ -15,7 +15,7 @@ public class TestParser {
 			// parser shift/reduce actions during parse
 			root = p.parse();
 			AST.Program program = (AST.Program)root.value;
-			program.accept(new AST.Visitor.PrettyPrintVisitor());
+			program.accept(new AST.Visitor.PrettyPrintVisitor(),null);
 			System.out.print("\n");
 			System.out.println("\nParsing completed\n"); 
 		} catch (Exception e) {

@@ -1,16 +1,15 @@
 package AST;
 import AST.Visitor.Visitor;
 
-public class Identifier extends ASTNode {
+public class Identifier {
 	public String s;
 
-	public Identifier(String as, int ln) { 
-		super(ln);
+	public Identifier(String as) {
 		s=as;
 	}
 
-	public void accept(Visitor v) {
-		v.visit(this);
+	public <T,E>T accept(Visitor<T,E> v, E env) {
+		return v.visit(this,env);
 	}
 
 	public String toString(){

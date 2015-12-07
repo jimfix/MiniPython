@@ -1,7 +1,7 @@
 import java.io.FileReader;
 
-import Evaluator.Environment;
-import Evaluator.Evaluator;
+import EvaluatorExample.Environment;
+import EvaluatorExample.Evaluator;
 import Parser.parser;
 import Scanner.scanner;
 import java_cup.runtime.Symbol;
@@ -14,8 +14,7 @@ public class TestEvaluator {
 			parser p = new parser(s);
 			Environment env = Environment.createGlobalEnvironment();
 			Symbol root = p.parse();
-			AST.Program program = (AST.Program)root.value;
-			Evaluator.evalSequence(program, env);
+			Evaluator.evalSequence(root, env);
 		} catch (Exception e) {
 			// yuck: some kind of error in the compiler implementation
 			// that we're not expecting (a bug!)

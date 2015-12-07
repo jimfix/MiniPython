@@ -4,12 +4,11 @@ import AST.Visitor.Visitor;
 public class Print extends Statement {
 	public Exp e;
 
-	public Print(Exp ae, int ln) {
-		super(ln);
+	public Print(Exp ae) {
 		e=ae; 
 	}
 
-	public void accept(Visitor v) {
-		v.visit(this);
+	public <T,E>T accept(Visitor<T,E> v, E env) {
+		return v.visit(this,env);
 	}
 }

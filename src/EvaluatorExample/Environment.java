@@ -1,4 +1,4 @@
-package Evaluator;
+package EvaluatorExample;
 import java.util.HashMap;
 
 // Environment objects are used to represent different

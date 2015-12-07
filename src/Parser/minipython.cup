@@ -107,23 +107,23 @@ precedence left INT_LITERAL,/*BOOL_LITERAL STRING_LITERAL,*/ IDENTIFIER;
 
 start with program;
 
-program  ::= definition_list:dl block:b    {: RESULT = new Program(dl,b,dlleft); :}
-    |   block:b {: RESULT = new Program(new DefnList(bleft),b,bleft); :}
+program  ::= definition_list:dl block:b    {: RESULT = new Program(dl,b); :}
+    |   block:b {: RESULT = new Program(new DefnList(),b); :}
     ;
 
-block ::= LBRACE:l statement_list:sl RBRACE {: RESULT = new Block(sl,lleft); :}
+block ::= LBRACE:l statement_list:sl RBRACE {: RESULT = new Block(sl); :}
     ;
 
-definition_list ::= definition:d {: DefnList dl = new DefnList(dleft); dl.add(d); RESULT = dl; :}
+definition_list ::= definition:d {: DefnList dl = new DefnList(); dl.add(d); RESULT = dl; :}
     |   definition_list:dl definition:d {: dl.add(d); RESULT = dl; :}
     ;
 
-statement_list ::= statement:s {: StatementList sl = new StatementList(sleft); sl.add(s); RESULT = sl; :}
+statement_list ::= statement:s {: StatementList sl = new StatementList(); sl.add(s); RESULT = sl; :}
     |   statement_list:sl statement:s {: sl.add(s); RESULT = sl; :}
     ;
 
-definition ::= DEF:df IDENTIFIER:f LPAREN RPAREN COLON block:b {: RESULT = new Defn(new Identifier(f,dfleft),new FormalList(dfleft),b,dfleft); :}
-    |   DEF:df IDENTIFIER:f LPAREN formals:xs RPAREN COLON block:b {: RESULT = new Defn(new Identifier(f,dfleft),xs,b,dfleft); :}
+definition ::= DEF IDENTIFIER:f LPAREN RPAREN COLON block:b {: RESULT = new Defn(new Identifier(f),new FormalList(),b); :}
+    |   DEF IDENTIFIER:f LPAREN formals:xs RPAREN COLON block:b {: RESULT = new Defn(new Identifier(f),xs,b); :}
     ;
 
 statement ::= assignment:as {: RESULT = as; :}
@@ -131,53 +131,52 @@ statement ::= assignment:as {: RESULT = as; :}
     |   while_statement:w {: RESULT = w; :}
     |   print_statement:p {: RESULT = p; :}
     |   return_statement:r {: RESULT = r; :}
-    |   expression:exp {: RESULT = new Assign(new Identifier("_",expleft),exp,expleft); :}
+    |   expression:exp {: RESULT = new Assign(new Identifier("_"),exp); :}
     ;
 
-assignment ::= IDENTIFIER:i ASSIGN expression:exp {: RESULT = new Assign(new Identifier(i,ileft),exp,ileft); :}
+assignment ::= IDENTIFIER:i ASSIGN expression:exp {: RESULT = new Assign(new Identifier(i),exp); :}
     ;
 
-if_statement ::= IF:i LPAREN expression:exp RPAREN COLON block:b {: RESULT = new If(exp,b,null,ileft); :}
-    |  IF:i LPAREN expression:exp RPAREN COLON block:b1 ELSE COLON block:b2 {: RESULT = new If(exp,b1,b2,ileft); :}
+if_statement ::= IF LPAREN expression:exp RPAREN COLON block:b {: RESULT = new If(exp,b,null); :}
+    |  IF LPAREN expression:exp RPAREN COLON block:b1 ELSE COLON block:b2 {: RESULT = new If(exp,b1,b2); :}
     ;
 
-while_statement ::= WHILE:wh expression:exp COLON block:b {: RESULT = new While(exp,b,whleft); :}
+while_statement ::= WHILE expression:exp COLON block:b {: RESULT = new While(exp,b); :}
     ;
 
-print_statement ::= PRINT:pr expression:exp {: RESULT = new Print(exp,prleft); :}
+print_statement ::= PRINT expression:exp {: RESULT = new Print(exp); :}
     ;
 
-return_statement ::= RETURN:ret expression:exp {: RESULT = new Return(exp,retleft); :}
+return_statement ::= RETURN expression:exp {: RESULT = new Return(exp); :}
 	;
 
-expression_list ::= expression:exp {: ExpList el = new ExpList(expleft); el.add(exp); RESULT = el; :}
+expression_list ::= expression:exp {: ExpList el = new ExpList(); el.add(exp); RESULT = el; :}
     |    expression_list:el expression:exp {: el.add(exp); RESULT = el; :}
     ;
 
-expression ::= expression:e1 PLUS expression:e2 {: RESULT = new Plus(e1,e2,e1left); :}
-    |   expression:e1 MINUS expression:e2 {: RESULT = new Minus(e1,e2,e1left); :}
-    |   expression:e1 TIMES expression:e2 {: RESULT = new Times(e1,e2,e1left); :}
-    |   expression:e1 DIV expression:e2 {: RESULT = new Div(e1,e2,e1left); :}
-    |   expression:e1 MOD expression:e2 {: RESULT = new Mod(e1,e2,e1left); :}    
-    |   expression:e1 AND expression:e2 {: RESULT = new And(e1,e2,e1left); :}
-    |   expression:e1 OR expression:e2 {: RESULT = new Or(e1,e2,e1left); :}    
-    |   expression:e1 GT expression:e2 {: RESULT = new GreaterThan(e1,e2,e1left); :}
-    |   expression:e1 LT expression:e2 {: RESULT = new LessThan(e1,e2,e1left); :}
-    |   expression:e1 EQ expression:e2 {: RESULT = new Equals(e1,e2,e1left); :}
-    |   expression:e1 NEQ expression:e2 {: RESULT = new NotEquals(e1,e2,e1left); :}
-    |   expression:e1 GEQ expression:e2 {: RESULT = new GreaterEquals(e1,e2,e1left); :}
-    |   expression:e1 LEQ expression:e2 {: RESULT = new LessEquals(e1,e2,e1left); :}
-    |   NOT:not expression:e {: RESULT = new Not(e,notleft); :}
-    |   INT_LITERAL:i {: RESULT = new IntegerLiteral(i,ileft); :}
-    |   BOOL_LITERAL:b {: RESULT = new BooleanLiteral(b,bleft); :}
+expression ::= expression:e1 PLUS expression:e2 {: RESULT = new Plus(e1,e2); :}
+    |   expression:e1 MINUS expression:e2 {: RESULT = new Minus(e1,e2); :}
+    |   expression:e1 TIMES expression:e2 {: RESULT = new Times(e1,e2); :}
+    |   expression:e1 DIV expression:e2 {: RESULT = new Div(e1,e2); :}
+    |   expression:e1 MOD expression:e2 {: RESULT = new Mod(e1,e2); :}    
+    |   expression:e1 AND expression:e2 {: RESULT = new And(e1,e2); :}
+    |   expression:e1 OR expression:e2 {: RESULT = new Or(e1,e2); :}    
+    |   expression:e1 GT expression:e2 {: RESULT = new GreaterThan(e1,e2); :}
+    |   expression:e1 LT expression:e2 {: RESULT = new LessThan(e1,e2); :}
+    |   expression:e1 EQ expression:e2 {: RESULT = new Equals(e1,e2); :}
+    |   expression:e1 NEQ expression:e2 {: RESULT = new NotEquals(e1,e2); :}
+    |   expression:e1 GEQ expression:e2 {: RESULT = new GreaterEquals(e1,e2); :}
+    |   expression:e1 LEQ expression:e2 {: RESULT = new LessEquals(e1,e2); :}
+    |   NOT:not expression:e {: RESULT = new Not(e); :}
+    |   INT_LITERAL:i {: RESULT = new IntegerLiteral(i); :}
     |   LPAREN expression:exp RPAREN {: RESULT = exp; :}
-    |   IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(new Identifier(f,fleft),el,fleft); :}
-    |   IDENTIFIER:f {: RESULT = new IdentifierExp(new Identifier(f,fleft),fleft); :}
-//    |  name:n postfix:post {: RESULT = new Name(n,post,nleft); :}
+    |   IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(new Identifier(f),el); :}
+    |   IDENTIFIER:i {: RESULT = new IdentifierExp(new Identifier(i)); :}
+//    |  name:n postfix:post {: RESULT = new Name(n,post); :}
     ;
 
-formals ::= IDENTIFIER:x {: FormalList fl = new FormalList(xleft); fl.add(new Formal(new Identifier(x,xleft),xleft)); RESULT = fl; :}
-    |    formals:fl COMMA IDENTIFIER:x {: fl.add(new Formal(new Identifier(x,flleft),flleft)); RESULT = fl; :}
+formals ::= IDENTIFIER:x {: FormalList fl = new FormalList(); fl.add(new Formal(new Identifier(x))); RESULT = fl; :}
+    |    formals:fl COMMA IDENTIFIER:x {: fl.add(new Formal(new Identifier(x))); RESULT = fl; :}
     ;
 
 /*

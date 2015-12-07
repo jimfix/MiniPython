@@ -3,12 +3,11 @@ import AST.Visitor.Visitor;
 
 public class IdentifierExp extends Exp {
 	public Identifier i;
-	public IdentifierExp(Identifier ai, int ln) { 
-		super(ln);
+	public IdentifierExp(Identifier ai) { 
 		i=ai;
 	}
 
-	public void accept(Visitor v) {
-		v.visit(this);
+	public <T,E>T accept(Visitor<T,E> v, E env) {
+		return v.visit(this,env);
 	}
 }
