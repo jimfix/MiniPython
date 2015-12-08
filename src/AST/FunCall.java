@@ -1,11 +1,11 @@
 package AST;
 import AST.Visitor.Visitor;
 
-public class Call extends Exp {
+public class FunCall extends Exp {
 	public Identifier i;
 	public ExpList el;
 
-	public Call(Identifier ai, ExpList ael) {
+	public FunCall(Identifier ai, ExpList ael) {
 		i=ai; el=ael;
 	}
 

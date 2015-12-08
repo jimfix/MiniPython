@@ -2,6 +2,7 @@ package Evaluator;
 import java.util.HashMap;
 
 import AST.Identifier;
+import AST.IdentifierExp;
 
 // Environment objects are used to represent different
 // program environments used throughout our Python program.
@@ -38,12 +39,12 @@ public class Environment {
 	}
 
 	// Look up a certain name in the environment
-	public Object lookupVariable(Identifier i) {		
+	public Object lookupVariable(IdentifierExp x) {		
 		// Check to see if the current environment has the
 		// variable we're looking for.  If so, return its
 		// value.
-		if (frame.containsKey(i)) {
-			return frame.get(i);
+		if (frame.containsKey(x)) {
+			return frame.get(x);
 		}
 
 		// If the variable isn't defined in this environment,
@@ -51,13 +52,13 @@ public class Environment {
 		// parent is null, then we're in the global environment,
 		// so we have to give up.
 		else if (parent != null) {
-			return parent.lookupVariable(i);
+			return parent.lookupVariable(x);
 		}
 
 		// If no environment has the variable we're looking for,
 		// we throw a sad error message.
 		else {
-			throw new Error("Undefined name " + i);
+			throw new Error("Undefined name " + x);
 		}
 	}
 

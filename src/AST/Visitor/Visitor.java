@@ -3,7 +3,7 @@ package AST.Visitor;
 import AST.And;
 import AST.Assign;
 import AST.Block;
-import AST.Call;
+import AST.FunCall;
 import AST.Defn;
 import AST.Div;
 import AST.Equals;
@@ -55,7 +55,7 @@ public interface Visitor < T, Env > {
 	T visit(Times n, Env e);
 	T visit(Div n, Env e);
 	T visit(Mod n, Env e);
-	T visit(Call n, Env e);
+	T visit(FunCall n, Env e);
 	T visit(IntegerLiteral n, Env e);
 	T visit(IdentifierType n, Env e);
 	T visit(StringLiteral n, Env e);

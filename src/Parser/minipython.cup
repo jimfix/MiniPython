@@ -169,7 +169,7 @@ expression ::= expression:e1 PLUS expression:e2 {: RESULT = new Plus(e1,e2); :}
     |   INT_LITERAL:i {: RESULT = new IntegerLiteral(i); :}
     |   NONE_LITERAL:n {: RESULT = new StringLiteral(n); :}
     |   LPAREN expression:exp RPAREN {: RESULT = exp; :}
-    |   IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new Call(new Identifier(f),el); :}
+    |   IDENTIFIER:f LPAREN expression_list:el RPAREN {: RESULT = new FunCall(new Identifier(f),el); :}
     |   IDENTIFIER:i {: RESULT = new IdentifierExp(new Identifier(i)); :}
 //    |   IDENTIFIER:i DOT postfix:post {: RESULT = ; :}
     ;

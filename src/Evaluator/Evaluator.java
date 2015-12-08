@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import AST.And;
 import AST.Assign;
 import AST.Block;
-import AST.Call;
+import AST.FunCall;
 import AST.Defn;
 import AST.Div;
 import AST.Equals;
@@ -56,7 +56,7 @@ public class Evaluator implements Visitor < Object, Environment >{
 		return null;
 	}
 
-	public Object visit(Call x, Environment env) {
+	public Object visit(FunCall x, Environment env) {
 		// First, we need to get the appropriate procedure out 
 		// of the environment
 		Procedure proc = ((Procedure)env.lookupVariable(x.i));
@@ -109,10 +109,6 @@ public class Evaluator implements Visitor < Object, Environment >{
 
 	}
 
-	public Boolean visit(Exp x, java.util.HashMap < String, Boolean > env){
-		return null;
-	}
-
 	public Boolean visit(False x, Environment env) {
 		return false;
 	}
@@ -124,23 +120,23 @@ public class Evaluator implements Visitor < Object, Environment >{
 
 	public Boolean visit(GreaterEquals x, Environment env) {
 		int exp1 = (int) x.e1.accept(this,env);
-		int exp2 = (int) x.e2.accept(this, env);
+		int exp2 = (int) x.e2.accept(this,env);
 		return exp1 >= exp2;
 	}
 
 	public Boolean visit(GreaterThan x, Environment env) {
 		int exp1 = (int) x.e1.accept(this,env);
-		int exp2 = (int) x.e2.accept(this, env);
+		int exp2 = (int) x.e2.accept(this,env);
 		return exp1 > exp2;
 	}
 
 	public Object visit(Identifier x, Environment env){
-		return env.lookupVariable(x);
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	public Object visit(IdentifierExp x, Environment env) {
-		// TODO Auto-generated method stub
-		return null;
+		return env.lookupVariable(x);
 	}
 
 	public Boolean visit(IdentifierType x, Environment env) {
@@ -163,25 +159,25 @@ public class Evaluator implements Visitor < Object, Environment >{
 
 	public Boolean visit(LessEquals x, Environment env) {
 		int exp1 = (int) x.e1.accept(this,env);
-		int exp2 = (int) x.e2.accept(this, env);
+		int exp2 = (int) x.e2.accept(this,env);
 		return exp1 <= exp2;
 	}
 
 	public Boolean visit(LessThan x, Environment env) {
 		int exp1 = (int) x.e1.accept(this,env);
-		int exp2 = (int) x.e2.accept(this, env);
+		int exp2 = (int) x.e2.accept(this,env);
 		return exp1 < exp2;
 	}
 
 	public Object visit(Minus x, Environment env) {
 		int exp1 = (int) x.e1.accept(this,env);
-		int exp2 = (int) x.e2.accept(this, env);
+		int exp2 = (int) x.e2.accept(this,env);
 		return exp1 - exp2;
 	}
 
 	public Object visit(Mod x, Environment env) {
 		int exp1 = (int) x.e1.accept(this,env);
-		int exp2 = (int) x.e2.accept(this, env);
+		int exp2 = (int) x.e2.accept(this,env);
 		return exp1 % exp2;
 	}
 
@@ -202,7 +198,7 @@ public class Evaluator implements Visitor < Object, Environment >{
 
 	public Object visit(Plus x, Environment env) {
 		int exp1 = (int) x.e1.accept(this,env);
-		int exp2 = (int) x.e2.accept(this, env);
+		int exp2 = (int) x.e2.accept(this,env);
 		return exp1 + exp2;
 	}
 
