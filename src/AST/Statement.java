@@ -2,5 +2,5 @@ package AST;
 import AST.Visitor.Visitor;
 
 public abstract class Statement {
-	public abstract <T,E>T accept(Visitor<T,E> v, E env);
+	public abstract <T,C>T accept(Visitor<T,C> v, C ctxt);
 }

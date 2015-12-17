@@ -8,8 +8,5 @@ public class Block extends Statement {
 		sl=asl;
 	}
 
-	public <T,E>T accept(Visitor<T,E> v, E env) {
-		return v.visit(this,env);
-	}
 }
 

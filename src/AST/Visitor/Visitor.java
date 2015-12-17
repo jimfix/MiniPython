@@ -32,9 +32,9 @@ import AST.Times;
 import AST.True;
 import AST.While;
 
-public interface Visitor < T, Env > {
-	T visit(Program n, Env e);
-	T visit(Defn n, Env e);
+public interface Visitor < T, C > {
+	T visit(Program n, C e);
+	T visit(Defn n, C e);
 	T visit(Formal n, Env e);
 	T visit(Block n, Env e);
 	T visit(If n, Env e);

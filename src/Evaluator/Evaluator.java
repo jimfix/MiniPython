@@ -23,6 +23,7 @@ import AST.LessEquals;
 import AST.LessThan;
 import AST.Minus;
 import AST.Mod;
+import AST.None;
 import AST.Not;
 import AST.NotEquals;
 import AST.Or;
@@ -36,27 +37,46 @@ import AST.True;
 import AST.While;
 import AST.Visitor.Visitor;
 
-public class Evaluator implements Visitor < Object, Environment >{
+public class Evaluator implements Visitor < Value, Environment >{
 
-	public Boolean visit(And x, Environment env){
-		Boolean exp1 = (Boolean) x.e1.accept(this,env);
-		Boolean exp2 = (Boolean) x.e2.accept(this,env);
-		return exp1 && exp2;
+	public Value visit(And x, Environment env){
+		Value exp1 = x.e1.accept(this,env);
+		if (exp1.toBoolean()) {
+			return x.e2.accept(this,env);
+		} else {
+			return exp1;
+		}
 	}
 
-	public Object visit(Assign x, Environment env) {
-		String id = (String) x.i.toString();
-		Object res = (Object) x.e.accept(this,env);
+	public Value visit(Or x, Environment env){
+		Value val1 = x.e1.accept(this,env);
+		if (val1.toBoolean()) {
+			return val1;
+		} else {
+			return x.e2.accept(this,env);
+		}
+	}
+
+	public Value visit(Assign x, Environment env) {
+		Identifier id = x.i;
+		Value res = x.e.accept(this,env);
 		env.addVariable(id, res);
-		return null;
+		return new NoneValue();
 	}
 
-	public Boolean visit(Block x, Environment env) {
-		// TODO Auto-generated method stub
-		return null;
+	// JF: hi JC, you'll need a ReturnContext everywhere a return 
+	//     might need to be handled. Let's not worry about this yet.
+	//     Instead, for now, we'll return None.
+	//
+	public Value visit(Block x, Environment env, ReturnContext ) {
+		for (Statement s: x.sl) {
+			s.accept(this,env);
+		}
+		// for now
+		return new NoneValue()
 	}
 
-	public Object visit(FunCall x, Environment env) {
+	public Value visit(FunCall x, Environment env) {
 		// First, we need to get the appropriate procedure out 
 		// of the environment
 		Procedure proc = ((Procedure)env.lookupVariable(x.i));
@@ -91,110 +111,63 @@ public class Evaluator implements Visitor < Object, Environment >{
 		return x.accept(proc.body,new_env);
 	}
 
-	public Object visit(Defn x, Environment env) {
+	public Value visit(Defn x, Environment env) {
 		Procedure newProc = new Procedure(x.fl,x.b,env);
-		env.addVariable(x.i.toString(),newProc);
-		return null;
+		env.addVariable(x.i,newProc);
+		return new NoneValue();
 	}
 
-	public Object visit(Div x, Environment env) {
-		int exp1 = (int) x.e1.accept(this,env);
-		int exp2 = (int) x.e2.accept(this,env);
-		return exp1 / exp2;
+	public Value visit(IntegerOp x, Environment env) {
+		Value val1 = x.e1.accept(this,env);
+		Value val2 = x.e2.accept(this,env);
+		if (val1 instanceof IntegerValue 
+			&& val2 instanceof IntegerValue) {
+			Integer i1 = ((IntegerValue)val1).value;
+			Integer i2 = ((IntegerValue)val2).value;
+			return x.compute(i1,i2);
+		}
+		// JF: JC, we need to raise an exception here
+		return new NoneValue()
 	}
 
-	public Boolean visit(Equals x, Environment env) {
+	public Value visit(Equals x, Environment env) {
+		// This is going to have to be special
 		if (x.e1.accept(this,env) == x.e2.accept(this,env)) { return true; }
 		else { return false; }
-
 	}
 
-	public Boolean visit(False x, Environment env) {
-		return false;
+	public Value visit(IdentifierExp x, Environment env) {
+		return env.lookupVariable(x.i);
 	}
 
-	public Boolean visit(Formal x, Environment env) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Boolean visit(GreaterEquals x, Environment env) {
-		int exp1 = (int) x.e1.accept(this,env);
-		int exp2 = (int) x.e2.accept(this,env);
-		return exp1 >= exp2;
-	}
-
-	public Boolean visit(GreaterThan x, Environment env) {
-		int exp1 = (int) x.e1.accept(this,env);
-		int exp2 = (int) x.e2.accept(this,env);
-		return exp1 > exp2;
-	}
-
-	public Object visit(Identifier x, Environment env){
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Object visit(IdentifierExp x, Environment env) {
-		return env.lookupVariable(x);
-	}
-
-	public Boolean visit(IdentifierType x, Environment env) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Boolean visit(If x, Environment env) {
-		if ((Boolean) x.e.accept(this,env) == true) {
-			return (Boolean) x.s1.accept(this,env);
+	public Value visit(If x, Environment env) {
+		Value c = x.e.accept(this,env)
+		if (c.toBoolean()) {
+			return x.s1.accept(this,env);
 		}
 		else {
-			return (Boolean) x.s2.accept(this,env);
+			return x.s2.accept(this,env);
 		}
-	}
-
-	public Object visit(IntegerLiteral x, Environment env) {
-		return x.i;
-	}
-
-	public Boolean visit(LessEquals x, Environment env) {
-		int exp1 = (int) x.e1.accept(this,env);
-		int exp2 = (int) x.e2.accept(this,env);
-		return exp1 <= exp2;
-	}
-
-	public Boolean visit(LessThan x, Environment env) {
-		int exp1 = (int) x.e1.accept(this,env);
-		int exp2 = (int) x.e2.accept(this,env);
-		return exp1 < exp2;
-	}
-
-	public Object visit(Minus x, Environment env) {
-		int exp1 = (int) x.e1.accept(this,env);
-		int exp2 = (int) x.e2.accept(this,env);
-		return exp1 - exp2;
-	}
-
-	public Object visit(Mod x, Environment env) {
-		int exp1 = (int) x.e1.accept(this,env);
-		int exp2 = (int) x.e2.accept(this,env);
-		return exp1 % exp2;
 	}
 
 	public Boolean visit(Not x, Environment env){
-		Boolean exp = (Boolean) x.e.accept(this,env);
-		return !exp;
+		Value val = .e.accept(this,env);
+		Boolean b = val.toBoolean();
+		if (b) {
+			return new BooleanValue(false);
+		} else {
+			return new BooleanValue(true);
+		}
 	}
 
+	// Get rid of NotEquals and parse it as Not(Equals(...))
+	/*
 	public Boolean visit(NotEquals x, Environment env) {
 		return x.e1.accept(this,env) != x.e2.accept(this,env);
 	}
+	*/
 
-	public Boolean visit(Or x, Environment env){
-		Boolean exp1 = (Boolean) x.e1.accept(this,env);
-		Boolean exp2 = (Boolean) x.e2.accept(this,env);
-		return exp1 || exp2;
-	}
+
 
 	public Object visit(Plus x, Environment env) {
 		int exp1 = (int) x.e1.accept(this,env);
