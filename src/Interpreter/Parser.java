@@ -1,5 +1,6 @@
-package ParserExample;
+package Interpreter;
 import java.util.ArrayList;
+import Errors.ParseError;
 
 // The Parser is a big chunk of our Interpreter.  The Parser does 
 // not actually run any of the code in our program, but rather helps
@@ -64,7 +65,7 @@ public class Parser {
 		
 		// Check that we're not out of tokens
 		if (tokens.size() < 1) {
-			throw new Error("Expected a statement, but there was none");
+			throw new ParseError("Expected a statement, but there was none");
 		}
 		
 		// Most types of statements can be identified just by 
@@ -86,7 +87,7 @@ public class Parser {
 			return parsePrint(tokens);
 		}
 		else if (tokens.get(0).equals("while")) {
-			return parseWhile(tokens);
+			return YourCode.parseWhile(tokens);
 		}
 		
 		// We cannot tell the difference between a procedure
@@ -108,7 +109,7 @@ public class Parser {
 		}
 		
 		// We don't know what kind of statement this is
-		throw new Error("Unexpected symbol: " + tokens.get(0));
+		throw new ParseError("Unexpected symbol: " + tokens.get(0));
 	}
 
 	// (Rules 3-5) DefStatement := def NAME ( ArgList ) : Sequence
@@ -196,18 +197,6 @@ public class Parser {
 		return retval;
 	}
 	
-	// WhileStatement := while Expression : Sequence
-	// --------------------------------------------------
-	//  To parse an WhileStatement, we'll need to parse both the 
-	//  loop condition and the loop body.  The condition to keep
-	//  looping should be an Expression, while the body should be
-	//  a Sequence.  Your implementation of parseWhile should produce
-	//  an ArrayList with the following format:
-	//  ["while", condition, body]
-	
-	public static ArrayList<Object> parseWhile(TokenStream tokens) {
-		return null;
-	}
 	
 	// (Rule 8) ReturnStatement := return Expression NEWLINE
 	// Output: ["return", expression]

@@ -1,12 +1,12 @@
-package ParserExample;
-
+package Driver;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import Evaluator.Environment;
-import EvaluatorExample.Evaluator;
+import Interpreter.Environment;
+import Interpreter.Evaluator;
+import Interpreter.Parser;
 
 public class Main {
 	public static void main(String args[]) throws Exception {

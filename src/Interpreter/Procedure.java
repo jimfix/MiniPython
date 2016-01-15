@@ -1,8 +1,5 @@
-package Evaluator;
+package Interpreter;
 import java.util.ArrayList;
-
-import AST.Block;
-import AST.FormalList;
 
 // We use the Procedure class in order to keep track of
 // our procedures.  Procedures consist of three parts:
@@ -13,8 +10,8 @@ public class Procedure {
 	public ArrayList<String> args; // A list of the procedure arguments
 	public ArrayList<Object> body; // The actual code for the procedure
 	public Environment env; // A pointer to the environment we should use
-	// when we run this procedure
-
+							// when we run this procedure
+	
 	// Procedure constructor
 	public Procedure(ArrayList<String> args_, ArrayList<Object> body_, Environment env_) {
 		args = args_;

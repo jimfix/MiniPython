@@ -1,8 +1,6 @@
-package EvaluatorExample;
+package Interpreter;
 import java.util.ArrayList;
-
-import Evaluator.Environment;
-import Evaluator.Procedure;
+import Errors.EvalError;
 
 // The Evaluator is where we actually run the code.  The Evaluator
 // takes in parsed code from the Parser as input and simulates the
@@ -29,7 +27,7 @@ public class Evaluator {
 
 			// Call the appropriate "eval" method based on
 			// the first element of the list
-
+			
 			// Function Definitions
 			if (operation.equals("def")) {
 				return evalDef(exp,env); 
@@ -61,16 +59,28 @@ public class Evaluator {
 			// How to evaluate a while loop is handled
 			// in your code
 			else if (operation.equals("while")) {				
-				return evalWhile(exp,env);
+				return YourCode.evalWhile(exp,env);
 			}
 			// Function calls (Expression version)
 			else if (operation.equals("callE")) {
 				return evalCall(exp,env);
 			}
+			// List indexing (i.e. lst[2])
+			else if (operation.equals("get")) {
+				return YourCode.evalGetListElement(exp,env);
+			}
+			// List creation (i.e. [1,2,3])
+			else if (operation.equals("list")) {
+				return YourCode.evalList(exp,env);
+			}
+			// List size (i.e. |lst|, equivalent to len(lst) in normal Python)
+			else if (operation.equals("sizeof")) {
+				return evalSize(exp,env);
+			}		
 
 			// Equality (for ints, booleans, and lists)
 			else if (operation.equals("==")) {
-				return evalEquals(exp,env);
+				return YourCode.evalEquals(exp,env);
 			}
 
 			// Addition (for integers and lists)
@@ -100,11 +110,7 @@ public class Evaluator {
 			}
 			// Less Than Equal
 			else if (operation.equals("<=")) {
-				return evalLessThanEqual(exp, env);
-			}
-			// Greater Than Equal
-			else if (operation.equals(">=")) {
-				return evalGreaterThanEqual(exp, env);
+				return YourCode.evalLessThanEqual(exp, env);
 			}
 		}
 		else {
@@ -145,7 +151,7 @@ public class Evaluator {
 		// Check that the condition is a Boolean. If not, throw
 		// an error.
 		if (!(cond instanceof Boolean)) {
-			throw new Error("Expected a boolean for the condition of the if statement");
+			throw new EvalError("Expected a boolean for the condition of the if statement");
 		}
 
 		// If the condition was true, evaluate the true clause
@@ -158,24 +164,6 @@ public class Evaluator {
 			return evalSequence(exp.get(3),env);
 		}	
 	}
-
-	// evalWhile should take as input an ArrayList formatted in the
-	// same way as the output of parseWhile: ["while", condition, body].
-	// Using this information, you should write code that runs the body
-	// of the while loop for as long as condition evaluates to true. Note
-	// that when testing this, we will assume that no "return" statements
-	// will be in any loop bodies.	
-	public static Object evalWhile(ArrayList<Object> exp, Environment env) {
-		Object cond = meval(exp.get(1),env);
-		if (!(cond instanceof Boolean)) {
-			throw new Error("Expected a boolean for the condition of the if statement");
-		}
-		while ((Boolean) cond) {
-			return evalSequence(exp.get(2),env);
-		}
-		return null;
-	}
-
 
 	// Evaluate variable assignments (i.e. things like x = x + 1)
 	public static Object evalAssign(ArrayList<Object> exp, Environment env) {
@@ -249,7 +237,7 @@ public class Evaluator {
 		// There should be just as many arguments in the function 
 		// call as the function expects
 		if (args.size() != fargs.size()) {
-			throw new Error("Function expected " + fargs.size() + " arguments, got " + args.size());
+			throw new EvalError("Function expected " + fargs.size() + " arguments, got " + args.size());
 		}
 
 		// Loop through each of the arguments. We first evaluate
@@ -266,10 +254,18 @@ public class Evaluator {
 		return evalSequence(proc.body,new_env);
 	}
 
+	// How to evaluate the |x| syntax where x is a list.  This
+	// is equivalent to len(x) in normal Python.  To make this 
+	// work, we just have to call the "size" method on the 
+	// ArrayList we're using to represent the Python list.
+	public static Integer evalSize(ArrayList<Object> exp, Environment env) {
+		return ((ArrayList<Object>) meval(exp.get(1),env)).size();
+	}
+	
 	// Evaluating primitives, which are either numbers or variable names
 	public static Object evalPrimative(Object exp, Environment env) {
 		String value = (String) exp;
-
+		
 		// We'll try to convert the string to a number.  If this
 		// fails, we know it's not a number.  Don't worry about
 		// the Java syntax here
@@ -297,21 +293,21 @@ public class Evaluator {
 			new_list.addAll(list2);
 			return new_list;
 		}
-		throw new Error("Cannot add " + v1 + " and " + v2);
+		throw new EvalError("Cannot add " + v1 + " and " + v2);
 	}
-
+		
 	public static Integer evalSub(ArrayList<Object> exp, Environment env) {
 		// Evaluate the two values we're taking the difference of
 		Object v1 = meval(exp.get(1),env);
 		Object v2 = meval(exp.get(2),env);
-
+		
 		// Check that both values are integers
 		if (v1 instanceof Integer && v2 instanceof Integer) {
 			// Perform the subtraction
 			return (Integer)v1-(Integer)v2;
 		}	
 		// Throw an error if both values are not integers
-		throw new Error("Cannot subtract " + v2 + " from " + v1);
+		throw new EvalError("Cannot subtract " + v2 + " from " + v1);
 	}
 	public static Integer evalMult(ArrayList<Object> exp, Environment env) {
 		Object v1 = meval(exp.get(1),env);
@@ -319,7 +315,7 @@ public class Evaluator {
 		if (v1 instanceof Integer && v2 instanceof Integer) {
 			return (Integer)v1*(Integer)v2;
 		}
-		throw new Error("Cannot multiply " + v1 + " and " + v2);
+		throw new EvalError("Cannot multiply " + v1 + " and " + v2);
 	}
 	public static Integer evalDiv(ArrayList<Object> exp, Environment env) {
 		Object v1 = meval(exp.get(1),env);
@@ -327,38 +323,22 @@ public class Evaluator {
 		if (v1 instanceof Integer && v2 instanceof Integer) {
 			return (Integer)v1/(Integer)v2;
 		}
-		throw new Error("Cannot divide " + v1 + " into " + v2);
+		throw new EvalError("Cannot divide " + v1 + " into " + v2);
 	}
-
-	public static Boolean evalEquals(ArrayList<Object> exp, Environment env) {
-		Object v1 = Evaluator.meval(exp.get(1),env);
-		Object v2 = Evaluator.meval(exp.get(2),env);
-		return checkEquals(v1,v2);
-	}
-	public static Boolean checkEquals(Object v1, Object v2) { 
-		if (v1 instanceof Integer && v2 instanceof Integer) {
-			return ((Integer) v1) == ((Integer) v2);
-		}
-		else if (v1 instanceof Boolean && v2 instanceof Boolean) {
-			return ((Boolean) v1) == ((Boolean) v2);
-		}
-		return false;
-	}
-
 	public static Boolean evalLessThan(ArrayList<Object> exp, Environment env) {
 		// Evaluate the two expressions we'll be comparing
 		Object v1 = meval(exp.get(1),env);
 		Object v2 = meval(exp.get(2),env);
-
+		
 		// Check that both values are indeed integers
 		if (v1 instanceof Integer && v2 instanceof Integer) {
-
+			
 			// Perform the actual calculation
 			return (Integer)v1<(Integer)v2;
 		}
-
+		
 		// Throw an error if we try to compare non-Integers
-		throw new Error("Cannot compare " + v1 + " and " + v2);
+		throw new EvalError("Cannot compare " + v1 + " and " + v2);
 	}
 	public static Boolean evalGreaterThan(ArrayList<Object> exp, Environment env) {
 		Object v1 = meval(exp.get(1),env);
@@ -366,22 +346,6 @@ public class Evaluator {
 		if (v1 instanceof Integer && v2 instanceof Integer) {
 			return (Integer)v1>(Integer)v2;
 		}
-		throw new Error("Cannot compare " + v1 + " and " + v2);
-	}
-	public static Boolean evalLessThanEqual(ArrayList<Object> exp, Environment env) {
-		Object v1 = meval(exp.get(1),env);
-		Object v2 = meval(exp.get(2),env);
-		if (v1 instanceof Integer && v2 instanceof Integer) {
-			return (Integer)v1<=(Integer)v2;
-		}
-		throw new Error("Cannot compare " + v1 + " and " + v2);
-	}
-	public static Boolean evalGreaterThanEqual(ArrayList<Object> exp, Environment env) {
-		Object v1 = meval(exp.get(1),env);
-		Object v2 = meval(exp.get(2),env);
-		if (v1 instanceof Integer && v2 instanceof Integer) {
-			return (Integer)v1>=(Integer)v2;
-		}
-		throw new Error("Cannot compare " + v1 + " and " + v2);
+		throw new EvalError("Cannot compare " + v1 + " and " + v2);
 	}
 }

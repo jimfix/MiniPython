@@ -1,7 +1,9 @@
-package ParserExample;
+package Interpreter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Stack;
+
+import Errors.ParseError;
 
 // The tokenizer takes the raw Python string and breaks it into
 // the individual "tokens" that make up our Python program. Tokens
@@ -248,6 +250,6 @@ public class Tokenizer {
 		if (stack.size() > 0) {
 			return true;
 		}
-		throw new Error("There's a problem with your indentation");
+		throw new ParseError("There's a problem with your indentation");
 	}
 }

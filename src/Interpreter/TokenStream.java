@@ -1,6 +1,8 @@
-package ParserExample;
+package Interpreter;
 
 import java.util.ArrayList;
+
+import Errors.ParseError;
 
 @SuppressWarnings("serial")
 
@@ -12,7 +14,7 @@ public class TokenStream extends ArrayList<String> {
 	// parseAssert takes some condition and if that condition
 	// isn't true, it throws a new error with the message provided
 	public static void parseAssert(boolean x, String message) {
-		if (!x) { throw new Error(message); }		
+		if (!x) { throw new ParseError(message); }		
 	}
 	
 	// As we parse our Python code, we continually remove the 
@@ -42,7 +44,7 @@ public class TokenStream extends ArrayList<String> {
 		}
 		else {
 			if (!b) {
-				throw new Error("Ran out of input while expecting: " + val);
+				throw new ParseError("Ran out of input while expecting: " + val);
 			}
 		}
 	}
