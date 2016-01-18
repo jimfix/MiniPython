@@ -261,7 +261,6 @@ public class Parser {
 	//   - EqualityExpression (Comparisons involving <,>,<=,>=)
 	//   - AdditionExpression (Calculations involving + and -)
 	//   - MultiplicationExpression (Calculations involving * and /)
-	//   - ElementExpression (Getting a certain element from a list using list[index])
 	//   - FunctionCallExpression (Call a function that returns a value)
 	//   - PrimativeExpression (Numbers, Variable Names, Parentheses, and Lists)
 	//
@@ -335,12 +334,13 @@ public class Parser {
 	//				 <= AdditionExpression Comparison |
 	//				 >= AdditionExpression Comparison | 
 	//				 == AdditionExpression Comparison |
+	//				 != AdditionExpression Comparison |
 	//				 epsilon
 	// --------------------------------------------------
 	public static Object parseEqualityExpression(TokenStream tokens) {
 		Object val1 = parseAddition(tokens);
 		if (tokens.size() > 0) {				
-			if (tokens.get(0).equals("<=") || tokens.get(0).equals(">=") || tokens.get(0).equals("<") || tokens.get(0).equals(">") || tokens.get(0).equals("==")) {
+			if (tokens.get(0).equals("<=") || tokens.get(0).equals(">=") || tokens.get(0).equals("<") || tokens.get(0).equals(">") || tokens.get(0).equals("==") || tokens.get(0).equals("!=")) {
 				ArrayList<Object> nexp = new ArrayList<Object>();
 				String operation = tokens.munch();
 				Object val2 = parseAddition(tokens);
@@ -372,47 +372,23 @@ public class Parser {
 		return val1;		
 	}
 
-	// MultiplicationExpression := ElementExpression MultiplicationFactor
-	// MultiplicationFactor := * ElementExpression MultiplicationFactor |
-	//                         / ElementExpression MultiplicationFactor |
+	// MultiplicationExpression := FunctionCallExpression MultiplicationFactor
+	// MultiplicationFactor := * FunctionCallExpression MultiplicationFactor |
+	//                         / FunctionCallExpression MultiplicationFactor |
 	// 						   epsilon
 
 	public static Object parseMultiplyDivide(TokenStream tokens) {
-		Object val1 = parseElement(tokens);				
+		Object val1 = parseCallExpression(tokens);				
 		while (tokens.size() > 0 && (tokens.get(0).equals("*") || tokens.get(0).equals("/"))) {
 			ArrayList<Object> nexp = new ArrayList<Object>();
 			String operation = tokens.munch();
-			Object val2 = parseElement(tokens);
+			Object val2 = parseCallExpression(tokens);
 			nexp.add(operation);
 			nexp.add(val1);
 			nexp.add(val2);
 			val1 = nexp;
 		}				
 		return val1;		
-	}
-
-	// ElementExpression := PrimitiveExpression ElementAccess
-	// ElementAccess :=  [ Expression ] ElementAcess | epsilon
-	// --------------------------------------------------
-	// Element accesses have their usual form in miniPython.  You
-	// can do x[1], [1,2,3][0], lst[i+1], [[1,2], 3, 4][0][1], etc.
-	// Element accesses will be represented as a list starting with
-	// "get". Multiple element accesses in a row are represented as
-	// nested lists. For example, x[1][3] will be represented as:
-	//	 ["get", ["get", "x", "1"], "3"]
-
-	public static Object parseElement(TokenStream tokens) {
-		Object val1 = parseCallExpression(tokens);
-		while (tokens.size() > 0 && tokens.get(0).equals("[")) {
-			tokens.munchAssert("[");
-			ArrayList<Object> nexp = new ArrayList<Object>();
-			nexp.add("get");
-			nexp.add(val1);
-			nexp.add(parseExpression(tokens));
-			tokens.munchAssert("]");
-			val1 = nexp;
-		}
-		return val1;
 	}
 
 	// FunctionCallExpression := PrimitiveExpression ( ExpressionList ) 
@@ -458,11 +434,6 @@ public class Parser {
 			return val1;
 		}
 
-		// Is the primitive a list?
-		else if (tokens.get(0).equals("[")) {
-			return parseList(tokens);
-		}
-
 		// In all other cases, the primitive is a number
 		// or name. We'll keep these as strings for now
 		else {
@@ -470,32 +441,6 @@ public class Parser {
 		}
 	}
 
-	// How to parse a list
-	public static ArrayList<Object> parseList(TokenStream tokens) {
-		// Make a new list
-		ArrayList<Object> list = new ArrayList<Object>();
-		list.add("list");
-		tokens.munchAssert("[");
-
-		// Keep looping until we hit a "]", indicating
-		// we've hit the end of our list
-		if (!tokens.get(0).equals("]")) {
-
-			// Parse the first element of the list
-			Object val = parseExpression(tokens);
-			list.add(val);
-			while (tokens.get(0).equals(",")) {
-
-				// Check for a comma, then parse
-				// the expression for the next element
-				tokens.munchAssert(",");
-				val = parseExpression(tokens);
-				list.add(val);
-			}
-		}
-		tokens.munchAssert("]");
-		return list;
-	}
 	// FunctionCallStatement := PrimitiveExpression ( ExpressionList ) NEWLINE
 	// --------------------------------------------------
 	// FunctionCallStatements are essentially just like FunctionCallExpressions

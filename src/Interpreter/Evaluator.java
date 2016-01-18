@@ -9,10 +9,9 @@ import Errors.EvalError;
 @SuppressWarnings("unchecked")
 public class Evaluator {
 
-	// Given a Statement or Expression, which is expect to be an ArrayList,
-	// determine what kind of Statement/Expression it is (an if statement,
-	// a function definition, etc.), then call the appropriate
-	// "eval" function to evaluate that statement.
+	// Given a Statement or Expression, which is expected to be an ArrayList,
+	// determine what kind of Statement/Expression it is,
+	// then call the appropriate "eval" function to evaluate that statement.
 
 	public static Object meval(Object expr, Environment env) {
 		// We have to check that the Statement is indeed an 
@@ -64,17 +63,13 @@ public class Evaluator {
 			else if (operation.equals("callE")) {
 				return evalCall(exp,env);
 			}
-			// List indexing (i.e. lst[2])
-			else if (operation.equals("get")) {
-				return evalGetListElement(exp,env);
-			}
-			// List creation (i.e. [1,2,3])
-			else if (operation.equals("list")) {
-				return evalList(exp,env);
-			}
 			// Equality (for ints & booleans)
 			else if (operation.equals("==")) {
 				return evalEquals(exp,env);
+			}
+			// Non-Equality (for ints & booleans)
+			else if (operation.equals("!=")) {
+				return evalNotEquals(exp,env);
 			}
 			// Or Comparison
 			else if (operation.equals("||")) {
@@ -259,7 +254,7 @@ public class Evaluator {
 		ArrayList<String> fargs = proc.args;
 
 		// Make a new environment in which we'll run the procedure.  
-		// It's parent should be the current environment.
+		// Its parent should be the current environment.
 		Environment new_env = new Environment(proc.env);
 
 		// There should be just as many arguments in the function 
@@ -281,36 +276,13 @@ public class Evaluator {
 		// the procedure in its own new environment
 		return evalSequence(proc.body,new_env);
 	}
-
-	// Your function "evalList" should take in an ArrayList formatted
-	// in the following way: ["list", expression1, expression2, expression3, ...]
-	// It should evaluate each of the expressions and build a new ArrayList
-	// with the result.
-	public static ArrayList<Object> evalList(ArrayList<Object> exp, Environment env) {
-		ArrayList<Object> list = new ArrayList<Object>();
-		// Your code here...
-		return list;
-	}
-
-	// Your "evalGet" function should take in an ArrayList formatted
-	// in the following way: ["get", list_expression, index_expression].
-	// You should evaluate both the list_expression and index_expression,
-	// which should return an ArrayList and Integer, respectively. You should
-	// produce an EvalError for the following three cases:
-	//   - list_expression does not evaluate to a list
-	//   - index_expression does not evaluate to an Integer
-	//   - The index is either less than 0 or greater than the size of the list-1
-	public static Object evalGetListElement(ArrayList<Object> exp, Environment env) {
-		return 0; // Replace this line with your code
-	}
 	
 	// Evaluating primitives, which are either numbers or variable names
 	public static Object evalPrimative(Object exp, Environment env) {
 		String value = (String) exp;
 
-		// We'll try to convert the string to a number.  If this
-		// fails, we know it's not a number.  Don't worry about
-		// the Java syntax here
+		// We'll try to convert the string to a number. If this
+		// fails, we know it's not a number.
 		try {
 			return Integer.parseInt(value);
 		}
@@ -398,7 +370,7 @@ public class Evaluator {
 		}
 		throw new EvalError("Cannot compare with <=: " + v1 + " and " + v2);
 	}
-	public static Object evalGreaterThanEqual(ArrayList<Object> exp, Environment env) {
+	public static Boolean evalGreaterThanEqual(ArrayList<Object> exp, Environment env) {
 		Object v1 = meval(exp.get(1),env);
 		Object v2 = meval(exp.get(2),env);
 		if (v1 instanceof Integer && v2 instanceof Integer) {
@@ -417,8 +389,20 @@ public class Evaluator {
 		}
 		throw new EvalError("Cannot check equality of " + v1 + " to " + v2);
 	}
+	
+	public static Boolean evalNotEquals(ArrayList<Object> exp, Environment env) {
+		Object v1 = meval(exp.get(1),env);
+		Object v2 = meval(exp.get(2),env);
+		if (v1 instanceof Integer && v2 instanceof Integer) {
+			return (Integer)v1!=(Integer)v2;
+		}
+		else if (v1 instanceof Boolean && v2 instanceof Boolean) {
+			return (Boolean)v1!=(Boolean)v2;
+		}
+		throw new EvalError("Cannot check non-equality of " + v1 + " to " + v2);
+	}
 
-	public static Object evalAnd(ArrayList<Object> exp, Environment env) {
+	public static Boolean evalAnd(ArrayList<Object> exp, Environment env) {
 		Object v1 = meval(exp.get(1),env);
 		Object v2 = meval(exp.get(2),env);
 		if (v1 instanceof Boolean && v2 instanceof Boolean) {
@@ -431,7 +415,7 @@ public class Evaluator {
 		}
 		throw new EvalError("Cannot compare with AND: " + v1 + " and " + v2);
 	}
-	public static Object evalOr(ArrayList<Object> exp, Environment env) {
+	public static Boolean evalOr(ArrayList<Object> exp, Environment env) {
 		Object v1 = meval(exp.get(1),env);
 		Object v2 = meval(exp.get(2),env);
 		if (v1 instanceof Boolean && v2 instanceof Boolean) {
