@@ -28,8 +28,12 @@ public class Evaluator {
 			// Call the appropriate "eval" method based on
 			// the first element of the list
 
+			// Function Definitions
+			if (operation.equals("def")) {
+				return evalDef(exp,env); 
+			}
 			// If Statements
-			if (operation.equals("if")) {				
+			else if (operation.equals("if")) {				
 				return evalIf(exp,env);
 			}
 			// Return Statements
@@ -45,10 +49,28 @@ public class Evaluator {
 			else if (operation.equals("print")) {
 				return evalPrint(exp,env);
 			}
-			// How to evaluate a while loop is handled
-			// in your code
+			// While Loops
 			else if (operation.equals("while")) {				
 				return evalWhile(exp,env);
+			}
+			// Function Calls (Statement version)
+			else if (operation.equals("callS")) {
+				evalCall(exp,env);
+				// Function calls as statements cannot return a value or
+				// this will be confused with the return value
+				return null;
+			}
+			// Function calls (Expression version)
+			else if (operation.equals("callE")) {
+				return evalCall(exp,env);
+			}
+			// List indexing (i.e. lst[2])
+			else if (operation.equals("get")) {
+				return evalGetListElement(exp,env);
+			}
+			// List creation (i.e. [1,2,3])
+			else if (operation.equals("list")) {
+				return evalList(exp,env);
 			}
 			// Equality (for ints & booleans)
 			else if (operation.equals("==")) {
@@ -101,6 +123,28 @@ public class Evaluator {
 		return null;
 	}
 
+	// Evaluating Procedure Definitions: Note that this code
+	// does not actually run the procedure, but rather saves
+	// its code for later in the current Environment.  This makes
+	// sense, as we don't run functions when we define them,
+	// we run them by calling the functions elsewhere.
+
+	public static Object evalDef(ArrayList<Object> exp, Environment env) {
+		// Create a new Procedure Object to store
+		// all of our procedure information. In particular:
+		// 1) The procedure's arguments
+		// 2) The procedure's code
+		// 3) The environment to run the procedure in  
+		//	  (This is the same as the environment the 
+		//     function is defined in)	
+		Procedure newProc = new Procedure((ArrayList<String>) exp.get(2), (ArrayList<Object>) exp.get(3),env);
+
+		// Store the new Procedure object in the Environment
+		// using the procedure's name as the key
+		env.addVariable((String) exp.get(1),newProc);
+		return null;
+	}
+
 	// Evaluating If Statements
 	public static Object evalIf(ArrayList<Object> exp, Environment env) {
 
@@ -127,28 +171,28 @@ public class Evaluator {
 
 	// Evaluating While Statements
 	public static Object evalWhile(ArrayList<Object> exp, Environment env) {
-		
+
 		// First we need to evaluate the condition to see whether
 		// its true or false
 		Object cond = meval(exp.get(1),env);
-		
+
 		// Check that the condition is a Boolean. If not, throw
 		// an error.
 		if (!(cond instanceof Boolean)) {
 			throw new EvalError("Expected a boolean for the condition of the while statement");
 		}
-		
+
 		// While the condition is true, evaluate the clause.
 		// Each time the evaluation finishes, update the condition.
 		while ((Boolean) cond) {
 			evalSequence(exp.get(2),env);
 			cond = meval(exp.get(1),env);
 		}
-		
+
 		// Return nothing when it stops being satisfied
 		return null;
 	}
-	
+
 	// Evaluate variable assignments (i.e. things like x = x + 1)
 	public static Object evalAssign(ArrayList<Object> exp, Environment env) {
 		// First let's get the name of the variable
@@ -201,6 +245,65 @@ public class Evaluator {
 		return null;
 	}
 
+	// Evaluating Function Calls
+	public static Object evalCall(ArrayList<Object> exp, Environment env) {
+
+		// First, we need to get the appropriate procedure out 
+		// of the environment
+		Procedure proc = ((Procedure)env.lookupVariable((String)exp.get(1)));
+
+		// Get the arguments passed to the function
+		ArrayList<Object> args = (ArrayList<Object>) exp.get(2);
+
+		// Get the arguments the function expects
+		ArrayList<String> fargs = proc.args;
+
+		// Make a new environment in which we'll run the procedure.  
+		// It's parent should be the current environment.
+		Environment new_env = new Environment(proc.env);
+
+		// There should be just as many arguments in the function 
+		// call as the function expects
+		if (args.size() != fargs.size()) {
+			throw new EvalError("Function expected " + fargs.size() + " arguments, got " + args.size());
+		}
+
+		// Loop through each of the arguments. We first evaluate
+		// each argument, then we add that value to the Procedure's
+		// environment under the appropriate name.  For example, if
+		// we had a function f(x) and we called f(1+2), we would evaluate
+		// 1+2, then set x to 3 in f's environment
+		for (int i=0;i<args.size();i++) {
+			new_env.addVariable(fargs.get(i), meval(args.get(i),env));					
+		}
+
+		// Now we're ready to run the procedure. Note that we run
+		// the procedure in its own new environment
+		return evalSequence(proc.body,new_env);
+	}
+
+	// Your function "evalList" should take in an ArrayList formatted
+	// in the following way: ["list", expression1, expression2, expression3, ...]
+	// It should evaluate each of the expressions and build a new ArrayList
+	// with the result.
+	public static ArrayList<Object> evalList(ArrayList<Object> exp, Environment env) {
+		ArrayList<Object> list = new ArrayList<Object>();
+		// Your code here...
+		return list;
+	}
+
+	// Your "evalGet" function should take in an ArrayList formatted
+	// in the following way: ["get", list_expression, index_expression].
+	// You should evaluate both the list_expression and index_expression,
+	// which should return an ArrayList and Integer, respectively. You should
+	// produce an EvalError for the following three cases:
+	//   - list_expression does not evaluate to a list
+	//   - index_expression does not evaluate to an Integer
+	//   - The index is either less than 0 or greater than the size of the list-1
+	public static Object evalGetListElement(ArrayList<Object> exp, Environment env) {
+		return 0; // Replace this line with your code
+	}
+	
 	// Evaluating primitives, which are either numbers or variable names
 	public static Object evalPrimative(Object exp, Environment env) {
 		String value = (String) exp;

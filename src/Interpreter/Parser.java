@@ -42,8 +42,9 @@ public class Parser {
 		return block;
 	}
 
-	// Statement := IfStatement | PrintStatment | ReturnStatment
-	// 				WhileStatement | AssignStatement
+	// Statement := DefStatement | IfStatement | PrintStatment |
+	// 				ReturnStatment | WhileStatement | AssignStatement
+	// 				FunctionCallStatement
 	// --------------------------------------------------
 	public static ArrayList<Object> parseStatement(TokenStream tokens) {
 
@@ -52,8 +53,10 @@ public class Parser {
 			throw new ParseError("Expected a statement, but there was none");
 		}
 
-
-		if (tokens.get(0).equals("if")) {
+		if (tokens.get(0).equals("def")) {
+			return parseDef(tokens);
+		}
+		else if (tokens.get(0).equals("if")) {
 			return parseIf(tokens);
 		}
 		else if (tokens.get(0).equals("while")) {
@@ -80,9 +83,65 @@ public class Parser {
 		if (lookahead.equals("=")) {
 			return parseAssign(tokens);
 		}
+		if (lookahead.equals("(")) {
+			return parseFunctionCallStatement(tokens.munch(),tokens);
+		}
 
 		// We don't know what kind of statement this is
 		throw new ParseError("Unexpected symbol: " + tokens.get(0));
+	}
+
+	// DefStatement := def NAME ( ArgList ) : Sequence
+	// ArgList := NAME MoreArgs | epsilon
+	// MoreArgs := , NAME MoreArgs | epsilon
+	// --------------------------------------------------
+	// Procedure definitions are pretty straightforward.  They should
+	// start with a name, then have a list of arguments, and then have
+	// a set of statements (a sequence) corresponding to the body of
+	// our procedure.  The output of parseDef is an ArrayList with the
+	// following format:
+	//  ["def", NAME, ArgList, Body]
+
+	public static ArrayList<Object> parseDef(TokenStream tokens) {
+
+		// This ArrayList will hold our new "def" statement
+		ArrayList<Object> retval = new ArrayList<Object>();
+
+		// Add "def" to the beginning of our ArrayList version of
+		// the statement so we can identify it as a "def" statement
+		// later
+		tokens.munch();
+		retval.add("def");
+
+		// Get the name of the new procedure
+		String name = tokens.munch();
+		retval.add(name);
+
+		// Read in the names of the procedure arguments, we
+		// store them in an ArrayList called "args"
+		tokens.munchAssert("(");
+		ArrayList<String> args = new ArrayList<String>();
+		if (!tokens.get(0).equals(")")) {
+			while (true) {
+				// Read in a name for the argument
+				args.add(tokens.munch());
+
+				// If the next token is not a comma, 
+				// there are no more arguments
+				if (!tokens.get(0).equals(",")) {
+					break;
+				}
+				tokens.munchAssert(",");
+			}
+		}
+		retval.add(args);
+		tokens.munchAssert(")");
+
+		tokens.munchAssert(":");
+
+		// Parse the body of the procedure
+		retval.add(parseSequence(tokens));
+		return retval;
 	}
 
 	// IfStatement := if Expression : Sequence else : Sequence
@@ -313,23 +372,68 @@ public class Parser {
 		return val1;		
 	}
 
-	// MultiplicationExpression := PrimativeExpression MultiplicationFactor
-	// MultiplicationFactor := * PrimativeExpression MultiplicationFactor |
-	//                         / PrimativeExpression MultiplicationFactor |
+	// MultiplicationExpression := ElementExpression MultiplicationFactor
+	// MultiplicationFactor := * ElementExpression MultiplicationFactor |
+	//                         / ElementExpression MultiplicationFactor |
 	// 						   epsilon
-	// --------------------------------------------------
+
 	public static Object parseMultiplyDivide(TokenStream tokens) {
-		Object val1 = parsePrimative(tokens);				
+		Object val1 = parseElement(tokens);				
 		while (tokens.size() > 0 && (tokens.get(0).equals("*") || tokens.get(0).equals("/"))) {
 			ArrayList<Object> nexp = new ArrayList<Object>();
 			String operation = tokens.munch();
-			Object val2 = parsePrimative(tokens);
+			Object val2 = parseElement(tokens);
 			nexp.add(operation);
 			nexp.add(val1);
 			nexp.add(val2);
 			val1 = nexp;
 		}				
 		return val1;		
+	}
+
+	// ElementExpression := PrimitiveExpression ElementAccess
+	// ElementAccess :=  [ Expression ] ElementAcess | epsilon
+	// --------------------------------------------------
+	// Element accesses have their usual form in miniPython.  You
+	// can do x[1], [1,2,3][0], lst[i+1], [[1,2], 3, 4][0][1], etc.
+	// Element accesses will be represented as a list starting with
+	// "get". Multiple element accesses in a row are represented as
+	// nested lists. For example, x[1][3] will be represented as:
+	//	 ["get", ["get", "x", "1"], "3"]
+
+	public static Object parseElement(TokenStream tokens) {
+		Object val1 = parseCallExpression(tokens);
+		while (tokens.size() > 0 && tokens.get(0).equals("[")) {
+			tokens.munchAssert("[");
+			ArrayList<Object> nexp = new ArrayList<Object>();
+			nexp.add("get");
+			nexp.add(val1);
+			nexp.add(parseExpression(tokens));
+			tokens.munchAssert("]");
+			val1 = nexp;
+		}
+		return val1;
+	}
+
+	// FunctionCallExpression := PrimitiveExpression ( ExpressionList ) 
+	// ExpressionList := Expression MoreExpressions | epsilon
+	// MoreExpressions := , Expression MoreExpressions | epsilon
+	// --------------------------------------------------
+	// Procedure calls are represented using ArrayLists with the
+	// following format: ["callE", [arg1, arg2, etc.]]
+
+	public static Object parseCallExpression(TokenStream tokens) {
+		Object val = parsePrimative(tokens);
+
+		// Since function calls can be mad both in Expressions
+		// and as a Statement, we use one helper function to do
+		// both.  We call that here.
+		if (tokens.size() > 0 && tokens.get(0).equals("(")) {
+			return parseCall((String)val,tokens,false,"callE");
+		}
+		else {
+			return val;
+		}
 	}
 
 	// PrimitiveExpression := Integer | NAME | ( Expression ) | 
@@ -354,10 +458,85 @@ public class Parser {
 			return val1;
 		}
 
+		// Is the primitive a list?
+		else if (tokens.get(0).equals("[")) {
+			return parseList(tokens);
+		}
+
 		// In all other cases, the primitive is a number
 		// or name. We'll keep these as strings for now
 		else {
 			return tokens.munch();
 		}
+	}
+
+	// How to parse a list
+	public static ArrayList<Object> parseList(TokenStream tokens) {
+		// Make a new list
+		ArrayList<Object> list = new ArrayList<Object>();
+		list.add("list");
+		tokens.munchAssert("[");
+
+		// Keep looping until we hit a "]", indicating
+		// we've hit the end of our list
+		if (!tokens.get(0).equals("]")) {
+
+			// Parse the first element of the list
+			Object val = parseExpression(tokens);
+			list.add(val);
+			while (tokens.get(0).equals(",")) {
+
+				// Check for a comma, then parse
+				// the expression for the next element
+				tokens.munchAssert(",");
+				val = parseExpression(tokens);
+				list.add(val);
+			}
+		}
+		tokens.munchAssert("]");
+		return list;
+	}
+	// FunctionCallStatement := PrimitiveExpression ( ExpressionList ) NEWLINE
+	// --------------------------------------------------
+	// FunctionCallStatements are essentially just like FunctionCallExpressions
+	// but they can appear in Sequences.
+
+	public static ArrayList<Object> parseFunctionCallStatement(String name, TokenStream tokens) {
+		return parseCall(name,tokens,true,"callS");
+	}
+
+	// Here is the helper function for function calls that is used in
+	// both FunctionCallStatement and FunctionCallExpression
+	public static ArrayList<Object> parseCall(String name, TokenStream tokens, boolean expectNewline, String calltype) {
+
+		// We will return a list where the first element is "call"
+		// to indicate that this is a function call
+		ArrayList<Object> retval = new ArrayList<Object>();
+		retval.add(calltype);
+
+		// Get the name of the function in question (this can also be a variable)
+		retval.add(name);
+
+		// Read in the expressions for each of the function
+		// arguments
+		tokens.munchAssert("(");
+		ArrayList<Object> args = new ArrayList<Object>();
+		if (!tokens.get(0).equals(")")) {
+			while (true) {
+				args.add(parseExpression(tokens));
+				if (!tokens.get(0).equals(",")) {
+					break;
+				}
+				tokens.munchAssert(",");
+			}
+		}
+		retval.add(args);
+		tokens.munchAssert(")");
+
+		// We expect a NEWLINE if this is a Statement,
+		// but not if it's an Expression
+		if (expectNewline) 
+			tokens.munchAssert("NEWLINE");
+		return retval;
 	}
 }
