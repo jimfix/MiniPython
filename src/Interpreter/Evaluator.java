@@ -27,13 +27,9 @@ public class Evaluator {
 
 			// Call the appropriate "eval" method based on
 			// the first element of the list
-			
-			// Function Definitions
-			if (operation.equals("def")) {
-				return evalDef(exp,env); 
-			}
+
 			// If Statements
-			else if (operation.equals("if")) {				
+			if (operation.equals("if")) {				
 				return evalIf(exp,env);
 			}
 			// Return Statements
@@ -49,45 +45,19 @@ public class Evaluator {
 			else if (operation.equals("print")) {
 				return evalPrint(exp,env);
 			}
-			// Function Calls (Statement version)
-			else if (operation.equals("callS")) {
-				evalCall(exp,env);
-				// Function calls as statements cannot return a value or
-				// this will be confused with the return value
-				return null;
-			}	
 			// How to evaluate a while loop is handled
 			// in your code
 			else if (operation.equals("while")) {				
-				return YourCode.evalWhile(exp,env);
+				return evalWhile(exp,env);
 			}
-			// Function calls (Expression version)
-			else if (operation.equals("callE")) {
-				return evalCall(exp,env);
-			}
-			// List indexing (i.e. lst[2])
-			else if (operation.equals("get")) {
-				return YourCode.evalGetListElement(exp,env);
-			}
-			// List creation (i.e. [1,2,3])
-			else if (operation.equals("list")) {
-				return YourCode.evalList(exp,env);
-			}
-			// List size (i.e. |lst|, equivalent to len(lst) in normal Python)
-			else if (operation.equals("sizeof")) {
-				return evalSize(exp,env);
-			}		
-
 			// Equality (for ints, booleans, and lists)
 			else if (operation.equals("==")) {
-				return YourCode.evalEquals(exp,env);
+				return evalEquals(exp,env);
 			}
-
 			// Addition (for integers and lists)
 			else if (operation.equals("+")) {
 				return evalAdd(exp,env);
 			}
-
 			// Subtraction
 			else if (operation.equals("-")) {
 				return evalSub(exp,env);
@@ -110,7 +80,11 @@ public class Evaluator {
 			}
 			// Less Than Equal
 			else if (operation.equals("<=")) {
-				return YourCode.evalLessThanEqual(exp, env);
+				return evalLessThanEqual(exp, env);
+			}
+			// Greater Than Equal
+			else if (operation.equals(">=")) {
+				
 			}
 		}
 		else {
@@ -125,19 +99,20 @@ public class Evaluator {
 	// sense, as we don't run functions when we define them,
 	// we run them by calling the functions elsewhere.
 
-	public static Object evalDef(ArrayList<Object> exp, Environment env) {
-		// Create a new Procedure Object to store
-		// all of our procedure information. In particular:
-		// 1) The procedure's arguments
-		// 2) The procedure's code
-		// 3) The environment to run the procedure in  
-		//	  (This is the same as the environment the 
-		//     function is defined in)	
-		Procedure newProc = new Procedure((ArrayList<String>) exp.get(2), (ArrayList<Object>) exp.get(3),env);
 
-		// Store the new Procedure object in the Environment
-		// using the procedure's name as the key
-		env.addVariable((String) exp.get(1),newProc);
+
+	private static Object evalList(ArrayList<Object> exp, Environment env) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private static Object evalGetListElement(ArrayList<Object> exp, Environment env) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private static Object evalWhile(ArrayList<Object> exp, Environment env) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -254,18 +229,10 @@ public class Evaluator {
 		return evalSequence(proc.body,new_env);
 	}
 
-	// How to evaluate the |x| syntax where x is a list.  This
-	// is equivalent to len(x) in normal Python.  To make this 
-	// work, we just have to call the "size" method on the 
-	// ArrayList we're using to represent the Python list.
-	public static Integer evalSize(ArrayList<Object> exp, Environment env) {
-		return ((ArrayList<Object>) meval(exp.get(1),env)).size();
-	}
-	
 	// Evaluating primitives, which are either numbers or variable names
 	public static Object evalPrimative(Object exp, Environment env) {
 		String value = (String) exp;
-		
+
 		// We'll try to convert the string to a number.  If this
 		// fails, we know it's not a number.  Don't worry about
 		// the Java syntax here
@@ -295,12 +262,12 @@ public class Evaluator {
 		}
 		throw new EvalError("Cannot add " + v1 + " and " + v2);
 	}
-		
+
 	public static Integer evalSub(ArrayList<Object> exp, Environment env) {
 		// Evaluate the two values we're taking the difference of
 		Object v1 = meval(exp.get(1),env);
 		Object v2 = meval(exp.get(2),env);
-		
+
 		// Check that both values are integers
 		if (v1 instanceof Integer && v2 instanceof Integer) {
 			// Perform the subtraction
@@ -329,14 +296,14 @@ public class Evaluator {
 		// Evaluate the two expressions we'll be comparing
 		Object v1 = meval(exp.get(1),env);
 		Object v2 = meval(exp.get(2),env);
-		
+
 		// Check that both values are indeed integers
 		if (v1 instanceof Integer && v2 instanceof Integer) {
-			
+
 			// Perform the actual calculation
 			return (Integer)v1<(Integer)v2;
 		}
-		
+
 		// Throw an error if we try to compare non-Integers
 		throw new EvalError("Cannot compare " + v1 + " and " + v2);
 	}
@@ -347,5 +314,14 @@ public class Evaluator {
 			return (Integer)v1>(Integer)v2;
 		}
 		throw new EvalError("Cannot compare " + v1 + " and " + v2);
+	}
+	public static Boolean evalLessThanEqual(ArrayList<Object> exp, Environment env) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static Boolean evalEquals(ArrayList<Object> exp, Environment env) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

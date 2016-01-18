@@ -26,7 +26,7 @@ public class Tokenizer {
 		// my:var, since a variable name must be a single token.
 		// We can, however, name it my_var, since "_" is not included 
 		// in this list.
-		Character[] breaks = {'(',')',':','+','-','/','*','<','>','=',',','[',']','|'};
+		Character[] breaks = {'(',')',':','+','-','/','*','<','>','=',',','[',']'};
 
 		// This list contains all of the special character sets that
 		// require two characters. We don't want "<=" to be treated
@@ -65,7 +65,7 @@ public class Tokenizer {
 					tokens.add(current);
 					current = "";
 				}
-				
+
 				// We have to peak ahead to the next character
 				// to see if this character would make a two-character
 				// special token.  
@@ -83,7 +83,7 @@ public class Tokenizer {
 					tokens.add(c.toString());
 				}
 			}
-			
+
 			// We need to treat newlines special. Newlines end
 			// the previous token.  We also add the special 
 			// NEWLINE token, then count the number of spaces
@@ -94,7 +94,7 @@ public class Tokenizer {
 					current = "";
 				}
 				tokens.add("NEWLINE");
-				
+
 				// We're on a new line, let's count spaces
 				index ++;
 				int count = 0;
@@ -108,7 +108,7 @@ public class Tokenizer {
 				}
 				index --;
 			}
-			
+
 			// Tabs are treated specially, and will be
 			// treated specially and represented with the
 			// "TAB" token.
@@ -119,14 +119,14 @@ public class Tokenizer {
 				}
 				tokens.add("TAB");
 			}
-			
+
 			// No special cases! Let's add the current
 			// character to the token we're building.
 			else {
 				current = current + c.toString();
 			}	
 		}	
-		
+
 		// If we hit the end of the file, we have to
 		// add the last token we were considering to the
 		// token list
@@ -136,21 +136,16 @@ public class Tokenizer {
 	}
 
 	// --------------------- Preparsing -------------------------
-	// Like tokenizing, this pre-parsing phase of our interpreter
-	// is complicated and not actually that relevant to how the 
-	// interpreter works, so PLEASE FEEL FREE TO SKIP OVER THIS CODE.
- 
-	
-	
+
 	// The goal of the "preparse" function is to take a set of tokens
 	// separated by NEWLINES and TABS and make sense of what this means
 	// in terms of indents and un-indents ("dedents").  
-	
+
 	// If a line has more tabs than the previous line, then we add an 
 	// INDENT.  If the line has fewer tabs than the previous line, we
 	// add a DEDENT.  Note that having fewer tabs, could also correspond
 	// to multiple DEDENTS, as in the following case:
-	
+
 	/* 
 	 * if a>b:
 	 *     if b>c:          <--- INDENT
@@ -158,17 +153,17 @@ public class Tokenizer {
 	 * print a              <--- DEDENT DEDENT
 	 * 
 	 */
-	
+
 	// In short, there must be just as many INDENTS as DEDENTS, and they
 	// must come in matched pairs, just like parentheses!
-	
+
 	public static TokenStream preparse(ArrayList<String> tokens) {
 		// We'll use this to keep track of how indented the previous line was
 		int lastindent = 0;  
-		
+
 		// We will copy over the tokens from the old list into this new list
 		ArrayList<String> newtokens = new ArrayList<String>();
-		
+
 		// In order to match INDENTs and DEDENTs, we need to have a
 		// stack that holds the "indent number" of the previous INDENTs,
 		// since an INDENT can be arbitrarily many tabs.  i.e. if we
@@ -176,33 +171,33 @@ public class Tokenizer {
 		// values 5, 2
 		Stack<Integer> indentstack = new Stack<Integer>(); 
 		indentstack.push(0);
-		
+
 		// Time to go through each of the tokens and look for
 		// tabs and newlines
 		for (int i=0; i<tokens.size();) {
-			
+
 			// If we hit a newline, then it's time to start
 			// looking for tabs!
 			if (tokens.get(i).equals("NEWLINE")) {
-				
+
 				// We'll keep the NEWLINE
 				newtokens.add("NEWLINE");
-								
+
 				i++;
-				
+
 				// This loop gets rid of completely blank lines,
 				// we don't care about them
 				while (tokens.size() > i && tokens.get(i).equals("NEWLINE")) {
 					i++;
 				}
-				
+
 				// We'll use "count" to count the number
 				// of tabs we see on this line
 				int count = 0;
-				
+
 				// Time to count tabs!
 				if (i < tokens.size()) {
-					
+
 					// While the next character is a TAB,
 					// increase the counter
 					while (tokens.get(i).equals("TAB")) {
@@ -215,7 +210,7 @@ public class Tokenizer {
 						indentstack.push(lastindent);
 						newtokens.add("INDENT");
 					}
-					
+
 					// If there are fewer TABS than before,
 					// this a DEDENT. There could be more
 					// than one DEDENT, though, as in the 
@@ -230,7 +225,7 @@ public class Tokenizer {
 					lastindent = count;
 				}
 			}
-			
+
 			// The current token is not a newline, so
 			// we should just copy it as is to the new
 			// list of tokens
@@ -243,7 +238,7 @@ public class Tokenizer {
 		tokenstrm.addAll(newtokens);
 		return tokenstrm;
 	}
-	
+
 	// Helper function to make sure we don't read off the
 	// end of our "indentstack"
 	public static boolean stackCheck(Stack<Integer> stack) {
