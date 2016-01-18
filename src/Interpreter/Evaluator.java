@@ -50,9 +50,17 @@ public class Evaluator {
 			else if (operation.equals("while")) {				
 				return evalWhile(exp,env);
 			}
-			// Equality (for ints, booleans, and lists)
+			// Equality (for ints & booleans)
 			else if (operation.equals("==")) {
 				return evalEquals(exp,env);
+			}
+			// Or Comparison
+			else if (operation.equals("||")) {
+				return evalOr(exp,env);
+			}
+			// And Comparison
+			else if (operation.equals("&&")) {
+				return evalAnd(exp,env);
 			}
 			// Addition (for integers and lists)
 			else if (operation.equals("+")) {
@@ -84,35 +92,12 @@ public class Evaluator {
 			}
 			// Greater Than Equal
 			else if (operation.equals(">=")) {
-				
+				return evalGreaterThanEqual(exp, env);
 			}
 		}
 		else {
 			return evalPrimative(expr,env);	
 		}
-		return null;
-	}
-
-	// Evaluating Procedure Definitions: Note that this code
-	// does not actually run the procedure, but rather saves
-	// its code for later in the current Environment.  This makes
-	// sense, as we don't run functions when we define them,
-	// we run them by calling the functions elsewhere.
-
-
-
-	private static Object evalList(ArrayList<Object> exp, Environment env) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private static Object evalGetListElement(ArrayList<Object> exp, Environment env) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private static Object evalWhile(ArrayList<Object> exp, Environment env) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -137,9 +122,31 @@ public class Evaluator {
 		// If the condition was false, evaluate the false clause
 		else {
 			return evalSequence(exp.get(3),env);
-		}	
+		}
 	}
 
+	// Evaluating While Statements
+	public static Object evalWhile(ArrayList<Object> exp, Environment env) {
+		
+		// First we need to evaluate the condition to see whether
+		// its true or false
+		Object cond = meval(exp.get(1),env);
+		
+		// Check that the condition is a Boolean. If not, throw
+		// an error.
+		if (!(cond instanceof Boolean)) {
+			throw new EvalError("Expected a boolean for the condition of the while statement");
+		}
+		
+		// While the condition is true, evaluate the clause
+		while ((Boolean) cond) {
+			return evalSequence(exp.get(2),env);
+		}
+		
+		// Return nothing when it stops being satisfied
+		return null;
+	}
+	
 	// Evaluate variable assignments (i.e. things like x = x + 1)
 	public static Object evalAssign(ArrayList<Object> exp, Environment env) {
 		// First let's get the name of the variable
@@ -190,43 +197,6 @@ public class Evaluator {
 			}
 		}
 		return null;
-	}
-
-	// Evaluating Function Calls
-	public static Object evalCall(ArrayList<Object> exp, Environment env) {
-
-		// First, we need to get the appropriate procedure out 
-		// of the environment
-		Procedure proc = ((Procedure)env.lookupVariable((String)exp.get(1)));
-
-		// Get the arguments passed to the function
-		ArrayList<Object> args = (ArrayList<Object>) exp.get(2);
-
-		// Get the arguments the function expects
-		ArrayList<String> fargs = proc.args;
-
-		// Make a new environment in which we'll run the procedure.  
-		// It's parent should be the current environment.
-		Environment new_env = new Environment(proc.env);
-
-		// There should be just as many arguments in the function 
-		// call as the function expects
-		if (args.size() != fargs.size()) {
-			throw new EvalError("Function expected " + fargs.size() + " arguments, got " + args.size());
-		}
-
-		// Loop through each of the arguments. We first evaluate
-		// each argument, then we add that value to the Procedure's
-		// environment under the appropriate name.  For example, if
-		// we had a function f(x) and we called f(1+2), we would evaluate
-		// 1+2, then set x to 3 in f's environment
-		for (int i=0;i<args.size();i++) {
-			new_env.addVariable(fargs.get(i), meval(args.get(i),env));					
-		}
-
-		// Now we're ready to run the procedure. Note that we run
-		// the procedure in its own new environment
-		return evalSequence(proc.body,new_env);
 	}
 
 	// Evaluating primitives, which are either numbers or variable names
@@ -305,7 +275,7 @@ public class Evaluator {
 		}
 
 		// Throw an error if we try to compare non-Integers
-		throw new EvalError("Cannot compare " + v1 + " and " + v2);
+		throw new EvalError("Cannot compare with <: " + v1 + " and " + v2);
 	}
 	public static Boolean evalGreaterThan(ArrayList<Object> exp, Environment env) {
 		Object v1 = meval(exp.get(1),env);
@@ -313,15 +283,60 @@ public class Evaluator {
 		if (v1 instanceof Integer && v2 instanceof Integer) {
 			return (Integer)v1>(Integer)v2;
 		}
-		throw new EvalError("Cannot compare " + v1 + " and " + v2);
+		throw new EvalError("Cannot compare with >: " + v1 + " and " + v2);
 	}
 	public static Boolean evalLessThanEqual(ArrayList<Object> exp, Environment env) {
-		// TODO Auto-generated method stub
-		return null;
+		Object v1 = meval(exp.get(1),env);
+		Object v2 = meval(exp.get(2),env);
+		if (v1 instanceof Integer && v2 instanceof Integer) {
+			return (Integer)v1<=(Integer)v2;
+		}
+		throw new EvalError("Cannot compare with <=: " + v1 + " and " + v2);
+	}
+	public static Object evalGreaterThanEqual(ArrayList<Object> exp, Environment env) {
+		Object v1 = meval(exp.get(1),env);
+		Object v2 = meval(exp.get(2),env);
+		if (v1 instanceof Integer && v2 instanceof Integer) {
+			return (Integer)v1>=(Integer)v2;
+		}
+		throw new EvalError("Cannot compare with >=: " + v1 + " and " + v2);
+	}
+	public static Boolean evalEquals(ArrayList<Object> exp, Environment env) {
+		Object v1 = meval(exp.get(1),env);
+		Object v2 = meval(exp.get(2),env);
+		if (v1 instanceof Integer && v2 instanceof Integer) {
+			return (Integer)v1==(Integer)v2;
+		}
+		else if (v1 instanceof Boolean && v2 instanceof Boolean) {
+			return (Boolean)v1==(Boolean)v2;
+		}
+		throw new EvalError("Cannot check equality of " + v1 + " to " + v2);
 	}
 
-	public static Boolean evalEquals(ArrayList<Object> exp, Environment env) {
-		// TODO Auto-generated method stub
-		return null;
+	public static Object evalAnd(ArrayList<Object> exp, Environment env) {
+		Object v1 = meval(exp.get(1),env);
+		Object v2 = meval(exp.get(2),env);
+		if (v1 instanceof Boolean && v2 instanceof Boolean) {
+			if ((Boolean)v1) {
+				return (Boolean)v2;
+			}
+			else {
+				return (Boolean)v1;
+			}
+		}
+		throw new EvalError("Cannot compare with AND: " + v1 + " and " + v2);
+	}
+	public static Object evalOr(ArrayList<Object> exp, Environment env) {
+		Object v1 = meval(exp.get(1),env);
+		Object v2 = meval(exp.get(2),env);
+		if (v1 instanceof Boolean && v2 instanceof Boolean) {
+			if ((Boolean)v1) {
+				return (Boolean)v1;
+			}
+			else {
+				return (Boolean)v2;
+			}
+		}
+		throw new EvalError("Cannot compare with OR: " + v1 + " and " + v2);
 	}
 }

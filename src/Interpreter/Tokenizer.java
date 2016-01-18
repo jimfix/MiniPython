@@ -26,14 +26,14 @@ public class Tokenizer {
 		// my:var, since a variable name must be a single token.
 		// We can, however, name it my_var, since "_" is not included 
 		// in this list.
-		Character[] breaks = {'(',')',':','+','-','/','*','<','>','=',',','[',']'};
+		Character[] breaks = {'(',')',':','+','-','/','*','<','>','='};
 
 		// This list contains all of the special character sets that
 		// require two characters. We don't want "<=" to be treated
 		// as "<" and "=" separately, so we need to treat them specially.
 		// We'll do this by "peaking" ahead to see if the token after the
 		// current one would complete one of these special strings.
-		String[] breaks2 = {"<=",">=","=="};
+		String[] breaks2 = {"<=",">=","==","&&","||"};
 
 		// We'll use this to build up tokens that have more than
 		// one character
