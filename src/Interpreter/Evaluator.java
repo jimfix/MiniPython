@@ -138,9 +138,11 @@ public class Evaluator {
 			throw new EvalError("Expected a boolean for the condition of the while statement");
 		}
 		
-		// While the condition is true, evaluate the clause
+		// While the condition is true, evaluate the clause.
+		// Each time the evaluation finishes, update the condition.
 		while ((Boolean) cond) {
-			return evalSequence(exp.get(2),env);
+			evalSequence(exp.get(2),env);
+			cond = meval(exp.get(1),env);
 		}
 		
 		// Return nothing when it stops being satisfied

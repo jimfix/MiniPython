@@ -5,11 +5,14 @@ import java.util.Scanner;
 import Interpreter.Environment;
 import Interpreter.Evaluator;
 import Interpreter.Parser;
+import Interpreter.Tokenizer;
 
 public class Main {
 	public static void main(String args[]) throws Exception {
-		// System.out.println(Tokenizer.tokenize(myProgram));
-		runFile("Examples/test.py");
+		String myProgram = loadFile("Examples/test.py");
+		System.out.println(Tokenizer.tokenize(myProgram));
+		ArrayList<Object> ast = Parser.parse(myProgram);
+		Evaluator.evalSequence(ast, Environment.createGlobalEnvironment());
 	}
 
 	// loadFile reads in a specific file and returns
@@ -23,12 +26,4 @@ public class Main {
 		s.close();
 		return file;
 	}
-
-	// runFile reads in the given file, then runs it
-	// through the parser to produce the Abstract Syntax
-	// Tree, then evaluates the tree to run the program
-	public static void runFile(String name) throws Exception {
-		ArrayList<Object> ast = Parser.parse(loadFile(name));
-		Evaluator.evalSequence(ast, Environment.createGlobalEnvironment());
-	}	
 }
