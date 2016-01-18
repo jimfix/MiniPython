@@ -10,8 +10,18 @@ import Interpreter.Tokenizer;
 public class Main {
 	public static void main(String args[]) throws Exception {
 		String myProgram = loadFile("Examples/test.py");
-		System.out.println(Tokenizer.tokenize(myProgram));
+		System.out.println("So here's the program I read:");
+		System.out.println("");
+		System.out.println(myProgram);
+		ArrayList<String> tokenized = Tokenizer.tokenize(myProgram);
+		System.out.println("After tokenizing:");
+		System.out.println(tokenized);
+		System.out.println("");
 		ArrayList<Object> ast = Parser.parse(myProgram);
+		System.out.println("After parsing:");
+		System.out.println(ast);
+		System.out.println("");
+		System.out.println("Now evaluating...");
 		Evaluator.evalSequence(ast, Environment.createGlobalEnvironment());
 	}
 
