@@ -9,10 +9,11 @@ import Interpreter.Tokenizer;
 
 public class Main {
 	public static void main(String args[]) throws Exception {
-		System.out.print("Input the name of the file you wish to load:");
+		System.out.print("Input the name of the file you wish to load: ");
 		Scanner scan = new Scanner(System.in);
 		String myProgram = scan.next();
 		myProgram = loadFile(myProgram);
+		System.out.println();
 		System.out.println("So here's the program I read:");
 		System.out.println("---------------------");
 		System.out.println(myProgram);
@@ -26,6 +27,7 @@ public class Main {
 		System.out.println(ast);
 		System.out.println("---------------------");
 		System.out.println("Now evaluating...");
+		System.out.println();
 		Evaluator.evalSequence(ast, Environment.createGlobalEnvironment());
 	}
 
