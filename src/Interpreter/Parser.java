@@ -213,7 +213,21 @@ public class Parser {
 		ArrayList<Object> retval = new ArrayList<Object>();
 		retval.add("print");
 		tokens.munch();
-		retval.add(parseExpression(tokens));
+		//Catch strings vs. expressions
+		if (tokens.get(0).equals("\"")) {
+			retval.add("string");
+			tokens.munch();
+			String phrase = tokens.munch();
+			while(!tokens.get(0).equals("\"")) {
+				phrase = phrase + " " + tokens.munch();
+			}
+			retval.add(phrase);
+			tokens.munch();
+		}
+		else {
+			retval.add("expression");
+			retval.add(parseExpression(tokens));
+		}
 		tokens.munchAssert("NEWLINE");
 		return retval;
 	}
