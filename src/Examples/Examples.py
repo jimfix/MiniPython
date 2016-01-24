@@ -1,11 +1,12 @@
-print "Part 1: "
+print " Part 1: "
 
 def square(x):
     return x*x
 print square(4)
 print square
 
-print "Part 2: "
+print newline
+print " Part 2: "
 
 x = 5
 if x < 6:
@@ -13,13 +14,17 @@ if x < 6:
 else:
     print 0
 
-print "Part 3: "
+print newline
+print " Part 3: "
 
-while i < max-1:
+i = 1
+max = 5
+while i < max:
     print i
     i = i + 1
 
-print "Part 4: "
+print newline
+print " Part 4: "
 
 def return6():
     return 6
@@ -29,7 +34,8 @@ print (x <= (return6()))
 print (x <= (return6()-2))
 print (10 <= (10-20))
 
-print "Part 5: "
+print newline
+print " Part 5: "
 
 def looptest(x):
     i = 0
