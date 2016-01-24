@@ -296,8 +296,13 @@ public class Evaluator {
 			return Integer.parseInt(value);
 		}
 		catch (Exception e) {
-			// Look up the variable in the environment
-			return env.lookupVariable(value);
+			if (value.charAt(0) == '"') {
+				return value.substring(1,value.length()-1);
+			}
+			else {
+				// Look up the variable in the environment
+				return env.lookupVariable(value);
+			}
 		}
 	}
 
