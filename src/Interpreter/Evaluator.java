@@ -205,7 +205,10 @@ public class Evaluator {
 
 	// Print statements are easy, we just use System.out.println
 	public static Object evalPrint(ArrayList<Object> exp, Environment env) {
-		if (exp.get(1) == "string") {
+		if (exp.get(1) == "SKIPLINE") {
+			System.out.println();
+		}
+		else if (exp.get(1) == "string") {
 			String phrase = (String) exp.get(2);
 			System.out.println(phrase);
 		}

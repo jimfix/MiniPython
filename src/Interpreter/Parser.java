@@ -213,8 +213,13 @@ public class Parser {
 		ArrayList<Object> retval = new ArrayList<Object>();
 		retval.add("print");
 		tokens.munch();
+		//Special newline keyword
+		if (tokens.get(0).equals("newline")) {
+			retval.add("SKIPLINE");
+			tokens.munch();
+		}
 		//Catch strings vs. expressions
-		if (tokens.get(0).equals("\"")) {
+		else if (tokens.get(0).equals("\"")) {
 			retval.add("string");
 			tokens.munch();
 			String phrase = tokens.munch();
@@ -482,7 +487,7 @@ public class Parser {
 		try {
 			Integer.valueOf((String)val1);
 		}
-		catch (NumberFormatException e) {
+		catch (NumberFormatException|ClassCastException e) {
 			while (tokens.size() > 0 && tokens.get(0).equals(".")) {
 				ArrayList<Object> nexp = new ArrayList<Object>();
 				tokens.remove(0);
