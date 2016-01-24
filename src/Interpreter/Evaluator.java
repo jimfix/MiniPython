@@ -205,18 +205,24 @@ public class Evaluator {
 
 	// Print statements are easy, we just use System.out.println
 	public static Object evalPrint(ArrayList<Object> exp, Environment env) {
-		Object val = meval(exp.get(1),env);
-		if (val instanceof Boolean) {
-			if ((Boolean) val) {
-				System.out.println("True");
+		if (exp.get(1) == "string") {
+			String phrase = (String) exp.get(2);
+			System.out.println(phrase);
+		}
+		else if (exp.get(1) == "expression") {
+			Object val = meval(exp.get(2),env);
+			if (val instanceof Boolean) {
+				if ((Boolean) val) {
+					System.out.println("True");
+				}
+				else {
+					System.out.println("False");
+				}
 			}
 			else {
-				System.out.println("False");
+				System.out.println(val);
 			}
 		}
-		else {
-			System.out.println(val);
-		}	
 		return null;
 	}
 
@@ -276,7 +282,7 @@ public class Evaluator {
 		// the procedure in its own new environment
 		return evalSequence(proc.body,new_env);
 	}
-	
+
 	// Evaluating primitives, which are either numbers or variable names
 	public static Object evalPrimative(Object exp, Environment env) {
 		String value = (String) exp;
@@ -389,7 +395,7 @@ public class Evaluator {
 		}
 		throw new EvalError("Cannot check equality of " + v1 + " to " + v2);
 	}
-	
+
 	public static Boolean evalNotEquals(ArrayList<Object> exp, Environment env) {
 		Object v1 = meval(exp.get(1),env);
 		Object v2 = meval(exp.get(2),env);
