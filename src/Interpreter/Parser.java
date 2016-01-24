@@ -77,15 +77,18 @@ public class Parser {
 		// it's a "(", we know it's a function call.
 
 		String lookahead = "";
-		String lookevenfurther = "";
+		String lookfurtherahead = "";
 		if (tokens.size() > 1) {
 			lookahead = tokens.get(1);
-			lookevenfurther = tokens.get(3);
+			if (lookahead.equals(".") && tokens.size() > 3) {
+				lookfurtherahead = tokens.get(3);
+			}
 		}
-		if (lookahead.equals("=") || lookevenfurther.equals("=")) {
+		
+		if (lookahead.equals("=") || lookfurtherahead.equals("=")) {
 			return parseAssign(tokens);
 		}
-		if (lookahead.equals("(") || lookevenfurther.equals("(")) {
+		if (lookahead.equals("(") || lookfurtherahead.equals("(")) {
 			return parseFunctionCallStatement(tokens.munch(),tokens);
 		}
 
@@ -505,6 +508,11 @@ public class Parser {
 			return val1;
 		}
 
+		// We need to make sure reserved keywords, like "left/right" aren't used.
+		else if (tokens.get(0).equals("left") || tokens.get(0).equals("right")) {
+			throw new ParseError("You can't use the reserved keyword '" + tokens.get(0) + "' here!");
+		}
+		
 		// In all other cases, the primitive is a number
 		// or name. We'll keep these as strings for now
 		else {
