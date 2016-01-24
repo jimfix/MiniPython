@@ -12,6 +12,7 @@ public class Main {
 		System.out.print("Input the name of the file you wish to load: ");
 		Scanner scan = new Scanner(System.in);
 		String myProgram = scan.next();
+		scan.close();
 		myProgram = loadFile(myProgram);
 		System.out.println();
 		System.out.println("So here's the program I read:");

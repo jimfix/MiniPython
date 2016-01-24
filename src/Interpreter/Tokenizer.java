@@ -24,7 +24,7 @@ public class Tokenizer {
 		// my:var, since a variable name must be a single token.
 		// We can, however, name it my_var, since "_" is not included 
 		// in this list.
-		Character[] breaks = {'(',')',':','+','-','/','*','<','>','=','!','.'};
+		Character[] breaks = {'(',')',':','+','-','/','*','<','>','=','!','.','"'};
 
 		// This list contains all of the special character sets that
 		// require two characters. We don't want "<=" to be treated

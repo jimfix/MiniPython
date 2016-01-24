@@ -113,7 +113,7 @@ public class Evaluator {
 			}
 		}
 		else {
-			return evalPrimative(expr,env);	
+			return evalPrimitive(expr,env);	
 		}
 		return null;
 	}
@@ -194,7 +194,13 @@ public class Evaluator {
 		String id = (String) exp.get(1);
 
 		// Now evaluate the expression for the new value of the variable 
-		Object res = (Object) meval(exp.get(2),env);
+		Object res;
+		if (exp.get(2) == "string") {
+			res = exp.get(3);
+		}
+		else {
+			res = (Object) meval(exp.get(3),env);
+		}
 
 		// Add the variable and its value to the current environment
 		env.addVariable(id, res);
@@ -209,10 +215,9 @@ public class Evaluator {
 			System.out.println();
 		}
 		else if (exp.get(1) == "string") {
-			String phrase = (String) exp.get(2);
-			System.out.println(phrase);
+			System.out.println(exp.get(2));
 		}
-		else if (exp.get(1) == "expression") {
+		else {
 			Object val = meval(exp.get(2),env);
 			if (val instanceof Boolean) {
 				if ((Boolean) val) {
@@ -287,7 +292,7 @@ public class Evaluator {
 	}
 
 	// Evaluating primitives, which are either numbers or variable names
-	public static Object evalPrimative(Object exp, Environment env) {
+	public static Object evalPrimitive(Object exp, Environment env) {
 		String value = (String) exp;
 
 		// We'll try to convert the string to a number. If this
@@ -296,13 +301,8 @@ public class Evaluator {
 			return Integer.parseInt(value);
 		}
 		catch (Exception e) {
-			if (value.charAt(0) == '"') {
-				return value.substring(1,value.length()-1);
-			}
-			else {
-				// Look up the variable in the environment
-				return env.lookupVariable(value);
-			}
+			// Look up the variable in the environment
+			return env.lookupVariable(value);
 		}
 	}
 

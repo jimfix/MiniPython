@@ -1,5 +1,6 @@
 package Interpreter;
 import java.util.ArrayList;
+
 import Errors.ParseError;
 
 // The Parser is a big chunk of our Interpreter.  The Parser does 
@@ -84,7 +85,7 @@ public class Parser {
 				lookfurtherahead = tokens.get(3);
 			}
 		}
-		
+
 		if (lookahead.equals("=") || lookfurtherahead.equals("=")) {
 			return parseAssign(tokens);
 		}
@@ -221,13 +222,7 @@ public class Parser {
 		//Catch strings vs. expressions
 		else if (tokens.get(0).equals("\"")) {
 			retval.add("string");
-			tokens.munch();
-			String phrase = tokens.munch();
-			while(!tokens.get(0).equals("\"")) {
-				phrase = phrase + " " + tokens.munch();
-			}
-			retval.add(phrase);
-			tokens.munch();
+			retval.add(parseString(tokens));
 		}
 		else {
 			retval.add("expression");
@@ -246,8 +241,16 @@ public class Parser {
 		// Get the name of the variable
 		retval.add(parseConstructor(tokens));
 		tokens.munchAssert("=");
-		// Parse the new value for the variable
-		retval.add(parseExpression(tokens));
+		// The assignment itself:
+		//Catch strings vs. expressions
+		if (tokens.get(0).equals("\"")) {
+			retval.add("string");
+			retval.add(parseString(tokens));
+		}
+		else {
+			retval.add("expression");
+			retval.add(parseExpression(tokens));
+		}
 		tokens.munchAssert("NEWLINE");
 		return retval;
 	}
@@ -287,7 +290,7 @@ public class Parser {
 	//   - MultiplicationExpression (Calculations involving * and /)
 	//   - FunctionCallExpression (Call a function that returns a value)
 	//   - ConstructorExpression (The dot (.) constructor with two cells: left/right)
-	//   - PrimativeExpression (Numbers, Variable Names, and Parentheses)
+	//   - PrimitiveExpression (Numbers, Variable Names, and Parentheses)
 	//
 	// The output of parsing Expressions will be a set of nested 
 	// lists where each list starts an operation.  For example, 
@@ -479,11 +482,11 @@ public class Parser {
 			tokens.munchAssert("NEWLINE");
 		return retval;
 	}	
-	
-	// ConstructorExpression := PrimativeExpression DOT LEFT | PrimativeExpression DOT RIGHT | PrimativeExpression
+
+	// ConstructorExpression := PrimitiveExpression DOT LEFT | primitiveExpression DOT RIGHT | primitiveExpression
 	// --------------------------------------------------
 	public static Object parseConstructor(TokenStream tokens) {
-		Object val1 = parsePrimative(tokens);
+		Object val1 = parsePrimitive(tokens);
 		try {
 			Integer.valueOf((String)val1);
 		}
@@ -517,7 +520,7 @@ public class Parser {
 	//   - Parentheses: returns the expression inside the parentheses
 	//   - List: Returns a list of expressions, one for each of the elements
 	// --------------------------------------------------
-	public static Object parsePrimative(TokenStream tokens) {
+	public static Object parsePrimitive(TokenStream tokens) {
 
 		// Is the primitive an expression in parentheses?
 		if (tokens.get(0).equals("(")) {
@@ -531,11 +534,22 @@ public class Parser {
 		else if (tokens.get(0).equals("left") || tokens.get(0).equals("right")) {
 			throw new ParseError("You can't use the reserved keyword '" + tokens.get(0) + "' here!");
 		}
-		
+
 		// In all other cases, the primitive is a number
 		// or name. We'll keep these as strings for now
 		else {
 			return tokens.munch();
 		}
+	}
+	
+	// Helper function for parsing strings
+	public static Object parseString(TokenStream tokens) {
+		tokens.munchAssert("\"");
+		String phrase = tokens.munch();
+		while(!tokens.get(0).equals("\"")) {
+			phrase = phrase + " " + tokens.munch();
+		}
+		tokens.munchAssert("\"");
+		return phrase;
 	}
 }
