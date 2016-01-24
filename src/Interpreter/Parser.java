@@ -77,13 +77,15 @@ public class Parser {
 		// it's a "(", we know it's a function call.
 
 		String lookahead = "";
+		String lookevenfurther = "";
 		if (tokens.size() > 1) {
 			lookahead = tokens.get(1);
+			lookevenfurther = tokens.get(3);
 		}
-		if (lookahead.equals("=")) {
+		if (lookahead.equals("=") || lookevenfurther.equals("=")) {
 			return parseAssign(tokens);
 		}
-		if (lookahead.equals("(")) {
+		if (lookahead.equals("(") || lookevenfurther.equals("(")) {
 			return parseFunctionCallStatement(tokens.munch(),tokens);
 		}
 
@@ -213,14 +215,14 @@ public class Parser {
 		return retval;
 	}
 
-	// AssignStatement := NAME = Expression NEWLINE
+	// AssignStatement := ConstructorExpression = Expression NEWLINE
 	// Output: ["assign", name, expression]
 	// --------------------------------------------------
 	public static ArrayList<Object> parseAssign(TokenStream tokens) {
 		ArrayList<Object> retval = new ArrayList<Object>();
 		retval.add("assign");
 		// Get the name of the variable
-		retval.add(tokens.munch());
+		retval.add(parseConstructor(tokens));
 		tokens.munchAssert("=");
 		// Parse the new value for the variable
 		retval.add(parseExpression(tokens));
@@ -262,7 +264,8 @@ public class Parser {
 	//   - AdditionExpression (Calculations involving + and -)
 	//   - MultiplicationExpression (Calculations involving * and /)
 	//   - FunctionCallExpression (Call a function that returns a value)
-	//   - PrimativeExpression (Numbers, Variable Names, Parentheses, and Lists)
+	//   - ConstructorExpression (The dot (.) constructor with two cells: left/right)
+	//   - PrimativeExpression (Numbers, Variable Names, and Parentheses)
 	//
 	// The output of parsing Expressions will be a set of nested 
 	// lists where each list starts an operation.  For example, 
@@ -376,7 +379,7 @@ public class Parser {
 	// MultiplicationFactor := * FunctionCallExpression MultiplicationFactor |
 	//                         / FunctionCallExpression MultiplicationFactor |
 	// 						   epsilon
-
+	// --------------------------------------------------
 	public static Object parseMultiplyDivide(TokenStream tokens) {
 		Object val1 = parseCallExpression(tokens);				
 		while (tokens.size() > 0 && (tokens.get(0).equals("*") || tokens.get(0).equals("/"))) {
@@ -391,15 +394,14 @@ public class Parser {
 		return val1;		
 	}
 
-	// FunctionCallExpression := PrimitiveExpression ( ExpressionList ) 
+	// FunctionCallExpression := ConstructorExpression ( ExpressionList ) 
 	// ExpressionList := Expression MoreExpressions | epsilon
 	// MoreExpressions := , Expression MoreExpressions | epsilon
 	// --------------------------------------------------
 	// Procedure calls are represented using ArrayLists with the
 	// following format: ["callE", [arg1, arg2, etc.]]
-
 	public static Object parseCallExpression(TokenStream tokens) {
-		Object val = parsePrimative(tokens);
+		Object val = parseConstructor(tokens);
 
 		// Since function calls can be mad both in Expressions
 		// and as a Statement, we use one helper function to do
@@ -409,35 +411,6 @@ public class Parser {
 		}
 		else {
 			return val;
-		}
-	}
-
-	// PrimitiveExpression := Integer | NAME | ( Expression ) | 
-	// 						  ListExpression
-	// --------------------------------------------------
-	// Lots of different things count as a primitive expression 
-	// including numbers, variable and function names, lists,
-	// expressions in parentheses and the |x| operation for 
-	// list sizes. Depending on the case, the output of parsePrimitive
-	// is slightly different:
-	//   - Numbers and names: returns the number or name (i.e. "6" of "x")
-	//   - Parentheses: returns the expression inside the parentheses
-	//   - List: Returns a list of expressions, one for each of the elements
-	// --------------------------------------------------
-	public static Object parsePrimative(TokenStream tokens) {
-
-		// Is the primitive an expression in parentheses?
-		if (tokens.get(0).equals("(")) {
-			tokens.munchAssert("(");
-			Object val1 = parseExpression(tokens);	
-			tokens.munchAssert(")");
-			return val1;
-		}
-
-		// In all other cases, the primitive is a number
-		// or name. We'll keep these as strings for now
-		else {
-			return tokens.munch();
 		}
 	}
 
@@ -483,5 +456,59 @@ public class Parser {
 		if (expectNewline) 
 			tokens.munchAssert("NEWLINE");
 		return retval;
+	}	
+	
+	// ConstructorExpression := PrimativeExpression DOT LEFT | PrimativeExpression DOT RIGHT | PrimativeExpression
+	// --------------------------------------------------
+	public static Object parseConstructor(TokenStream tokens) {
+		Object val1 = parsePrimative(tokens);
+		try {
+			Integer.valueOf((String)val1);
+		}
+		catch (NumberFormatException e) {
+			while (tokens.size() > 0 && tokens.get(0).equals(".")) {
+				ArrayList<Object> nexp = new ArrayList<Object>();
+				tokens.remove(0);
+				if (tokens.get(0).equals("left") || tokens.get(0).equals("right")) {
+					String val2 = tokens.munch();
+					nexp.add("pair");
+					nexp.add(val1);
+					nexp.add(val2);
+					val1 = nexp;
+				}
+				else {
+					throw new ParseError("Expected 'left' or 'right' for constructor cell.");
+				}			
+			}
+		}
+		return val1;
+	}
+
+	// PrimitiveExpression := NAME | Integer | ( Expression )
+	// --------------------------------------------------
+	// Lots of different things count as a primitive expression 
+	// including numbers, variable and function names, lists,
+	// expressions in parentheses and the |x| operation for 
+	// list sizes. Depending on the case, the output of parsePrimitive
+	// is slightly different:
+	//   - Numbers and names: returns the number or name (i.e. "6" of "x")
+	//   - Parentheses: returns the expression inside the parentheses
+	//   - List: Returns a list of expressions, one for each of the elements
+	// --------------------------------------------------
+	public static Object parsePrimative(TokenStream tokens) {
+
+		// Is the primitive an expression in parentheses?
+		if (tokens.get(0).equals("(")) {
+			tokens.munchAssert("(");
+			Object val1 = parseExpression(tokens);	
+			tokens.munchAssert(")");
+			return val1;
+		}
+
+		// In all other cases, the primitive is a number
+		// or name. We'll keep these as strings for now
+		else {
+			return tokens.munch();
+		}
 	}
 }

@@ -9,7 +9,10 @@ import Interpreter.Tokenizer;
 
 public class Main {
 	public static void main(String args[]) throws Exception {
-		String myProgram = loadFile("Examples/test.py");
+		System.out.print("Input the name of the file you wish to load:");
+		Scanner scan = new Scanner(System.in);
+		String myProgram = scan.next();
+		myProgram = loadFile(myProgram);
 		System.out.println("So here's the program I read:");
 		System.out.println("---------------------");
 		System.out.println(myProgram);

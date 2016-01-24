@@ -11,8 +11,6 @@ import Errors.ParseError;
 // For example, tokenizing the string "(12<=256)" will produce the
 // following set of five tokens: (, 12, <=, 256, )
 
-// You don't need to understand everything that's happening in the
-// Tokenizer.  Feel free to look through it, though, if you're curious.
 public class Tokenizer {
 
 	// tokenize takes the raw Python string s and returns an ArrayList
@@ -26,7 +24,7 @@ public class Tokenizer {
 		// my:var, since a variable name must be a single token.
 		// We can, however, name it my_var, since "_" is not included 
 		// in this list.
-		Character[] breaks = {'(',')',':','+','-','/','*','<','>','=','!'};
+		Character[] breaks = {'(',')',':','+','-','/','*','<','>','=','!','.'};
 
 		// This list contains all of the special character sets that
 		// require two characters. We don't want "<=" to be treated
