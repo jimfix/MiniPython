@@ -428,7 +428,7 @@ public class Parser {
 	public static Object parseCallExpression(TokenStream tokens) {
 		Object val = parseConstructor(tokens);
 
-		// Since function calls can be mad both in Expressions
+		// Since function calls can be made both in Expressions
 		// and as a Statement, we use one helper function to do
 		// both.  We call that here.
 		if (tokens.size() > 0 && tokens.get(0).equals("(")) {
@@ -493,10 +493,9 @@ public class Parser {
 		catch (NumberFormatException|ClassCastException e) {
 			while (tokens.size() > 0 && tokens.get(0).equals(".")) {
 				ArrayList<Object> nexp = new ArrayList<Object>();
-				tokens.remove(0);
 				if (tokens.get(0).equals("left") || tokens.get(0).equals("right")) {
 					String val2 = tokens.munch();
-					nexp.add("pair");
+					nexp.add("field");
 					nexp.add(val1);
 					nexp.add(val2);
 					val1 = nexp;

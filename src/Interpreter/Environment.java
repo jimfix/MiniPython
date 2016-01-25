@@ -1,4 +1,5 @@
 package Interpreter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import Errors.EvalError;
 
@@ -15,7 +16,7 @@ public class Environment {
 	// environment.  Since we have only one mapping used by both 
 	// procedures and variables, we cannot have variable and a 
 	// procedure that have the same name. 
-	private HashMap<String,Object> frame;
+	private HashMap<String,ArrayList<Object>> frame;
 
 	// The parent environment. If we can't find what we're looking
 	// for in the current environment, we'll check in the parent.
@@ -27,15 +28,20 @@ public class Environment {
 	// to have no variables or procedures.
 	public Environment(Environment parent_) {
 		parent = parent_;
-		frame = new HashMap<String,Object>();		
+		frame = new HashMap<String,ArrayList<Object>>();		
 	}
 
 	// Add a new variable (or procedure) to the current
 	// environment
+	
 	public void addVariable(String name, Object value) {
-		frame.put(name,value);
+		frame.put(name,(ArrayList<Object>) value);
 	}
-
+	
+	public void addVariable(String name, ArrayList<Object> values) {
+		frame.put(name,values);
+	}
+	
 	// Look up a certain name in the environment
 	public Object lookupVariable(String name) {		
 		// Check to see if the current environment has the

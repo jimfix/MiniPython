@@ -52,6 +52,9 @@ public class Evaluator {
 			else if (operation.equals("while")) {				
 				return evalWhile(exp,env);
 			}
+			else if (operation.equals("field")) {
+				return evalConscell(exp,env);
+			}
 			// Function Calls (Statement version)
 			else if (operation.equals("callS")) {
 				evalCall(exp,env);
@@ -61,7 +64,14 @@ public class Evaluator {
 			}
 			// Function calls (Expression version)
 			else if (operation.equals("callE")) {
-				return evalCall(exp,env);
+				// Special keyword 'pair' gets us to the
+				// constructor eval function
+				if (exp.get(1) == "pair") {
+					return evalConscell(exp,env);
+				}
+				else {
+					return evalCall(exp,env);
+				}
 			}
 			// Equality (for ints & booleans)
 			else if (operation.equals("==")) {
@@ -140,6 +150,15 @@ public class Evaluator {
 		return null;
 	}
 
+	public static ArrayList<Object> evalConscell(ArrayList<Object> exp, Environment env) {
+		ArrayList<Object> field = new ArrayList<Object>();
+		Object left = meval(exp.get(3),env);
+		field.add(left);
+		Object right = meval(exp.get(4),env);
+		field.add(right);
+		return field;
+	}
+
 	// Evaluating If Statements
 	public static Object evalIf(ArrayList<Object> exp, Environment env) {
 
@@ -199,7 +218,7 @@ public class Evaluator {
 			res = exp.get(3);
 		}
 		else {
-			res = (Object) meval(exp.get(3),env);
+			res = meval(exp.get(3),env);
 		}
 
 		// Add the variable and its value to the current environment
@@ -256,7 +275,6 @@ public class Evaluator {
 
 	// Evaluating Function Calls
 	public static Object evalCall(ArrayList<Object> exp, Environment env) {
-
 		// First, we need to get the appropriate procedure out 
 		// of the environment
 		Procedure proc = ((Procedure)env.lookupVariable((String)exp.get(1)));
@@ -301,8 +319,13 @@ public class Evaluator {
 			return Integer.parseInt(value);
 		}
 		catch (Exception e) {
-			// Look up the variable in the environment
-			return env.lookupVariable(value);
+			if (value == "pair") {
+				throw new EvalError("The name 'pair' is a reserved keyword for constructors.");
+			}
+			else {
+				// Look up the variable in the environment
+				return env.lookupVariable(value);
+			}
 		}
 	}
 
