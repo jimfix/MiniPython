@@ -1,16 +1,18 @@
 package Interpreter;
 
-public class Pair<L,R> {
+public class Pair {
 
-	private final L left;
-	private final R right;
+	private Object left;
+	private Object right;
 
-	public Pair(L left, R right) {
+	public Pair(Object left, Object right) {
 		this.left = left;
 		this.right = right;
 	}
 
-	public L getLeft() { return left; }
-	public R getRight() { return right; }
+	public Object getLeft() { return left; }
+	public Object getRight() { return right; }
+	public void setLeft(Object left_) { left = left_; }
+	public void setRight(Object right_) { right = right_; }
 
 }

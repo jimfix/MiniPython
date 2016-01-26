@@ -1,6 +1,6 @@
 package Interpreter;
-import java.util.ArrayList;
 import java.util.HashMap;
+
 import Errors.EvalError;
 
 // Environment objects are used to represent different

@@ -1,5 +1,6 @@
 package Interpreter;
 import java.util.ArrayList;
+
 import Errors.EvalError;
 
 // The Evaluator is where we actually run the code.  The Evaluator
@@ -150,15 +151,15 @@ public class Evaluator {
 		return null;
 	}
 
-	public static Pair<Object, Object> evalConscell(ArrayList<Object> exp, Environment env) {
-		Object left = meval(exp.get(3),env);
-		Object right = meval(exp.get(4),env);
-		Pair<Object, Object> cells = new Pair<Object, Object>(left,right);
+	public static Pair evalConscell(ArrayList<Object> exp, Environment env) {
+		Pair cells = (Pair)exp.get(3);
+		cells.setLeft(meval(cells.getLeft(),env));
+		cells.setRight(meval(cells.getRight(),env));
 		return cells;
 	}
 
 	private static Object evalField(ArrayList<Object> exp, Environment env) {
-		Pair<Object, Object> var = (Pair<Object, Object>)env.lookupVariable((String)exp.get(1));
+		Pair var = (Pair)env.lookupVariable((String)meval(exp.get(1),env));
 		Object fielder;
 		if (exp.get(2) == "left") {
 			fielder = var.getLeft();
@@ -222,7 +223,8 @@ public class Evaluator {
 
 	// Evaluate variable assignments (i.e. things like x = x + 1)
 	public static Object evalAssign(ArrayList<Object> exp, Environment env) {
-		// First let's get the name of the variable
+
+		// First let's get the name of the variable	
 		String id = (String) exp.get(1);
 
 		// Now evaluate the expression for the new value of the variable 
