@@ -52,9 +52,6 @@ public class Evaluator {
 			else if (operation.equals("while")) {				
 				return evalWhile(exp,env);
 			}
-			else if (operation.equals("field")) {
-				return evalConscell(exp,env);
-			}
 			// Function Calls (Statement version)
 			else if (operation.equals("callS")) {
 				evalCall(exp,env);
@@ -121,6 +118,9 @@ public class Evaluator {
 			else if (operation.equals(">=")) {
 				return evalGreaterThanEqual(exp, env);
 			}
+			else if (operation.equals("field")) {
+				return evalField(exp,env);
+			}
 		}
 		else {
 			return evalPrimitive(expr,env);	
@@ -150,13 +150,26 @@ public class Evaluator {
 		return null;
 	}
 
-	public static ArrayList<Object> evalConscell(ArrayList<Object> exp, Environment env) {
-		ArrayList<Object> field = new ArrayList<Object>();
+	public static Pair<Object, Object> evalConscell(ArrayList<Object> exp, Environment env) {
 		Object left = meval(exp.get(3),env);
-		field.add(left);
 		Object right = meval(exp.get(4),env);
-		field.add(right);
-		return field;
+		Pair<Object, Object> cells = new Pair<Object, Object>(left,right);
+		return cells;
+	}
+
+	private static Object evalField(ArrayList<Object> exp, Environment env) {
+		Pair<Object, Object> var = (Pair<Object, Object>)env.lookupVariable((String)exp.get(1));
+		Object fielder;
+		if (exp.get(2) == "left") {
+			fielder = var.getLeft();
+		}
+		else if (exp.get(2) == "right") {
+			fielder = var.getRight();
+		}
+		else {
+			throw new EvalError("Expected a 'left' or 'right' field indicator.");
+		}
+		return fielder;
 	}
 
 	// Evaluating If Statements
@@ -319,8 +332,8 @@ public class Evaluator {
 			return Integer.parseInt(value);
 		}
 		catch (Exception e) {
-			if (value == "pair") {
-				throw new EvalError("The name 'pair' is a reserved keyword for constructors.");
+			if (value == "field") {
+				throw new EvalError("The name 'field' is a reserved keyword for constructors.");
 			}
 			else {
 				// Look up the variable in the environment

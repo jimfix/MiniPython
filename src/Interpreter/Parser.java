@@ -78,18 +78,19 @@ public class Parser {
 		// it's a "(", we know it's a function call.
 
 		String lookahead = "";
-		String lookfurtherahead = "";
 		if (tokens.size() > 1) {
+			int offset = 2;
 			lookahead = tokens.get(1);
-			if (lookahead.equals(".") && tokens.size() > 3) {
-				lookfurtherahead = tokens.get(3);
+			while (lookahead.equals(".")) {
+				lookahead = tokens.get(1+offset);
+				offset += 2;
 			}
 		}
 
-		if (lookahead.equals("=") || lookfurtherahead.equals("=")) {
+		if (lookahead.equals("=")) {
 			return parseAssign(tokens);
 		}
-		if (lookahead.equals("(") || lookfurtherahead.equals("(")) {
+		if (lookahead.equals("(")) {
 			return parseFunctionCallStatement(tokens.munch(),tokens);
 		}
 
@@ -493,6 +494,7 @@ public class Parser {
 		catch (NumberFormatException|ClassCastException e) {
 			while (tokens.size() > 0 && tokens.get(0).equals(".")) {
 				ArrayList<Object> nexp = new ArrayList<Object>();
+				tokens.munch();
 				if (tokens.get(0).equals("left") || tokens.get(0).equals("right")) {
 					String val2 = tokens.munch();
 					nexp.add("field");
@@ -502,11 +504,12 @@ public class Parser {
 				}
 				else {
 					throw new ParseError("Expected 'left' or 'right' for constructor cell.");
-				}			
+				}
 			}
 		}
 		return val1;
 	}
+
 
 	// PrimitiveExpression := NAME | Integer | ( Expression )
 	// --------------------------------------------------
@@ -540,7 +543,7 @@ public class Parser {
 			return tokens.munch();
 		}
 	}
-	
+
 	// Helper function for parsing strings
 	public static Object parseString(TokenStream tokens) {
 		tokens.munchAssert("\"");
