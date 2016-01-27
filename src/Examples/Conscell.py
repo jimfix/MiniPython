@@ -1,7 +1,9 @@
-x = pair(10,20)
-y = 1 * 2 * 3 * 4 * x.left
-x.left = 20
-x.right = 30
+a = 10
+b = 20
+x = pair(a , b)
+print a
+print b
 print x
+x.left = b
 print x.left
-print x.right
+print x

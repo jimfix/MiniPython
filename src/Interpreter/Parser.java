@@ -488,23 +488,18 @@ public class Parser {
 	// --------------------------------------------------
 	public static Object parseConstructor(TokenStream tokens) {
 		Object val1 = parsePrimitive(tokens);
-		try {
-			Integer.valueOf((String)val1);
-		}
-		catch (NumberFormatException|ClassCastException e) {
-			while (tokens.size() > 0 && tokens.get(0).equals(".")) {
-				ArrayList<Object> nexp = new ArrayList<Object>();
-				tokens.munch();
-				if (tokens.get(0).equals("left") || tokens.get(0).equals("right")) {
-					String val2 = tokens.munch();
-					nexp.add("field");
-					nexp.add(val1);
-					nexp.add(val2);
-					val1 = nexp;
-				}
-				else {
-					throw new ParseError("Expected 'left' or 'right' for constructor cell.");
-				}
+		while (tokens.size() > 0 && tokens.get(0).equals(".")) {
+			ArrayList<Object> nexp = new ArrayList<Object>();
+			tokens.munch();
+			if (tokens.get(0).equals("left") || tokens.get(0).equals("right")) {
+				String val2 = tokens.munch();
+				nexp.add("field");
+				nexp.add(val1);
+				nexp.add(val2);
+				val1 = nexp;
+			}
+			else {
+				throw new ParseError("Expected 'left' or 'right' for constructor cell.");
 			}
 		}
 		return val1;

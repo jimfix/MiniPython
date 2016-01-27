@@ -64,7 +64,7 @@ public class Evaluator {
 			else if (operation.equals("callE")) {
 				// Special keyword 'pair' gets us to the
 				// constructor eval function
-				if (exp.get(1) == "pair") {
+				if (exp.get(1).equals("pair")) {
 					return evalConscell(exp,env);
 				}
 				else {
@@ -152,20 +152,21 @@ public class Evaluator {
 	}
 
 	public static Pair evalConscell(ArrayList<Object> exp, Environment env) {
-		Pair cells = (Pair)exp.get(3);
-		cells.setLeft(meval(cells.getLeft(),env));
-		cells.setRight(meval(cells.getRight(),env));
-		return cells;
+		ArrayList<Object> cells = (ArrayList<Object>) exp.get(2);
+		Object lv = (meval(cells.get(0),env));
+		Object rv = (meval(cells.get(1),env));
+		Pair newcells = new Pair(lv,rv);
+		return newcells;
 	}
 
-	private static Object evalField(ArrayList<Object> exp, Environment env) {
-		Pair var = (Pair)env.lookupVariable((String)meval(exp.get(1),env));
+	public static Object evalField(ArrayList<Object> exp, Environment env) {
+		Pair pair = (Pair) env.lookupVariable((String)exp.get(1));
 		Object fielder;
-		if (exp.get(2) == "left") {
-			fielder = var.getLeft();
+		if (exp.get(2).equals("left")) {
+			fielder = pair.getLeft();
 		}
-		else if (exp.get(2) == "right") {
-			fielder = var.getRight();
+		else if (exp.get(2).equals("right")) {
+			fielder = pair.getRight();
 		}
 		else {
 			throw new EvalError("Expected a 'left' or 'right' field indicator.");
@@ -224,12 +225,27 @@ public class Evaluator {
 	// Evaluate variable assignments (i.e. things like x = x + 1)
 	public static Object evalAssign(ArrayList<Object> exp, Environment env) {
 
+		ArrayList<Object> checker;
+		String id = null;
+		String parent, side;
+
 		// First let's get the name of the variable	
-		String id = (String) exp.get(1);
+		if (!(exp.get(1) instanceof String)) {
+			checker = (ArrayList<Object>) exp.get(1);
+			if (checker.get(0).equals("field")) {
+				parent = (String) checker.get(1);
+				side = (String) checker.get(2);
+				id = parent + "." + side;
+			}
+		}
+		
+		else {
+			id = (String)exp.get(1);
+		}
 
 		// Now evaluate the expression for the new value of the variable 
 		Object res;
-		if (exp.get(2) == "string") {
+		if (exp.get(2).equals("string")) {
 			res = exp.get(3);
 		}
 		else {
@@ -237,18 +253,18 @@ public class Evaluator {
 		}
 
 		// Add the variable and its value to the current environment
-		env.addVariable(id, res);
-
+		env.addVariable((String)id, res);
+		
 		// Assignments do not have a return value
 		return null;
 	}
 
 	// Print statements are easy, we just use System.out.println
 	public static Object evalPrint(ArrayList<Object> exp, Environment env) {
-		if (exp.get(1) == "SKIPLINE") {
+		if (exp.get(1).equals("SKIPLINE")) {
 			System.out.println();
 		}
-		else if (exp.get(1) == "string") {
+		else if (exp.get(1).equals("string")) {
 			System.out.println(exp.get(2));
 		}
 		else {
@@ -289,7 +305,7 @@ public class Evaluator {
 	}
 
 	// Evaluating Function Calls
-	public static Object evalCall(ArrayList<Object> exp, Environment env) {
+	public static Object evalCall(ArrayList<Object> exp, Environment env) {		
 		// First, we need to get the appropriate procedure out 
 		// of the environment
 		Procedure proc = ((Procedure)env.lookupVariable((String)exp.get(1)));
@@ -334,7 +350,7 @@ public class Evaluator {
 			return Integer.parseInt(value);
 		}
 		catch (Exception e) {
-			if (value == "field") {
+			if (value.equals("field")) {
 				throw new EvalError("The name 'field' is a reserved keyword for constructors.");
 			}
 			else {
