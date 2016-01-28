@@ -36,7 +36,7 @@ public class Environment {
 	public void addVariable(String name, Object value) {
 		frame.put(name,value);
 	}
-	
+
 	// Look up a certain name in the environment
 	public Object lookupVariable(String name) {		
 		// Check to see if the current environment has the

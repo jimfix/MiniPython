@@ -466,7 +466,12 @@ public class Parser {
 		ArrayList<Object> args = new ArrayList<Object>();
 		if (!tokens.get(0).equals(")")) {
 			while (true) {
-				args.add(parseExpression(tokens));
+				if (tokens.get(0).equals("\"")) {
+					args.add(parseString(tokens));
+				}
+				else {
+					args.add(parseExpression(tokens));
+				}
 				if (!tokens.get(0).equals(",")) {
 					break;
 				}
@@ -540,12 +545,12 @@ public class Parser {
 
 	// Helper function for parsing strings
 	public static Object parseString(TokenStream tokens) {
-		tokens.munchAssert("\"");
 		String phrase = tokens.munch();
+		phrase += tokens.munch();
 		while(!tokens.get(0).equals("\"")) {
 			phrase = phrase + " " + tokens.munch();
 		}
-		tokens.munchAssert("\"");
+		phrase += tokens.munch();
 		return phrase;
 	}
 }

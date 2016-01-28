@@ -172,7 +172,7 @@ public class Evaluator {
 		// Store the new Procedure object in the Environment
 		// using the procedure's name as the key
 
-		env.addVariable((String) exp.get(1),newProc);
+		env.addVariable((String)exp.get(1),newProc);
 		return null;
 	}
 
@@ -191,7 +191,7 @@ public class Evaluator {
 	// left/right (side), give back that stored value.
 
 	public static Object evalField(ArrayList<Object> exp, Environment env) {
-		Pair pair = (Pair) env.lookupVariable((String)exp.get(1));
+		Pair pair = (Pair)env.lookupVariable((String)exp.get(1));
 		Object fielder;
 		if (exp.get(2).equals("left")) {
 			fielder = pair.getLeft();
@@ -249,40 +249,29 @@ public class Evaluator {
 	}
 
 	// Evaluate variable assignments (i.e. things like x = x + 1)
-
 	public static Object evalAssign(ArrayList<Object> exp, Environment env) {
 
-		ArrayList<Object> checker;
-		String id = null;
-		String parent, side;
+		// Evaluate the expression for the new value of the variable
+		// Doing this first helps us determine what the variable type is
+		Object res = meval(exp.get(3),env);
 
-		// First let's get the name of the variable
-		// It's possible we're given a field selector, so that
-		// needs to be acknowledged in the id creation
-		if (!(exp.get(1) instanceof String)) {
-			checker = (ArrayList<Object>) exp.get(1);
-			if (checker.get(0).equals("field")) {
-				parent = (String) checker.get(1);
-				side = (String) checker.get(2);
-				id = parent + "." + side;
+		if (exp.get(1) instanceof ArrayList<?> && ((ArrayList<?>) exp.get(1)).get(0).equals("field")) {
+			ArrayList<Object> id = (ArrayList<Object>) exp.get(1);
+			Pair parent = (Pair) env.lookupVariable((String)id.get(1));
+			String side = (String) id.get(2);
+			if (side.equals("left")) {
+				parent.setLeft(res);
+			}
+			else if (side.equals("right")) {
+				parent.setRight(res);
 			}
 		}
 
 		else {
-			id = (String)exp.get(1);
-		}
 
-		// Evaluate the expression for the new value of the variable 
-		Object res;
-		if (exp.get(2).equals("string")) {
-			res = exp.get(3);
+			String id = (String) exp.get(1);
+			env.addVariable(id, res);
 		}
-		else {
-			res = meval(exp.get(3),env);
-		}
-
-		// Add the variable and its value to the current environment
-		env.addVariable((String)id, res);
 
 		// Assignments do not have a return value
 		return null;
@@ -343,7 +332,7 @@ public class Evaluator {
 
 		// First, we need to get the appropriate procedure out 
 		// of the environment
-		Procedure proc = ((Procedure)env.lookupVariable((String)exp.get(1)));
+		Procedure proc = ((Procedure)env.lookupVariable((String) exp.get(1)));
 
 		// Get the arguments passed to the function
 		ArrayList<Object> args = (ArrayList<Object>) exp.get(2);
@@ -378,20 +367,23 @@ public class Evaluator {
 	// Evaluating primitives, which are either numbers or variable names
 
 	public static Object evalPrimitive(Object exp, Environment env) {
-		String value = (String) exp;
+		String var = (String) exp;
 
 		// We'll try to convert the string to a number. If this
 		// fails, we know it's not a number.
 		try {
-			return Integer.parseInt(value);
+			return Integer.parseInt(var);
 		}
 		catch (Exception e) {
-			if (value.equals("field")) {
+			if (var.equals("field")) {
 				throw new EvalError("The name 'field' is a reserved keyword for constructors.");
+			}
+			else if (var.charAt(0) == '"') {
+				return var.substring(1,var.length()-1);
 			}
 			else {
 				// Look up the variable in the environment
-				return env.lookupVariable(value);
+				return env.lookupVariable(var);
 			}
 		}
 	}
