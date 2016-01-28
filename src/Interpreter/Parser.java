@@ -78,16 +78,15 @@ public class Parser {
 		// it's a "(", we know it's a function call.
 
 		String lookahead = "";
+		String lookfurtherahead = "";
 		if (tokens.size() > 1) {
-			int offset = 2;
 			lookahead = tokens.get(1);
-			while (lookahead.equals(".")) {
-				lookahead = tokens.get(1+offset);
-				offset += 2;
+			if (lookahead.equals(".") && tokens.size() > 3) {
+				lookfurtherahead = tokens.get(3);
 			}
 		}
 
-		if (lookahead.equals("=")) {
+		if (lookahead.equals("=") || lookfurtherahead.equals("=")) {
 			return parseAssign(tokens);
 		}
 		if (lookahead.equals("(")) {
