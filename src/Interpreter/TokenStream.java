@@ -2,7 +2,7 @@ package Interpreter;
 
 import java.util.ArrayList;
 
-import Errors.ParseError;
+import Runtime.ParseError;
 
 @SuppressWarnings("serial")
 

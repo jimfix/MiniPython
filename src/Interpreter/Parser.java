@@ -1,7 +1,7 @@
 package Interpreter;
 import java.util.ArrayList;
 
-import Errors.ParseError;
+import Runtime.ParseError;
 
 // The Parser is a big chunk of our Interpreter.  The Parser does 
 // not actually run any of the code in our program, but rather helps
@@ -78,15 +78,16 @@ public class Parser {
 		// it's a "(", we know it's a function call.
 
 		String lookahead = "";
-		String lookfurtherahead = "";
+		int i = 2;
 		if (tokens.size() > 1) {
 			lookahead = tokens.get(1);
-			if (lookahead.equals(".") && tokens.size() > 3) {
-				lookfurtherahead = tokens.get(3);
+			while (lookahead.equals(".") && tokens.size() > i+1) {
+				lookahead = tokens.get(i+1);
+				i += 2;
 			}
 		}
 
-		if (lookahead.equals("=") || lookfurtherahead.equals("=")) {
+		if (lookahead.equals("=")) {
 			return parseAssign(tokens);
 		}
 		if (lookahead.equals("(")) {

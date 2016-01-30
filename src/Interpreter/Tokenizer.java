@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Stack;
 
-import Errors.ParseError;
+import Runtime.ParseError;
 
 // The tokenizer takes the raw Python string and breaks it into
 // the individual "tokens" that make up our Python program. Tokens

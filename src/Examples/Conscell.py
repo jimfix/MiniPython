@@ -5,3 +5,6 @@ print x.left
 print x.right
 x.left = "wow"
 print x.left
+x.left = y
+print x.left
+print x.left.left

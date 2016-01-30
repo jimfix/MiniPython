@@ -1,7 +1,10 @@
 package Interpreter;
 import java.util.ArrayList;
 
-import Errors.EvalError;
+import Environment.Frame;
+import Environment.Pair;
+import Environment.Value;
+import Runtime.EvalError;
 
 // The Evaluator is where we actually run the code.  The Evaluator
 // takes in parsed code from the Parser as input and simulates the
@@ -14,7 +17,7 @@ public class Evaluator {
 	// determine what kind of Statement/Expression it is,
 	// then call the appropriate "eval" function to evaluate that statement.
 
-	public static Object meval(Object expr, Environment env) {
+	public static Object meval(Object expr, Frame env) {
 		if (expr instanceof ArrayList<?>) {
 
 			ArrayList<Object> exp = (ArrayList<Object>) expr;	
@@ -27,13 +30,13 @@ public class Evaluator {
 			// Call the appropriate "eval" method based on
 			// the first element of the list
 
-			// Function Definitions
-			if (operation.equals("def")) {
-				return evalDef(exp,env); 
-			}
+			//			// Function Definitions
+			//			if (operation.equals("def")) {
+			//				return evalDef(exp,env); 
+			//			}
 
 			// If Statements
-			else if (operation.equals("if")) {				
+			if (operation.equals("if")) {				
 				return evalIf(exp,env);
 			}
 
@@ -151,38 +154,38 @@ public class Evaluator {
 		return null;
 	}
 
-	// Evaluating Procedure Definitions: Note that this code
-	// does not actually run the procedure, but rather saves
-	// its code for later in the current Environment.  This makes
-	// sense, as we don't run functions when we define them,
-	// we run them by calling the functions elsewhere.
-
-	public static Object evalDef(ArrayList<Object> exp, Environment env) {
-
-		// Create a new Procedure Object to store
-		// all of our procedure information. In particular:
-		// 1) The procedure's arguments
-		// 2) The procedure's code
-		// 3) The environment to run the procedure in  
-		//	  (This is the same as the environment the 
-		//     function is defined in)	
-
-		Procedure newProc = new Procedure((ArrayList<String>) exp.get(2), (ArrayList<Object>) exp.get(3),env);
-
-		// Store the new Procedure object in the Environment
-		// using the procedure's name as the key
-
-		env.addVariable((String)exp.get(1),newProc);
-		return null;
-	}
+	//		// Evaluating Procedure Definitions: Note that this code
+	//		// does not actually run the procedure, but rather saves
+	//		// its code for later in the current Environment.  This makes
+	//		// sense, as we don't run functions when we define them,
+	//		// we run them by calling the functions elsewhere.
+	//	
+	//		public static Object evalDef(ArrayList<Object> exp, Frame env) {
+	//	
+	//			// Create a new Procedure Object to store
+	//			// all of our procedure information. In particular:
+	//			// 1) The procedure's arguments
+	//			// 2) The procedure's code
+	//			// 3) The environment to run the procedure in  
+	//			//	  (This is the same as the environment the 
+	//			//     function is defined in)	
+	//	
+	//			Procedure newProc = new Procedure((ArrayList<String>) exp.get(2), (ArrayList<Object>) exp.get(3),env);
+	//	
+	//			// Store the new Procedure object in the Environment
+	//			// using the procedure's name as the key
+	//	
+	//			env.addVariable((String)exp.get(1),newProc);
+	//			return null;
+	//		}
 
 	// Evaluating a Constructed Cell: Uses a custom Pair class that has
 	// a left and right value stored.
 
-	public static Pair evalConscell(ArrayList<Object> exp, Environment env) {
+	public static Pair evalConscell(ArrayList<Object> exp, Frame env) {
 		ArrayList<Object> cells = (ArrayList<Object>) exp.get(2);
-		Object lv = (meval(cells.get(0),env));
-		Object rv = (meval(cells.get(1),env));
+		Value lv = (Value)(meval(cells.get(0),env));
+		Value rv = (Value)(meval(cells.get(1),env));
 		Pair newcells = new Pair(lv,rv);
 		return newcells;
 	}
@@ -190,7 +193,8 @@ public class Evaluator {
 	// Evaluating a Field Selector: When given a Pair (parent) and
 	// left/right (side), give back that stored value.
 
-	public static Object evalField(ArrayList<Object> exp, Environment env) {
+	public static Object evalField(ArrayList<Object> exp, Frame env) {
+
 		Pair pair = (Pair)env.lookupVariable((String)exp.get(1));
 		Object fielder;
 		if (exp.get(2).equals("left")) {
@@ -208,7 +212,7 @@ public class Evaluator {
 	// Evaluating If Statements: Evaluate the condition. Evaluate the first
 	// clause if true, other/second clause if false.
 
-	public static Object evalIf(ArrayList<Object> exp, Environment env) {
+	public static Object evalIf(ArrayList<Object> exp, Frame env) {
 
 		Object cond = meval(exp.get(1),env);
 
@@ -231,7 +235,7 @@ public class Evaluator {
 	// evaluate the clause. Each time the evaluation finishes,
 	// update the condition.
 
-	public static Object evalWhile(ArrayList<Object> exp, Environment env) {
+	public static Object evalWhile(ArrayList<Object> exp, Frame env) {
 
 		Object cond = meval(exp.get(1),env);
 
@@ -249,36 +253,23 @@ public class Evaluator {
 	}
 
 	// Evaluate variable assignments (i.e. things like x = x + 1)
-	public static Object evalAssign(ArrayList<Object> exp, Environment env) {
+	public static Object evalAssign(ArrayList<Object> exp, Frame env) {
 
-		// Evaluate the expression for the new value of the variable
-		// Doing this first helps us determine what the variable type is
-		Object res = meval(exp.get(3),env);
+		// First let's get the name of the variable
+		String id = (String)exp.get(1);
 
-		if (exp.get(1) instanceof ArrayList<?> && ((ArrayList<?>) exp.get(1)).get(0).equals("field")) {
-			ArrayList<Object> id = (ArrayList<Object>) exp.get(1);
-			Pair parent = (Pair) env.lookupVariable((String)id.get(1));
-			String side = (String) id.get(2);
-			if (side.equals("left")) {
-				parent.setLeft(res);
-			}
-			else if (side.equals("right")) {
-				parent.setRight(res);
-			}
-		}
+		// Now evaluate the expression for the new value of the variable 
+		Value res = (Value)meval(exp.get(2),env);
 
-		else {
-
-			String id = (String) exp.get(1);
-			env.addVariable(id, res);
-		}
+		// Add the variable and its value to the current environment
+		env.addVariable(id, res);
 
 		// Assignments do not have a return value
 		return null;
 	}
 
 	// Print statements are easy, we just use System.out.println
-	public static Object evalPrint(ArrayList<Object> exp, Environment env) {
+	public static Object evalPrint(ArrayList<Object> exp, Frame env) {
 		if (exp.get(1).equals("SKIPLINE")) {
 			System.out.println();
 		}
@@ -308,7 +299,7 @@ public class Evaluator {
 	}
 
 	// Evaluate a sequence (list) of statements
-	public static Object evalSequence(Object exp, Environment env) {
+	public static Object evalSequence(Object exp, Frame env) {
 		// We just loop through the statements one at a time
 		// and evaluate each one
 		ArrayList<Object> expr = (ArrayList<Object>) exp;
@@ -328,7 +319,7 @@ public class Evaluator {
 	}
 
 	// Evaluating Function Calls
-	public static Object evalCall(ArrayList<Object> exp, Environment env) {		
+	public static Object evalCall(ArrayList<Object> exp, Frame env) {		
 
 		// First, we need to get the appropriate procedure out 
 		// of the environment
@@ -342,7 +333,7 @@ public class Evaluator {
 
 		// Make a new environment in which we'll run the procedure.  
 		// Its parent should be the current environment.
-		Environment new_env = new Environment(proc.env);
+		Frame new_env = new Frame(proc.env);
 
 		// There should be just as many arguments in the function 
 		// call as the function expects
@@ -356,7 +347,7 @@ public class Evaluator {
 		// we had a function f(x) and we called f(1+2), we would evaluate
 		// 1+2, then set x to 3 in f's environment
 		for (int i=0;i<args.size();i++) {
-			new_env.addVariable(fargs.get(i), meval(args.get(i),env));					
+			new_env.addVariable(fargs.get(i), (Value)meval(args.get(i),env));					
 		}
 
 		// Now we're ready to run the procedure. Note that we run
@@ -366,7 +357,7 @@ public class Evaluator {
 
 	// Evaluating primitives, which are either numbers or variable names
 
-	public static Object evalPrimitive(Object exp, Environment env) {
+	public static Object evalPrimitive(Object exp, Frame env) {
 		String var = (String) exp;
 
 		// We'll try to convert the string to a number. If this
@@ -391,7 +382,7 @@ public class Evaluator {
 	// Our basic math functions:
 	// --------------------------------
 
-	public static Object evalAdd(ArrayList<Object> exp, Environment env) {
+	public static Object evalAdd(ArrayList<Object> exp, Frame env) {
 		Object v1 = Evaluator.meval(exp.get(1),env);
 		Object v2 = Evaluator.meval(exp.get(2),env);
 		if (v1 instanceof Integer && v2 instanceof Integer) {
@@ -407,7 +398,7 @@ public class Evaluator {
 		throw new EvalError("Cannot add " + v1 + " and " + v2);
 	}
 
-	public static Integer evalSub(ArrayList<Object> exp, Environment env) {
+	public static Integer evalSub(ArrayList<Object> exp, Frame env) {
 		Object v1 = meval(exp.get(1),env);
 		Object v2 = meval(exp.get(2),env);
 		if (v1 instanceof Integer && v2 instanceof Integer) {
@@ -416,7 +407,7 @@ public class Evaluator {
 		throw new EvalError("Cannot subtract " + v2 + " from " + v1);
 	}
 
-	public static Integer evalMult(ArrayList<Object> exp, Environment env) {
+	public static Integer evalMult(ArrayList<Object> exp, Frame env) {
 		Object v1 = meval(exp.get(1),env);
 		Object v2 = meval(exp.get(2),env);
 		if (v1 instanceof Integer && v2 instanceof Integer) {
@@ -425,7 +416,7 @@ public class Evaluator {
 		throw new EvalError("Cannot multiply " + v1 + " and " + v2);
 	}
 
-	public static Integer evalDiv(ArrayList<Object> exp, Environment env) {
+	public static Integer evalDiv(ArrayList<Object> exp, Frame env) {
 		Object v1 = meval(exp.get(1),env);
 		Object v2 = meval(exp.get(2),env);
 		if (v1 instanceof Integer && v2 instanceof Integer) {
@@ -434,7 +425,7 @@ public class Evaluator {
 		throw new EvalError("Cannot divide " + v1 + " into " + v2);
 	}
 
-	public static Boolean evalLessThan(ArrayList<Object> exp, Environment env) {
+	public static Boolean evalLessThan(ArrayList<Object> exp, Frame env) {
 		// Evaluate the two expressions we'll be comparing
 		Object v1 = meval(exp.get(1),env);
 		Object v2 = meval(exp.get(2),env);
@@ -450,7 +441,7 @@ public class Evaluator {
 		throw new EvalError("Cannot compare with <: " + v1 + " and " + v2);
 	}
 
-	public static Boolean evalGreaterThan(ArrayList<Object> exp, Environment env) {
+	public static Boolean evalGreaterThan(ArrayList<Object> exp, Frame env) {
 		Object v1 = meval(exp.get(1),env);
 		Object v2 = meval(exp.get(2),env);
 		if (v1 instanceof Integer && v2 instanceof Integer) {
@@ -459,7 +450,7 @@ public class Evaluator {
 		throw new EvalError("Cannot compare with >: " + v1 + " and " + v2);
 	}
 
-	public static Boolean evalLessThanEqual(ArrayList<Object> exp, Environment env) {
+	public static Boolean evalLessThanEqual(ArrayList<Object> exp, Frame env) {
 		Object v1 = meval(exp.get(1),env);
 		Object v2 = meval(exp.get(2),env);
 		if (v1 instanceof Integer && v2 instanceof Integer) {
@@ -468,7 +459,7 @@ public class Evaluator {
 		throw new EvalError("Cannot compare with <=: " + v1 + " and " + v2);
 	}
 
-	public static Boolean evalGreaterThanEqual(ArrayList<Object> exp, Environment env) {
+	public static Boolean evalGreaterThanEqual(ArrayList<Object> exp, Frame env) {
 		Object v1 = meval(exp.get(1),env);
 		Object v2 = meval(exp.get(2),env);
 		if (v1 instanceof Integer && v2 instanceof Integer) {
@@ -477,7 +468,7 @@ public class Evaluator {
 		throw new EvalError("Cannot compare with >=: " + v1 + " and " + v2);
 	}
 
-	public static Boolean evalEquals(ArrayList<Object> exp, Environment env) {
+	public static Boolean evalEquals(ArrayList<Object> exp, Frame env) {
 		Object v1 = meval(exp.get(1),env);
 		Object v2 = meval(exp.get(2),env);
 		if (v1 instanceof Integer && v2 instanceof Integer) {
@@ -489,7 +480,7 @@ public class Evaluator {
 		throw new EvalError("Cannot check equality of " + v1 + " to " + v2);
 	}
 
-	public static Boolean evalNotEquals(ArrayList<Object> exp, Environment env) {
+	public static Boolean evalNotEquals(ArrayList<Object> exp, Frame env) {
 		Object v1 = meval(exp.get(1),env);
 		Object v2 = meval(exp.get(2),env);
 		if (v1 instanceof Integer && v2 instanceof Integer) {
@@ -501,7 +492,7 @@ public class Evaluator {
 		throw new EvalError("Cannot check non-equality of " + v1 + " to " + v2);
 	}
 
-	public static Boolean evalAnd(ArrayList<Object> exp, Environment env) {
+	public static Boolean evalAnd(ArrayList<Object> exp, Frame env) {
 		Object v1 = meval(exp.get(1),env);
 		Object v2 = meval(exp.get(2),env);
 		if (v1 instanceof Boolean && v2 instanceof Boolean) {
@@ -515,7 +506,7 @@ public class Evaluator {
 		throw new EvalError("Cannot compare with AND: " + v1 + " and " + v2);
 	}
 
-	public static Boolean evalOr(ArrayList<Object> exp, Environment env) {
+	public static Boolean evalOr(ArrayList<Object> exp, Frame env) {
 		Object v1 = meval(exp.get(1),env);
 		Object v2 = meval(exp.get(2),env);
 		if (v1 instanceof Boolean && v2 instanceof Boolean) {

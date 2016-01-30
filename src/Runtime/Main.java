@@ -1,13 +1,18 @@
+package Runtime;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import Interpreter.Environment;
+import Environment.Frame;
+import Environment.Heap;
 import Interpreter.Evaluator;
 import Interpreter.Parser;
 import Interpreter.Tokenizer;
 
 public class Main {
+	
+	Heap heap = new Heap();
+	
 	public static void main(String args[]) throws Exception {
 		System.out.print("Input the name of the file you wish to load: ");
 		Scanner scan = new Scanner(System.in);
@@ -29,7 +34,7 @@ public class Main {
 		System.out.println("---------------------");
 		System.out.println("Now evaluating...");
 		System.out.println();
-		Evaluator.evalSequence(ast, Environment.createGlobalEnvironment());
+		Evaluator.evalSequence(ast, Frame.createGlobalEnvironment());
 	}
 
 	// loadFile reads in a specific file and returns
