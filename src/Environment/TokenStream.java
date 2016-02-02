@@ -1,4 +1,4 @@
-package Interpreter;
+package Environment;
 
 import java.util.ArrayList;
 

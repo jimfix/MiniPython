@@ -1,6 +1,7 @@
 package Interpreter;
 import java.util.ArrayList;
 
+import Environment.TokenStream;
 import Errors.ParseError;
 
 // The Parser is a big chunk of our Interpreter.  The Parser does 

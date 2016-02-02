@@ -503,6 +503,14 @@ public class Evaluator {
 				return new Value("boolean",(Boolean)v1);
 			}
 		}
+		else if (v1 instanceof Integer && v2 instanceof Integer) {
+			if (Integer.compare((Integer)v1,(Integer)v2) == 0) {
+				return new Value("boolean",true);
+			}
+			else {
+				return new Value("boolean",false);
+			}
+		}
 		throw new EvalError("Cannot compare with AND: " + v1 + " and " + v2);
 	}
 

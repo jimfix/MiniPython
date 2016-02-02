@@ -66,6 +66,8 @@ public class Frame {
 		// Make the environment.  The global environment has
 		// no parent, so we set its parent to "null"
 		Frame env = new Frame(null);
+		env.addVariable("True", new Value("boolean",true));
+		env.addVariable("False", new Value("boolean",false));
 		return env;
 	}
 }

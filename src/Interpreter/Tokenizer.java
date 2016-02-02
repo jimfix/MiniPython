@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Stack;
 
+import Environment.TokenStream;
 import Errors.ParseError;
 
 // The tokenizer takes the raw Python string and breaks it into

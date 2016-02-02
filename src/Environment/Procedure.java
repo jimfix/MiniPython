@@ -1,7 +1,5 @@
-package Interpreter;
+package Environment;
 import java.util.ArrayList;
-
-import Environment.Frame;
 
 // We use the Procedure class in order to keep track of
 // our procedures.  Procedures consist of three parts:
