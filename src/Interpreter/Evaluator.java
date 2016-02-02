@@ -225,7 +225,8 @@ public class Evaluator {
 
 	public static Object evalField(ArrayList<Object> exp, Frame env) {
 
-		Value val = (Value)env.lookupVariable((String)exp.get(1));
+		Value val = (Value)(meval(exp.get(1),env));
+		
 		if (!val.getTag().equals("pair")) {
 			throw new EvalError("Expected a pair data value for this variable!");
 		}
