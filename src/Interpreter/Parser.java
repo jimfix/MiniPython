@@ -1,7 +1,7 @@
 package Interpreter;
 import java.util.ArrayList;
 
-import Runtime.ParseError;
+import Errors.ParseError;
 
 // The Parser is a big chunk of our Interpreter.  The Parser does 
 // not actually run any of the code in our program, but rather helps
@@ -222,11 +222,9 @@ public class Parser {
 		}
 		//Catch strings vs. expressions
 		else if (tokens.get(0).equals("\"")) {
-			retval.add("string");
 			retval.add(parseString(tokens));
 		}
 		else {
-			retval.add("expression");
 			retval.add(parseExpression(tokens));
 		}
 		tokens.munchAssert("NEWLINE");
@@ -245,11 +243,9 @@ public class Parser {
 		// The assignment itself:
 		//Catch strings vs. expressions
 		if (tokens.get(0).equals("\"")) {
-			retval.add("string");
 			retval.add(parseString(tokens));
 		}
 		else {
-			retval.add("expression");
 			retval.add(parseExpression(tokens));
 		}
 		tokens.munchAssert("NEWLINE");

@@ -1,5 +1,4 @@
-package Runtime;
-
+package Errors;
 
 @SuppressWarnings("serial")
 public class ParseError extends Error {

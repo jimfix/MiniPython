@@ -2,9 +2,10 @@ package Interpreter;
 import java.util.ArrayList;
 
 import Environment.Frame;
+import Environment.Heap;
 import Environment.Pair;
 import Environment.Value;
-import Runtime.EvalError;
+import Errors.EvalError;
 
 // The Evaluator is where we actually run the code.  The Evaluator
 // takes in parsed code from the Parser as input and simulates the
@@ -12,6 +13,8 @@ import Runtime.EvalError;
 
 @SuppressWarnings("unchecked")
 public class Evaluator {
+
+	static Heap heap = new Heap();
 
 	// Given a Statement or Expression, which is expected to be an ArrayList,
 	// determine what kind of Statement/Expression it is,
@@ -61,13 +64,13 @@ public class Evaluator {
 				return evalWhile(exp,env);
 			}
 
-			// Function Calls (Statement version)
-			else if (operation.equals("callS")) {
-				evalCall(exp,env);
-				// Function calls as statements cannot return a value or
-				// this will be confused with the return value
-				return null;
-			}
+			//			// Function Calls (Statement version)
+			//			else if (operation.equals("callS")) {
+			//				evalCall(exp,env);
+			//				// Function calls as statements cannot return a value or
+			//				// this will be confused with the return value
+			//				return null;
+			//			}
 
 			// Function calls (Expression version)
 			else if (operation.equals("callE")) {
@@ -77,7 +80,8 @@ public class Evaluator {
 					return evalConscell(exp,env);
 				}
 				else {
-					return evalCall(exp,env);
+					//					return evalCall(exp,env);
+					return null;
 				}
 			}
 
@@ -182,12 +186,14 @@ public class Evaluator {
 	// Evaluating a Constructed Cell: Uses a custom Pair class that has
 	// a left and right value stored.
 
-	public static Pair evalConscell(ArrayList<Object> exp, Frame env) {
+	public static Value evalConscell(ArrayList<Object> exp, Frame env) {
 		ArrayList<Object> cells = (ArrayList<Object>) exp.get(2);
 		Value lv = (Value)(meval(cells.get(0),env));
 		Value rv = (Value)(meval(cells.get(1),env));
 		Pair newcells = new Pair(lv,rv);
-		return newcells;
+		heap.addPair(newcells);
+		int index = heap.indexOf(newcells);
+		return new Value("pair",index);
 	}
 
 	// Evaluating a Field Selector: When given a Pair (parent) and
@@ -195,8 +201,12 @@ public class Evaluator {
 
 	public static Object evalField(ArrayList<Object> exp, Frame env) {
 
-		Pair pair = (Pair)env.lookupVariable((String)exp.get(1));
-		Object fielder;
+		Value val = (Value)env.lookupVariable((String)exp.get(1));
+		if (!val.getTag().equals("pair")) {
+			throw new EvalError("Expected a pair data value for this variable!");
+		}
+		Pair pair = (Pair)val.getData();
+		Value fielder;
 		if (exp.get(2).equals("left")) {
 			fielder = pair.getLeft();
 		}
@@ -214,15 +224,15 @@ public class Evaluator {
 
 	public static Object evalIf(ArrayList<Object> exp, Frame env) {
 
-		Object cond = meval(exp.get(1),env);
+		Value cond = (Value)meval(exp.get(1),env);
 
 		// Check that the condition is a Boolean. If not, throw
 		// an error.
-		if (!(cond instanceof Boolean)) {
+		if (!(cond.getData() instanceof Boolean)) {
 			throw new EvalError("Expected a boolean for the condition of the if statement");
 		}
 
-		if ((Boolean) cond) {
+		if ((Boolean) cond.getData()) {
 			return evalSequence(exp.get(2),env);
 		}
 
@@ -273,26 +283,23 @@ public class Evaluator {
 		if (exp.get(1).equals("SKIPLINE")) {
 			System.out.println();
 		}
-		else if (exp.get(1).equals("string")) {
-			System.out.println(exp.get(2));
-		}
 		else {
-			Object val = meval(exp.get(2),env);
-			if (val instanceof Boolean) {
-				if ((Boolean) val) {
+			Value val = (Value)meval(exp.get(1),env);
+			if (val.getData() instanceof Boolean) {
+				if ((Boolean) val.getData()) {
 					System.out.println("True");
 				}
 				else {
 					System.out.println("False");
 				}
 			}
-			else if (val instanceof Pair) {
-				Object left = ((Pair) val).getLeft();
-				Object right = ((Pair) val).getRight();
+			else if (val.getData() instanceof Pair) {
+				Value left = ((Pair) val.getData()).getLeft();
+				Value right = ((Pair) val.getData()).getRight();
 				System.out.println("(" + left + ", " + right + ")");
 			}
 			else {
-				System.out.println(val);
+				System.out.println(val.getData());
 			}
 		}
 		return null;
@@ -318,42 +325,42 @@ public class Evaluator {
 		return null;
 	}
 
-	// Evaluating Function Calls
-	public static Object evalCall(ArrayList<Object> exp, Frame env) {		
-
-		// First, we need to get the appropriate procedure out 
-		// of the environment
-		Procedure proc = ((Procedure)env.lookupVariable((String) exp.get(1)));
-
-		// Get the arguments passed to the function
-		ArrayList<Object> args = (ArrayList<Object>) exp.get(2);
-
-		// Get the arguments the function expects
-		ArrayList<String> fargs = proc.args;
-
-		// Make a new environment in which we'll run the procedure.  
-		// Its parent should be the current environment.
-		Frame new_env = new Frame(proc.env);
-
-		// There should be just as many arguments in the function 
-		// call as the function expects
-		if (args.size() != fargs.size()) {
-			throw new EvalError("Function expected " + fargs.size() + " arguments, got " + args.size());
-		}
-
-		// Loop through each of the arguments. We first evaluate
-		// each argument, then we add that value to the Procedure's
-		// environment under the appropriate name.  For example, if
-		// we had a function f(x) and we called f(1+2), we would evaluate
-		// 1+2, then set x to 3 in f's environment
-		for (int i=0;i<args.size();i++) {
-			new_env.addVariable(fargs.get(i), (Value)meval(args.get(i),env));					
-		}
-
-		// Now we're ready to run the procedure. Note that we run
-		// the procedure in its own new environment
-		return evalSequence(proc.body,new_env);
-	}
+	//	// Evaluating Function Calls
+	//	public static Object evalCall(ArrayList<Object> exp, Frame env) {		
+	//
+	//		// First, we need to get the appropriate procedure out 
+	//		// of the environment
+	//		Procedure proc = ((Procedure)env.lookupVariable((String) exp.get(1)));
+	//
+	//		// Get the arguments passed to the function
+	//		ArrayList<Object> args = (ArrayList<Object>) exp.get(2);
+	//
+	//		// Get the arguments the function expects
+	//		ArrayList<String> fargs = proc.args;
+	//
+	//		// Make a new environment in which we'll run the procedure.  
+	//		// Its parent should be the current environment.
+	//		Frame new_env = new Frame(proc.env);
+	//
+	//		// There should be just as many arguments in the function 
+	//		// call as the function expects
+	//		if (args.size() != fargs.size()) {
+	//			throw new EvalError("Function expected " + fargs.size() + " arguments, got " + args.size());
+	//		}
+	//
+	//		// Loop through each of the arguments. We first evaluate
+	//		// each argument, then we add that value to the Procedure's
+	//		// environment under the appropriate name.  For example, if
+	//		// we had a function f(x) and we called f(1+2), we would evaluate
+	//		// 1+2, then set x to 3 in f's environment
+	//		for (int i=0;i<args.size();i++) {
+	//			new_env.addVariable(fargs.get(i), (Value)meval(args.get(i),env));					
+	//		}
+	//
+	//		// Now we're ready to run the procedure. Note that we run
+	//		// the procedure in its own new environment
+	//		return evalSequence(proc.body,new_env);
+	//	}
 
 	// Evaluating primitives, which are either numbers or variable names
 
@@ -363,14 +370,14 @@ public class Evaluator {
 		// We'll try to convert the string to a number. If this
 		// fails, we know it's not a number.
 		try {
-			return Integer.parseInt(var);
+			return new Value("int",Integer.parseInt(var));
 		}
 		catch (Exception e) {
 			if (var.equals("field")) {
 				throw new EvalError("The name 'field' is a reserved keyword for constructors.");
 			}
 			else if (var.charAt(0) == '"') {
-				return var.substring(1,var.length()-1);
+				return new Value("string",var.substring(1,var.length()-1));
 			}
 			else {
 				// Look up the variable in the environment
@@ -382,139 +389,132 @@ public class Evaluator {
 	// Our basic math functions:
 	// --------------------------------
 
-	public static Object evalAdd(ArrayList<Object> exp, Frame env) {
-		Object v1 = Evaluator.meval(exp.get(1),env);
-		Object v2 = Evaluator.meval(exp.get(2),env);
+	public static Value evalAdd(ArrayList<Object> exp, Frame env) {
+		Object v1 = ((Value) meval(exp.get(1),env)).getData();
+		Object v2 = ((Value) meval(exp.get(2),env)).getData();
 		if (v1 instanceof Integer && v2 instanceof Integer) {
-			return (Integer)v1+(Integer)v2;
-		}
-		else if (v1 instanceof ArrayList<?> && v2 instanceof ArrayList<?>) {
-			ArrayList<Object> list1 = (ArrayList<Object>) v1;
-			ArrayList<Object> list2 = (ArrayList<Object>) v2;
-			ArrayList<Object> new_list = (ArrayList<Object>) list1.clone();
-			new_list.addAll(list2);
-			return new_list;
+			return new Value("int",(Integer)v1+(Integer)v2);
 		}
 		throw new EvalError("Cannot add " + v1 + " and " + v2);
 	}
 
-	public static Integer evalSub(ArrayList<Object> exp, Frame env) {
-		Object v1 = meval(exp.get(1),env);
-		Object v2 = meval(exp.get(2),env);
+	public static Value evalSub(ArrayList<Object> exp, Frame env) {
+		Object v1 = ((Value) meval(exp.get(1),env)).getData();
+		Object v2 = ((Value) meval(exp.get(2),env)).getData();
 		if (v1 instanceof Integer && v2 instanceof Integer) {
-			return (Integer)v1-(Integer)v2;
+			return new Value("int",(Integer)v1-(Integer)v2);
 		}	
 		throw new EvalError("Cannot subtract " + v2 + " from " + v1);
 	}
 
-	public static Integer evalMult(ArrayList<Object> exp, Frame env) {
-		Object v1 = meval(exp.get(1),env);
-		Object v2 = meval(exp.get(2),env);
+	public static Value evalMult(ArrayList<Object> exp, Frame env) {
+		Object v1 = ((Value) meval(exp.get(1),env)).getData();
+		Object v2 = ((Value) meval(exp.get(2),env)).getData();
 		if (v1 instanceof Integer && v2 instanceof Integer) {
-			return (Integer)v1*(Integer)v2;
+			return new Value("int",(Integer)v1*(Integer)v2);
 		}
 		throw new EvalError("Cannot multiply " + v1 + " and " + v2);
 	}
 
-	public static Integer evalDiv(ArrayList<Object> exp, Frame env) {
-		Object v1 = meval(exp.get(1),env);
-		Object v2 = meval(exp.get(2),env);
+	public static Value evalDiv(ArrayList<Object> exp, Frame env) {
+		Object v1 = ((Value) meval(exp.get(1),env)).getData();
+		Object v2 = ((Value) meval(exp.get(2),env)).getData();
 		if (v1 instanceof Integer && v2 instanceof Integer) {
-			return (Integer)v1/(Integer)v2;
+			return new Value("int",(Integer)v1/(Integer)v2);
 		}
 		throw new EvalError("Cannot divide " + v1 + " into " + v2);
 	}
 
-	public static Boolean evalLessThan(ArrayList<Object> exp, Frame env) {
+	public static Value evalLessThan(ArrayList<Object> exp, Frame env) {
 		// Evaluate the two expressions we'll be comparing
-		Object v1 = meval(exp.get(1),env);
-		Object v2 = meval(exp.get(2),env);
+		Object v1 = ((Value) meval(exp.get(1),env)).getData();
+		Object v2 = ((Value) meval(exp.get(2),env)).getData();
 
 		// Check that both values are indeed integers
 		if (v1 instanceof Integer && v2 instanceof Integer) {
 
 			// Perform the actual calculation
-			return (Integer)v1<(Integer)v2;
+			return new Value("boolean",(Integer)v1<(Integer)v2);
 		}
 
 		// Throw an error if we try to compare non-Integers
 		throw new EvalError("Cannot compare with <: " + v1 + " and " + v2);
 	}
 
-	public static Boolean evalGreaterThan(ArrayList<Object> exp, Frame env) {
-		Object v1 = meval(exp.get(1),env);
-		Object v2 = meval(exp.get(2),env);
+	public static Value evalGreaterThan(ArrayList<Object> exp, Frame env) {
+		Object v1 = ((Value) meval(exp.get(1),env)).getData();
+		Object v2 = ((Value) meval(exp.get(2),env)).getData();
 		if (v1 instanceof Integer && v2 instanceof Integer) {
-			return (Integer)v1>(Integer)v2;
+			return new Value("boolean",(Integer)v1>(Integer)v2);
 		}
 		throw new EvalError("Cannot compare with >: " + v1 + " and " + v2);
 	}
 
-	public static Boolean evalLessThanEqual(ArrayList<Object> exp, Frame env) {
-		Object v1 = meval(exp.get(1),env);
-		Object v2 = meval(exp.get(2),env);
+	public static Value evalLessThanEqual(ArrayList<Object> exp, Frame env) {
+		Object v1 = ((Value) meval(exp.get(1),env)).getData();
+		Object v2 = ((Value) meval(exp.get(2),env)).getData();
 		if (v1 instanceof Integer && v2 instanceof Integer) {
-			return (Integer)v1<=(Integer)v2;
+			return new Value("boolean",(Integer)v1<=(Integer)v2);
 		}
 		throw new EvalError("Cannot compare with <=: " + v1 + " and " + v2);
 	}
 
-	public static Boolean evalGreaterThanEqual(ArrayList<Object> exp, Frame env) {
-		Object v1 = meval(exp.get(1),env);
-		Object v2 = meval(exp.get(2),env);
+	public static Value evalGreaterThanEqual(ArrayList<Object> exp, Frame env) {
+		Object v1 = ((Value) meval(exp.get(1),env)).getData();
+		Object v2 = ((Value) meval(exp.get(2),env)).getData();
 		if (v1 instanceof Integer && v2 instanceof Integer) {
-			return (Integer)v1>=(Integer)v2;
+			return new Value("boolean",(Integer)v1>=(Integer)v2);
 		}
 		throw new EvalError("Cannot compare with >=: " + v1 + " and " + v2);
 	}
 
-	public static Boolean evalEquals(ArrayList<Object> exp, Frame env) {
-		Object v1 = meval(exp.get(1),env);
-		Object v2 = meval(exp.get(2),env);
+	public static Value evalEquals(ArrayList<Object> exp, Frame env) {
+		Object v1 = ((Value) meval(exp.get(1),env)).getData();
+		Object v2 = ((Value) meval(exp.get(2),env)).getData();
 		if (v1 instanceof Integer && v2 instanceof Integer) {
-			return (Integer)v1==(Integer)v2;
+			return new Value("boolean",(Integer)v1==(Integer)v2);
 		}
 		else if (v1 instanceof Boolean && v2 instanceof Boolean) {
-			return (Boolean)v1==(Boolean)v2;
+			return new Value("boolean",(Boolean)v1==(Boolean)v2);
 		}
 		throw new EvalError("Cannot check equality of " + v1 + " to " + v2);
 	}
 
-	public static Boolean evalNotEquals(ArrayList<Object> exp, Frame env) {
-		Object v1 = meval(exp.get(1),env);
-		Object v2 = meval(exp.get(2),env);
+	public static Value evalNotEquals(ArrayList<Object> exp, Frame env) {
+		Object v1 = ((Value) meval(exp.get(1),env)).getData();
+		Object v2 = ((Value) meval(exp.get(2),env)).getData();
 		if (v1 instanceof Integer && v2 instanceof Integer) {
-			return (Integer)v1!=(Integer)v2;
+			return new Value("boolean",(Integer)v1!=(Integer)v2);
 		}
 		else if (v1 instanceof Boolean && v2 instanceof Boolean) {
-			return (Boolean)v1!=(Boolean)v2;
+			return new Value("boolean",(Boolean)v1!=(Boolean)v2);
 		}
 		throw new EvalError("Cannot check non-equality of " + v1 + " to " + v2);
 	}
 
-	public static Boolean evalAnd(ArrayList<Object> exp, Frame env) {
-		Object v1 = meval(exp.get(1),env);
-		Object v2 = meval(exp.get(2),env);
+	public static Value evalAnd(ArrayList<Object> exp, Frame env) {
+		Object v1 = ((Value) meval(exp.get(1),env)).getData();
+		Object v2 = ((Value) meval(exp.get(2),env)).getData();
 		if (v1 instanceof Boolean && v2 instanceof Boolean) {
 			if ((Boolean)v1) {
-				return (Boolean)v2;
+				return new Value("boolean",(Boolean)v2);
 			}
 			else {
-				return (Boolean)v1;
+				return new Value("boolean",(Boolean)v1);
 			}
 		}
 		throw new EvalError("Cannot compare with AND: " + v1 + " and " + v2);
 	}
 
-	public static Boolean evalOr(ArrayList<Object> exp, Frame env) {
-		Object v1 = meval(exp.get(1),env);
-		Object v2 = meval(exp.get(2),env);
+	public static Value evalOr(ArrayList<Object> exp, Frame env) {
+		Object v1 = ((Value) meval(exp.get(1),env)).getData();
+		Object v2 = ((Value) meval(exp.get(2),env)).getData();
 		if (v1 instanceof Boolean && v2 instanceof Boolean) {
 			if ((Boolean)v1) {
-				return (Boolean)v1;
+				return new Value("boolean",(Boolean)v1);
 			}
 			else {
-				return (Boolean)v2;
+				return new Value("boolean",(Boolean)v2);
 			}
 		}
 		throw new EvalError("Cannot compare with OR: " + v1 + " and " + v2);

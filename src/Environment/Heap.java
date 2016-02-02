@@ -11,6 +11,10 @@ public class Heap {
 	}
 
 	public void addPair(Pair pair) {
-		heap.add(pair);
+		heap.addElement(pair);
+	}
+
+	public int indexOf(Pair newcells) {
+		return heap.indexOf(newcells);
 	}
 }

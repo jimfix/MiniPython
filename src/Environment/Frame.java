@@ -1,7 +1,7 @@
 package Environment;
 import java.util.HashMap;
 
-import Runtime.EvalError;
+import Errors.EvalError;
 
 // Environment objects are used to represent different
 // program environments used throughout our Python program.

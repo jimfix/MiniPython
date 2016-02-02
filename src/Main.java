@@ -1,4 +1,4 @@
-package Runtime;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -10,8 +10,6 @@ import Interpreter.Parser;
 import Interpreter.Tokenizer;
 
 public class Main {
-	
-	Heap heap = new Heap();
 	
 	public static void main(String args[]) throws Exception {
 		System.out.print("Input the name of the file you wish to load: ");

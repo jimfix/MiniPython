@@ -1,4 +1,4 @@
-package Runtime;
+package Errors;
 
 @SuppressWarnings("serial")
 public class EvalError extends Error {
