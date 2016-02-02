@@ -17,4 +17,13 @@ public class Heap {
 	public int indexOf(Pair newcells) {
 		return heap.indexOf(newcells);
 	}
+	
+	public Pair get(int index) {
+		return heap.get(index);
+	}
+	
+	public String print(int index) {
+		Pair result = heap.get(index);
+		return "(" + result.getLeft().getData() + "," + result.getRight().getData() + ")";
+	}
 }

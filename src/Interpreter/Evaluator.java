@@ -36,37 +36,44 @@ public class Evaluator {
 
 			// Function Definitions
 			if (operation.equals("def")) {
-				return evalDef(exp,env); 
+				System.out.println("Running " + operation + " with " + exp + " ...");
+				return evalDef(exp,env);
 			}
 
 			// If Statements
-			if (operation.equals("if")) {				
+			if (operation.equals("if")) {
+				System.out.println("Running " + operation + " with " + exp + " ...");
 				return evalIf(exp,env);
 			}
 
 			// Return Statements
 			else if (operation.equals("return")) {
 				// Return is straightforward so it doesn't get its own method
+				System.out.println("Running " + operation + " with " + exp + " ...");
 				return meval(exp.get(1),env);
 			}
 
 			// Variable Assignment
 			else if (operation.equals("assign")) {
+				System.out.println("Running " + operation + " with " + exp + " ...");
 				return evalAssign(exp,env);
 			}
 
 			// Print Statements
 			else if (operation.equals("print")) {
+				System.out.println("Running " + operation + " with " + exp + " ...");
 				return evalPrint(exp,env);
 			}
 
 			// While Loops
-			else if (operation.equals("while")) {				
+			else if (operation.equals("while")) {
+				System.out.println("Running " + operation + " with " + exp + " ...");
 				return evalWhile(exp,env);
 			}
 
 			// Function Calls (Statement version)
 			else if (operation.equals("callS")) {
+				System.out.println("Running " + operation + " with " + exp + " ...");
 				evalCall(exp,env);
 				// Function calls as statements cannot return a value or
 				// this will be confused with the return value
@@ -78,80 +85,96 @@ public class Evaluator {
 				// Special keyword 'pair' gets us to the
 				// constructor eval function
 				if (exp.get(1).equals("pair")) {
+					System.out.println("Running conscell with " + exp + "...");
 					return evalConscell(exp,env);
 				}
 				else {
+					System.out.println("Running " + operation + " with " + exp + " ...");
 					return evalCall(exp,env);
 				}
 			}
 
 			// Equality (for ints & booleans)
 			else if (operation.equals("==")) {
+				System.out.println("Running " + operation + " with " + exp + " ...");
 				return evalEquals(exp,env);
 			}
 
 			// Non-Equality (for ints & booleans)
 			else if (operation.equals("!=")) {
+				System.out.println("Running " + operation + " with " + exp + " ...");
 				return evalNotEquals(exp,env);
 			}
 
 			// Or Comparison
 			else if (operation.equals("||")) {
+				System.out.println("Running " + operation + " with " + exp + " ...");
 				return evalOr(exp,env);
 			}
 
 			// And Comparison
 			else if (operation.equals("&&")) {
+				System.out.println("Running " + operation + " with " + exp + " ...");
 				return evalAnd(exp,env);
 			}
 
 			// Addition
 			else if (operation.equals("+")) {
+				System.out.println("Running " + operation + " with " + exp + " ...");
 				return evalAdd(exp,env);
 			}
 
 			// Subtraction
 			else if (operation.equals("-")) {
+				System.out.println("Running " + operation + " with " + exp + " ...");
 				return evalSub(exp,env);
 			}
 
 			// Multiplication
 			else if (operation.equals("*")) {
+				System.out.println("Running " + operation + " with " + exp + " ...");
 				return evalMult(exp,env);
 			}
 
 			// Division
 			else if (operation.equals("/")) {
+				System.out.println("Running " + operation + " with " + exp + " ...");
 				return evalDiv(exp,env);
 			}
 
 			// Greater Than
 			else if (operation.equals(">")) {
+				System.out.println("Running " + operation + " with " + exp + " ...");
 				return evalGreaterThan(exp, env);
 			}
 
 			// Less Than
 			else if (operation.equals("<")) {
+				System.out.println("Running " + operation + " with " + exp + " ...");
 				return evalLessThan(exp, env);
 			}
 
 			// Less Than Equal
 			else if (operation.equals("<=")) {
+				System.out.println("Running " + operation + " with " + exp + " ...");
 				return evalLessThanEqual(exp, env);
 			}
 
 			// Greater Than Equal
 			else if (operation.equals(">=")) {
+				System.out.println("Running " + operation + " with " + exp + " ...");
 				return evalGreaterThanEqual(exp, env);
 			}
 
 			// Field selector (left/right)
 			else if (operation.equals("field")) {
+				System.out.println("Running " + operation + " with " + exp + " ...");
 				return evalField(exp,env);
 			}
 		}
 
 		else {
+			System.out.println("Running primitive with " + expr + " ...");
 			return evalPrimitive(expr,env);	
 		}
 
@@ -193,6 +216,7 @@ public class Evaluator {
 		Pair newcells = new Pair(lv,rv);
 		heap.addPair(newcells);
 		int index = heap.indexOf(newcells);
+		System.out.println("Conscell created at index " + index + " with pair " + heap.print(index));
 		return new Value("pair",index);
 	}
 
@@ -205,7 +229,7 @@ public class Evaluator {
 		if (!val.getTag().equals("pair")) {
 			throw new EvalError("Expected a pair data value for this variable!");
 		}
-		Pair pair = (Pair)val.getData();
+		Pair pair = heap.get((int) val.getData());
 		Value fielder;
 		if (exp.get(2).equals("left")) {
 			fielder = pair.getLeft();
@@ -265,14 +289,26 @@ public class Evaluator {
 	// Evaluate variable assignments (i.e. things like x = x + 1)
 	public static Object evalAssign(ArrayList<Object> exp, Frame env) {
 
-		// First let's get the name of the variable
-		String id = (String)exp.get(1);
-
-		// Now evaluate the expression for the new value of the variable 
 		Value res = (Value)meval(exp.get(2),env);
 
-		// Add the variable and its value to the current environment
-		env.addVariable(id, res);
+		if (exp.get(1) instanceof ArrayList<?> && ((ArrayList<?>) exp.get(1)).get(0).equals("field")) {
+			ArrayList<Object> id = (ArrayList<Object>) exp.get(1);
+			Value parent = (Value) env.lookupVariable((String) id.get(1));
+			Pair parent_data = (Pair) heap.get((int)parent.getData());
+			String side = (String) id.get(2);
+			if (side.equals("left")) {
+				parent_data.setLeft(res);
+			}
+			else if (side.equals("right")) {
+				parent_data.setRight(res);
+			}
+		}
+
+		else {
+
+			String id = (String) exp.get(1);
+			env.addVariable(id, res);
+		}
 
 		// Assignments do not have a return value
 		return null;
@@ -293,10 +329,28 @@ public class Evaluator {
 					System.out.println("False");
 				}
 			}
-			else if (val.getData() instanceof Pair) {
-				Value left = ((Pair) val.getData()).getLeft();
-				Value right = ((Pair) val.getData()).getRight();
-				System.out.println("(" + left + ", " + right + ")");
+			else if (val.getTag().equals("pair")) {
+
+				//				Object left = null;
+				//				Boolean cond = true;
+				//				while (cond) {
+				//					left = (heap.get((int) val.getData()).getLeft());
+				//					if (((Value) left).getTag().equals("int") || ((Value) left).getTag().equals("string") || ((Value) left).getTag().equals("boolean")) {
+				//						cond = false;
+				//					}
+				//				}
+				//				Object right = null;
+				//				cond = true;
+				//				while (cond) {
+				//					right = (heap.get((int) val.getData()).getRight());
+				//					if (((Value) left).getTag().equals("int") || ((Value) left).getTag().equals("string") || ((Value) left).getTag().equals("boolean")) {
+				//						cond = false;
+				//					}
+				//				}
+
+				Value left = (heap.get((int) val.getData()).getLeft());
+				Value right = (heap.get((int) val.getData()).getRight());
+				System.out.println("(" + left.getData() + ", " + right.getData() + ")");
 			}
 			else {
 				System.out.println(val.getData());

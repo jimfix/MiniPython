@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import Environment.Frame;
-import Environment.Heap;
 import Interpreter.Evaluator;
 import Interpreter.Parser;
 import Interpreter.Tokenizer;
