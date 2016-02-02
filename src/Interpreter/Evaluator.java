@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import Environment.Frame;
 import Environment.Heap;
 import Environment.Pair;
+import Environment.Procedure;
 import Environment.Value;
 import Errors.EvalError;
 
@@ -33,10 +34,10 @@ public class Evaluator {
 			// Call the appropriate "eval" method based on
 			// the first element of the list
 
-			//			// Function Definitions
-			//			if (operation.equals("def")) {
-			//				return evalDef(exp,env); 
-			//			}
+			// Function Definitions
+			if (operation.equals("def")) {
+				return evalDef(exp,env); 
+			}
 
 			// If Statements
 			if (operation.equals("if")) {				
@@ -64,13 +65,13 @@ public class Evaluator {
 				return evalWhile(exp,env);
 			}
 
-			//			// Function Calls (Statement version)
-			//			else if (operation.equals("callS")) {
-			//				evalCall(exp,env);
-			//				// Function calls as statements cannot return a value or
-			//				// this will be confused with the return value
-			//				return null;
-			//			}
+			// Function Calls (Statement version)
+			else if (operation.equals("callS")) {
+				evalCall(exp,env);
+				// Function calls as statements cannot return a value or
+				// this will be confused with the return value
+				return null;
+			}
 
 			// Function calls (Expression version)
 			else if (operation.equals("callE")) {
@@ -80,8 +81,7 @@ public class Evaluator {
 					return evalConscell(exp,env);
 				}
 				else {
-					//					return evalCall(exp,env);
-					return null;
+					return evalCall(exp,env);
 				}
 			}
 
@@ -158,30 +158,30 @@ public class Evaluator {
 		return null;
 	}
 
-	//		// Evaluating Procedure Definitions: Note that this code
-	//		// does not actually run the procedure, but rather saves
-	//		// its code for later in the current Environment.  This makes
-	//		// sense, as we don't run functions when we define them,
-	//		// we run them by calling the functions elsewhere.
-	//	
-	//		public static Object evalDef(ArrayList<Object> exp, Frame env) {
-	//	
-	//			// Create a new Procedure Object to store
-	//			// all of our procedure information. In particular:
-	//			// 1) The procedure's arguments
-	//			// 2) The procedure's code
-	//			// 3) The environment to run the procedure in  
-	//			//	  (This is the same as the environment the 
-	//			//     function is defined in)	
-	//	
-	//			Procedure newProc = new Procedure((ArrayList<String>) exp.get(2), (ArrayList<Object>) exp.get(3),env);
-	//	
-	//			// Store the new Procedure object in the Environment
-	//			// using the procedure's name as the key
-	//	
-	//			env.addVariable((String)exp.get(1),newProc);
-	//			return null;
-	//		}
+	// Evaluating Procedure Definitions: Note that this code
+	// does not actually run the procedure, but rather saves
+	// its code for later in the current Environment.  This makes
+	// sense, as we don't run functions when we define them,
+	// we run them by calling the functions elsewhere.
+
+	public static Object evalDef(ArrayList<Object> exp, Frame env) {
+
+		// Create a new Procedure Object to store
+		// all of our procedure information. In particular:
+		// 1) The procedure's arguments
+		// 2) The procedure's code
+		// 3) The environment to run the procedure in  
+		//	  (This is the same as the environment the 
+		//     function is defined in)	
+
+		Procedure newProc = new Procedure((ArrayList<String>) exp.get(2), (ArrayList<Object>) exp.get(3),env);
+
+		// Store the new Procedure object in the Environment
+		// using the procedure's name as the key
+
+		env.addVariable((String)exp.get(1),new Value("def",newProc));
+		return null;
+	}
 
 	// Evaluating a Constructed Cell: Uses a custom Pair class that has
 	// a left and right value stored.
@@ -325,42 +325,43 @@ public class Evaluator {
 		return null;
 	}
 
-	//	// Evaluating Function Calls
-	//	public static Object evalCall(ArrayList<Object> exp, Frame env) {		
-	//
-	//		// First, we need to get the appropriate procedure out 
-	//		// of the environment
-	//		Procedure proc = ((Procedure)env.lookupVariable((String) exp.get(1)));
-	//
-	//		// Get the arguments passed to the function
-	//		ArrayList<Object> args = (ArrayList<Object>) exp.get(2);
-	//
-	//		// Get the arguments the function expects
-	//		ArrayList<String> fargs = proc.args;
-	//
-	//		// Make a new environment in which we'll run the procedure.  
-	//		// Its parent should be the current environment.
-	//		Frame new_env = new Frame(proc.env);
-	//
-	//		// There should be just as many arguments in the function 
-	//		// call as the function expects
-	//		if (args.size() != fargs.size()) {
-	//			throw new EvalError("Function expected " + fargs.size() + " arguments, got " + args.size());
-	//		}
-	//
-	//		// Loop through each of the arguments. We first evaluate
-	//		// each argument, then we add that value to the Procedure's
-	//		// environment under the appropriate name.  For example, if
-	//		// we had a function f(x) and we called f(1+2), we would evaluate
-	//		// 1+2, then set x to 3 in f's environment
-	//		for (int i=0;i<args.size();i++) {
-	//			new_env.addVariable(fargs.get(i), (Value)meval(args.get(i),env));					
-	//		}
-	//
-	//		// Now we're ready to run the procedure. Note that we run
-	//		// the procedure in its own new environment
-	//		return evalSequence(proc.body,new_env);
-	//	}
+	// Evaluating Function Calls
+	public static Object evalCall(ArrayList<Object> exp, Frame env) {		
+
+		// First, we need to get the appropriate procedure out 
+		// of the environment
+		Value defn = (Value)env.lookupVariable((String) exp.get(1));
+		Procedure proc = (Procedure)defn.getData();
+
+		// Get the arguments passed to the function
+		ArrayList<Object> args = (ArrayList<Object>) exp.get(2);
+
+		// Get the arguments the function expects
+		ArrayList<String> fargs = proc.args;
+
+		// Make a new environment in which we'll run the procedure.  
+		// Its parent should be the current environment.
+		Frame new_env = new Frame(proc.env);
+
+		// There should be just as many arguments in the function 
+		// call as the function expects
+		if (args.size() != fargs.size()) {
+			throw new EvalError("Function expected " + fargs.size() + " arguments, got " + args.size());
+		}
+
+		// Loop through each of the arguments. We first evaluate
+		// each argument, then we add that value to the Procedure's
+		// environment under the appropriate name.  For example, if
+		// we had a function f(x) and we called f(1+2), we would evaluate
+		// 1+2, then set x to 3 in f's environment
+		for (int i=0;i<args.size();i++) {
+			new_env.addVariable(fargs.get(i), (Value)meval(args.get(i),env));					
+		}
+
+		// Now we're ready to run the procedure. Note that we run
+		// the procedure in its own new environment
+		return evalSequence(proc.body,new_env);
+	}
 
 	// Evaluating primitives, which are either numbers or variable names
 
