@@ -272,15 +272,15 @@ public class Evaluator {
 
 	public static Object evalWhile(ArrayList<Object> exp, Frame env) {
 
-		Object cond = meval(exp.get(1),env);
+		Value cond = (Value)meval(exp.get(1),env);
 
-		if (!(cond instanceof Boolean)) {
+		if (!cond.getTag().equals("boolean")) {
 			throw new EvalError("Expected a boolean for the condition of the while statement");
 		}
 
-		while ((Boolean) cond) {
+		while ((Boolean) cond.getData()) {
 			evalSequence(exp.get(2),env);
-			cond = meval(exp.get(1),env);
+			cond = (Value)meval(exp.get(1),env);
 		}
 
 		// Return nothing when it stops being satisfied
@@ -385,8 +385,13 @@ public class Evaluator {
 
 		// First, we need to get the appropriate procedure out 
 		// of the environment
-		Value defn = (Value)env.lookupVariable((String) exp.get(1));
-		Procedure proc = (Procedure)defn.getData();
+		Value fn = (Value)meval(exp.get(1),env);
+
+		if (!fn.getTag().equals("def")) {
+			throw new EvalError("Function value expected but "+fn.getTag()+ " applied.");
+		}
+
+		Procedure proc = (Procedure)fn.getData();
 
 		// Get the arguments passed to the function
 		ArrayList<Object> args = (ArrayList<Object>) exp.get(2);

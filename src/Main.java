@@ -11,11 +11,16 @@ import Interpreter.Tokenizer;
 public class Main {
 	
 	public static void main(String args[]) throws Exception {
-		System.out.print("Input the name of the file you wish to load: ");
-		Scanner scan = new Scanner(System.in);
-		String myProgram = scan.next();
-		scan.close();
-		myProgram = loadFile(myProgram);
+		String mySource = "hello.py"; 
+		if (args.length == 0) {
+			System.out.print("Input the name of the file you wish to load: ");
+			Scanner scan = new Scanner(System.in);
+			mySource = scan.next();
+			scan.close();
+		} else {
+			mySource = args[0];
+		}
+		String myProgram = loadFile(mySource);
 		System.out.println();
 		System.out.println("So here's the program I read:");
 		System.out.println("---------------------");
